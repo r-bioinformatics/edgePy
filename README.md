@@ -11,3 +11,6 @@ edgePy uses a general outline of importing data counts data from genomics analys
 Input should be given in a tab-delimited matrix of GeneID, SampleID, and counts.
 
 Sample data can be found in the data folder, which was derived from data on the NCBI Gene Expression Ombnibus (https://www.ncbi.nlm.nih.gov/geo/)
+
+## To-do list
+
