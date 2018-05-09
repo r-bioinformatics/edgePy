@@ -4,7 +4,7 @@ edgePy is a python-based implementation of edgeR for differential expression ana
 
 ## Outline
 
-edgePy uses a general outline of importing data counts data from genomics analyses, normalizaiton with respect to conditions, generalized linear models, and visualization.
+edgePy uses a general outline of importing data counts data from genomics analyses, normalization with respect to conditions, generalized linear models, and visualization.
 
 ## Input
 
