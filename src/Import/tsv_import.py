@@ -27,7 +27,7 @@ class Importer(object):
         with open_function(self.filename) as f:
             for line in f:
                 if decode_required:
-                    line = line.decode('utf-8')
+                    line = line.decode('utf-8')  # this is needed if we are using gzip, which returns a binary-string.
                 line = line.strip()
                 if not header_read:
                     self.headers = line.split("\t")
