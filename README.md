@@ -10,8 +10,3 @@ edgePy uses a general outline of importing data counts data from genomics analys
 
 Input should be given in a tab-delimited matrix of GeneID, SampleID, and counts.
 
-Sample matrix:
-GeneID SampleID counts
-1 2 10
-2 3 20
-
