@@ -1,20 +1,15 @@
 # edgePy
 
-edgePy is a python-based implementation of edgeR for differential expression analysis. It has advantages over edgeR in that in uses unit tests and performs faster. edgePy maintains the functionality of edgeR in that it performs differential expression analysis of RNA-Seq expression profiels with biological replication. The statistical methods for negative binomial distributions include empirical Bayes estimations, exact tests, generalized linear models, and quasi-likelihood tests. 
+[![Build Status](https://travis-ci.org/r-bioinformatics/edgePy.svg?branch=master)](https://travis-ci.org/r-bioinformatics/edgePy)
+[![codecov](https://codecov.io/gh/r-bioinformatics/edgePy/branch/master/graph/badge.svg)](https://codecov.io/gh/r-bioinformatics/edgePy)
+[![PyPI Version](https://badge.fury.io/py/edgePy.svg)](https://pypi.org/project/edgePy)
+[![GitHub License](https://img.shields.io/github/license/r-bioinformatics/edgePy.svg)](https://github.com/r-bioinformatics/edgePy/blob/master/LICENSE)
 
-## Outline
+The `edgePy` library will become an implementation of [`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html) for differential expression analysis in the Python language.
+This library will have advantages over [`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html) in that it will be well-tested and will run faster by utilizing Cythonized routines.
+`edgePy` will maintain the functionality of [`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html) in that it's primary goals are differential expression analysis of RNA-Seq expression profiles with biological replication.
+The statistical methods for negative binomial distributions will include empirical Bayes estimations, exact tests, generalized linear models, and quasi-likelihood tests. 
 
-edgePy uses a general outline of importing data counts data from genomics analyses, normalization with respect to conditions, generalized linear models, and visualization.
+## Project Aims
 
-## Input
-
-Input should be given in a tab-delimited matrix of GeneID, SampleID, and counts.
-
-Sample data can be found in the data folder, which was derived from data on the NCBI Gene Expression Ombnibus (https://www.ncbi.nlm.nih.gov/geo/)
-
-## To-do list
-
-There is a list of Bioconductor libraries here: http://bioconductor.org/packages/3.6/bioc/ The libraries will need to be written in python.
-
-limma and edgeR need to be ported. The dependency graphs for those libraries should be used as well. 
-
+The `edgePy` library will be used for data import, normalization with respect to conditions, application of generalized linear models, and visualization.

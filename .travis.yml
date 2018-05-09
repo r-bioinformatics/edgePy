@@ -1,0 +1,29 @@
+sudo: false
+
+language: python
+
+python:
+  - 3.6
+  - 3.7-dev
+  - nightly
+
+install:
+  - pip install '.[ci]'
+
+script:
+  - |
+    nosetests \
+      --verbosity=2 \
+      --ignore-files '^\.'\
+      --ignore-files '^setup\.py$' \
+      --with-doctest \
+      --with-coverage \
+      --cover-package=edgePy \
+      --cover-xml \
+      --where .
+
+after_success:
+  - codecov
+
+notifications:
+  email: false
