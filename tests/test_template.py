@@ -12,6 +12,3 @@ class TestImport(unittest.TestCase):
 
         self.assertEqual(10, len(import_module.headers))
         self.assertEqual(21716, len(import_module.data))
-
-
-
