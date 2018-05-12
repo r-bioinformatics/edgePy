@@ -16,8 +16,9 @@ class Importer(object):
 
     def __init__(self, filename=None):
         self.filename = str(filename) if filename else None
-        self.data = []
-        self.headers = None
+        self.raw_data = []
+        self.data = {}
+        self.samples = None
 
         self.read_file()
         self.validate()
@@ -40,16 +41,23 @@ class Importer(object):
                     line = line.decode('utf-8')
                 line = line.strip()
                 if not header_read:
-                    self.headers = line.split("\t")
+                    self.samples = line.split("\t")
                     header_read = True
                 else:
-                    self.data.append(line.split("\t"))
+                    self.raw_data.append(line.split("\t"))
 
     def validate(self):
-        columns = len(self.data[1])
-        for row in self.data:
+        columns = len(self.raw_data[1])
+        for row in self.raw_data:
             if len(row) != columns:
                 raise Exception("Inconsistent number of rows")
+
+    def process_data(self):
+        for line in self.raw_data:
+            gene = line[0]
+            self.data[gene] = [float(point) for point in line[1:]]
+
+        self.raw_data.clear()
 
 
 def get_dataset_path(filename: Union[str, Path]) -> Path:
