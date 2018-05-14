@@ -9,7 +9,8 @@ from typing import Union
 __all__ = [
     'GroupImporter',
     'DataImporter',
-    'get_dataset_path'
+    'get_dataset_path',
+    'get_open_function'
 ]
 
 
