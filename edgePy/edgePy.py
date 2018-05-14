@@ -2,13 +2,14 @@
 import sys
 import argparse
 
-from edgePy.io import DataImporter, GroupImporter
+from edgePy.io import DataImporter
+from edgePy.io import GroupImporter
 
 
 def parse_arguments(args):
     parser = argparse.ArgumentParser()
-    parser.add_argument("--count_file", help="name of the file to tweet")
-    parser.add_argument("--groups_file", help="Where to put the combined files")
+    parser.add_argument("--count_file", help="name of the count file")
+    parser.add_argument("--groups_file", help="name of the groups file")
     args = parser.parse_args(args)
 
     return args
