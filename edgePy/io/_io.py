@@ -42,7 +42,9 @@ class GroupImporter(object):
                     # this is needed if we are using gzip, which returns a
                     # binary-string.
                     line = line.decode('utf-8')
-                line = line.split(":")
+                line = line.strip().split(":")
+                if len(line) < 2:
+                    continue
                 group = line[0].strip()
                 samples = [x.strip() for x in line[1].split(",")]
                 self.groups[group] = samples
