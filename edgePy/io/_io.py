@@ -79,16 +79,17 @@ class DataImporter(object):
                     # this is needed if we are using gzip, which returns a
                     # binary-string.
                     line = line.decode('utf-8')
-                line = line.strip()
+                line = line.strip().split("\t")
                 if not header_read:
-                    self.samples = line.split("\t")
-                    self.clean_headers()
+                    self.samples = line
+                    self.samples = self.clean_headers(self.samples)
                     header_read = True
                 else:
-                    self.raw_data.append(line.split("\t"))
+                    self.raw_data.append(line)
 
-    def clean_headers(self):
-        self.samples = [s.replace("\"", "").strip() for s in self.samples]
+    @staticmethod
+    def clean_headers(samples):
+        return [s.replace("\"", "").strip() for s in samples]
 
     def validate(self):
         columns = len(self.raw_data[1])
