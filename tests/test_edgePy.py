@@ -1,6 +1,5 @@
 
-from nose.tools import eq_, assert_raises
-
+from nose.tools import eq_
 from unittest import TestCase
 
 from edgePy.edgePy import parse_arguments

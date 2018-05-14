@@ -45,7 +45,7 @@ class GroupImporter(object):
                     line = line.decode('utf-8')
                 line = line.strip().split(":")
                 if len(line) < 2:
-                    continue
+                    continue  # blank line, or does not have any samples.
                 group = line[0].strip()
                 samples = [x.strip() for x in line[1].split(",")]
                 self.groups[group] = samples
