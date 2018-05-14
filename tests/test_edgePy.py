@@ -5,6 +5,7 @@ from unittest import TestCase
 
 from edgePy.edgePy import parse_arguments
 
+
 class TestEdgePy(TestCase):
     """Unit tests for ``edgePy.io.Importer``"""
 
