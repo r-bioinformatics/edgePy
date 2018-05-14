@@ -7,12 +7,52 @@ from typing import Union
 
 
 __all__ = [
-    'Importer',
+    'GroupImporter',
+    'DataImporter',
     'get_dataset_path'
 ]
 
 
-class Importer(object):
+def get_open_function(filename):
+    decode_required = False
+    if filename.endswith("gz"):
+        open_function = gzip.open
+        decode_required = True
+    else:
+        open_function = open
+
+    return open_function, decode_required
+
+
+class GroupImporter(object):
+
+    def __init__(self, filename=None):
+        self.filename = str(filename) if filename else None
+        if not self.filename:
+            raise Exception("No group filename")
+        self.samples = {}
+        self.groups = {}
+        self.read_file()
+
+    def read_file(self):
+        open_function, decode_required = get_open_function(filename=self.filename)
+        with open_function(self.filename) as f:
+            for line in f:
+                if decode_required:
+                    # this is needed if we are using gzip, which returns a
+                    # binary-string.
+                    line = line.decode('utf-8')
+                line = line.split(":")
+                group = line[0].strip()
+                samples = [x.strip() for x in line[1].split(",")]
+                self.groups[group] = samples
+                for sample in samples:
+                    if sample in self.samples:
+                        raise Exception(f"Duplicate sample detected! {sample}")
+                    self.samples[sample] = group
+
+
+class DataImporter(object):
 
     def __init__(self, filename=None):
         self.filename = str(filename) if filename else None
@@ -24,12 +64,7 @@ class Importer(object):
         self.validate()
 
     def read_file(self):
-        decode_required = False
-        if self.filename.endswith("gz"):
-            open_function = gzip.open
-            decode_required = True
-        else:
-            open_function = open
+        open_function, decode_required = get_open_function(filename=self.filename)
 
         header_read = False
 
@@ -42,9 +77,13 @@ class Importer(object):
                 line = line.strip()
                 if not header_read:
                     self.samples = line.split("\t")
+                    self.clean_headers()
                     header_read = True
                 else:
                     self.raw_data.append(line.split("\t"))
+
+    def clean_headers(self):
+        self.samples = [s.replace("\"", "").strip() for s in self.samples]
 
     def validate(self):
         columns = len(self.raw_data[1])
