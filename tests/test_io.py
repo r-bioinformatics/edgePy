@@ -1,10 +1,26 @@
 import pkgutil
+import gzip
 
 from nose.tools import eq_
 
 from unittest import TestCase
 
-from edgePy.io import DataImporter, GroupImporter, get_dataset_path  # Test import of __all__
+from edgePy.io import DataImporter, GroupImporter, get_dataset_path, get_open_function  # Test import of __all__
+
+
+class TestCommonFunctions(TestCase):
+
+    def test_get_open_function(self):
+
+        file_name = "blah.gz"
+        open_function, decode_required = get_open_function(filename=file_name)
+        eq_(gzip.open, open_function)
+        eq_(True, decode_required)
+
+        file_name = "blah.txt"
+        open_function, decode_required = get_open_function(filename=file_name)
+        eq_(open, open_function)
+        eq_(False, decode_required)
 
 
 class TestImporter(TestCase):
