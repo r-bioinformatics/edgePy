@@ -59,6 +59,8 @@ class DataImporter(object):
 
     def __init__(self, filename=None):
         self.filename = str(filename) if filename else None
+        if not self.filename:
+            raise Exception("No data source filename")
         self.raw_data = []
         self.data = {}
         self.samples = None

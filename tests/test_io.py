@@ -1,7 +1,7 @@
 import pkgutil
 import gzip
 
-from nose.tools import eq_
+from nose.tools import eq_, assert_raises, assert_false, assert_true
 
 from unittest import TestCase
 
@@ -15,12 +15,12 @@ class TestCommonFunctions(TestCase):
         file_name = "blah.gz"
         open_function, decode_required = get_open_function(filename=file_name)
         eq_(gzip.open, open_function)
-        eq_(True, decode_required)
+        assert_true(decode_required)
 
         file_name = "blah.txt"
         open_function, decode_required = get_open_function(filename=file_name)
         eq_(open, open_function)
-        eq_(False, decode_required)
+        assert_false(decode_required)
 
 
 class TestImporter(TestCase):
@@ -37,6 +37,9 @@ class TestImporter(TestCase):
         eq_(10, len(import_module.samples))
         eq_(21716, len(import_module.data))
 
+    def test_failure(self):
+        assert_raises(Exception, DataImporter, None)
+
 
 class TestGroupImporter(TestCase):
 
@@ -52,6 +55,9 @@ class TestGroupImporter(TestCase):
         eq_("Group 1", group_importer.samples['A_5'])
         eq_("Group 2", group_importer.samples['B_2'])
         eq_("Group 2", group_importer.samples['B_4'])
+
+    def test_failure(self):
+        assert_raises(Exception, GroupImporter, None)
 
 
 class TestPackagedData(TestCase):
