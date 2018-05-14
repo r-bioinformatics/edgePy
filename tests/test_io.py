@@ -1,11 +1,17 @@
 import pkgutil
 import gzip
 
-from nose.tools import eq_, assert_raises, assert_false, assert_true
+from nose.tools import eq_
+from nose.tools import assert_raises
+from nose.tools import assert_false
+from nose.tools import assert_true
 
 from unittest import TestCase
 
-from edgePy.io import DataImporter, GroupImporter, get_dataset_path, get_open_function  # Test import of __all__
+from edgePy.io import DataImporter
+from edgePy.io import GroupImporter
+from edgePy.io import get_dataset_path
+from edgePy.io import get_open_function
 
 
 class TestCommonFunctions(TestCase):
