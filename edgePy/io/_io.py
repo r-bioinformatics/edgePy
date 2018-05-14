@@ -27,7 +27,7 @@ def get_open_function(filename):
 
 class GroupImporter(object):
 
-    def __init__(self, filename=None):
+    def __init__(self, filename):
         self.filename = str(filename) if filename else None
         if not self.filename:
             raise Exception("No group filename")
@@ -57,7 +57,7 @@ class GroupImporter(object):
 
 class DataImporter(object):
 
-    def __init__(self, filename=None):
+    def __init__(self, filename):
         self.filename = str(filename) if filename else None
         if not self.filename:
             raise Exception("No data source filename")
