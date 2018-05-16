@@ -1,0 +1,3 @@
+[submodule "libs/edgeR"]
+	path = libs/edgeR
+	url = https://git.bioconductor.org/packages/edgeR
