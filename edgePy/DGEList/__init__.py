@@ -1,1 +1,1 @@
-from DGEList import *
+from .DGEList import *
