@@ -1,1 +1,3 @@
-from edgePy import io, DGEList
+from edgePy import io
+
+from edgePy import DGEList
