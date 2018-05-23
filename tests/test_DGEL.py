@@ -2,12 +2,9 @@ import pkgutil
 
 from nose.tools import eq_
 
-from unittest import TestCase
+from edgePy.io import *
 
-from _io import *
-
-from DGEList import *
-
+from edgePy.DGEList import *
 
 filename = get_dataset_path('GSE49712_HTSeq.txt.gz')
 

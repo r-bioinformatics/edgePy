@@ -1,5 +1,9 @@
 import numpy as np
 
+__all__ = [
+    'DGEList'
+]
+
 class DGEList:
     # ABANDON HOPE ALL YE WHO USE THIS CLASS
     def __init__(
