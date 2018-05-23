@@ -1,10 +1,5 @@
 import numpy as np
 
-__all__ = [
-    'DGEList',
-]
-
-
 class DGEList:
     # ABANDON HOPE ALL YE WHO USE THIS CLASS
     def __init__(
@@ -43,8 +38,4 @@ class DGEList:
 
             self.norm_factors = np.ones(np.shape(counts)[0])
             
-
-    def foo(self):
-
-        pass
 
