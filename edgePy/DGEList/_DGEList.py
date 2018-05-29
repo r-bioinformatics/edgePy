@@ -26,7 +26,8 @@ class DGEList:
 
         else:
 
-            self.counts = counts
+            # Removes rows where counts are all zero
+            self.counts = counts[np.all(counts != 0, axis=1)]
 
 
         # Library size is an array of the sums of each column of counts, same as edgeR
