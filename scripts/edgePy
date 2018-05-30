@@ -1,6 +1,6 @@
-
-import sys
+#!/usr/bin/env python3
 import argparse
+import sys
 
 from edgePy.io import DataImporter
 from edgePy.io import GroupImporter

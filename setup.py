@@ -30,7 +30,9 @@ setup(
     extras_require={
         'ci': ['nose', 'codecov'],
     },
-    scripts=[],
+    scripts=[
+        # "scripts/edgePy",  # TODO: Uncomment to install / test script.
+    ],
     package_dir={'edgePy': 'edgePy'},
     package_data={
         'edgePy': [
