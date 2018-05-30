@@ -15,22 +15,15 @@ __all__ = [
 
 
 def get_open_function(filename):
-    decode_required = False
-    if filename.endswith("gz"):
-        open_function = gzip.open
-        decode_required = True
-    else:
-        open_function = open
-
+    decode_required = filename.endswith("gz")
+    open_function = gzip.open if decode_required else open
     return open_function, decode_required
 
 
 class GroupImporter(object):
 
     def __init__(self, filename):
-        self.filename = str(filename) if filename else None
-        if not self.filename:
-            raise Exception("No group filename")
+        self.filename = str(filename)
         self.samples = {}
         self.groups = {}
         self.read_file()
@@ -60,7 +53,7 @@ class DataImporter(object):
     def __init__(self, filename):
         self.filename = str(filename) if filename else None
         if not self.filename:
-            raise Exception("No data source filename")
+            raise ValueError("No data source filename")
         self.raw_data = []
         self.data = {}
         self.samples = None
