@@ -36,6 +36,7 @@ class TestImporter(TestCase):
         """Tests instantiation of the ``Importer`` class"""
         filename = get_dataset_path('GSE49712_HTSeq.txt.gz')
         import_module = DataImporter(filename)
+
         eq_(10, len(import_module.samples))
         eq_(21716, len(import_module.raw_data))
 
