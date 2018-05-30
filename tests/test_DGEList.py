@@ -12,6 +12,6 @@ class TestDGEList(TestCase):
     def test_init(self):
         """Tests instantiation of the ``DGEList`` class"""
         filename = get_dataset_path('GSE49712_HTSeq.txt.gz')
-        import_module = Importer(filename=filename)
+        import_module = DataImporter(filename=filename)
         counts = DGEList(np.asarray(import_module.raw_data))
         print(counts.counts)
