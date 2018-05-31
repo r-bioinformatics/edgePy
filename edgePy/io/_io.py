@@ -74,7 +74,7 @@ class DataImporter(object):
                     line = line.decode('utf-8')
                 line = line.strip().split("\t")
                 if not header_read:
-                    self.samples = line
+                    _, *self.samples = line
                     self.samples = self.clean_headers(self.samples)
                     header_read = True
                 else:
