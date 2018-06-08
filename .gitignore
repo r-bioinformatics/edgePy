@@ -6,6 +6,9 @@ edgePy/data/*.txt
 # Intellij project files
 .idea
 
+# VS Code project files
+.vscode/
+
 # Concatenated from the following sources on 2018-05-08:
 #
 #   Lang.    URI
