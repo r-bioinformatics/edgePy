@@ -2,9 +2,14 @@ import re
 
 import numpy as np
 
+from typing import Mapping
+
 __all__ = [
     'DGEList'
 ]
+
+
+PRIOR_COUNT = 0.25
 
 
 class DGEList(object):
@@ -42,12 +47,12 @@ class DGEList(object):
 
     def __init__(
         self,
-        counts=None,
-        samples=None,
-        genes=None,
-        norm_factors=None,
-        group=None,
-        to_remove_zeroes=True
+        counts: np.matrix=None,
+        samples: np.array=None,
+        genes: np.array=None,
+        norm_factors: np.array=None,
+        group: np.array=None,
+        to_remove_zeroes: bool=True
     ):
         if counts is None:
             counts = np.matrix(np.zeros(3))
@@ -71,7 +76,7 @@ class DGEList(object):
             yield DGEList._field_strip_re.sub('', field)
 
     @property
-    def counts(self):
+    def counts(self) -> np.matrix:
         """The read counts for the genes in all samples.
 
         Returns
@@ -82,7 +87,7 @@ class DGEList(object):
         return self._counts
 
     @counts.setter
-    def counts(self, counts):
+    def counts(self, counts) -> np.matrix:
         """Validate setting ``DGEList.counts`` for the illegal conditions:
 
             * Negative values
@@ -105,7 +110,7 @@ class DGEList(object):
         self._counts = np.matrix(counts)
 
     @property
-    def samples(self):
+    def samples(self) -> np.array:
         """Array of sample names."""
         return self._samples
 
@@ -117,7 +122,7 @@ class DGEList(object):
         self._samples = samples
 
     @property
-    def genes(self):
+    def genes(self) -> np.array:
         """Array of gene names."""
         return self._genes
 
@@ -129,7 +134,7 @@ class DGEList(object):
         self._genes = genes
 
     @property
-    def library_size(self):
+    def library_size(self) -> np.array:
         """The total read counts per sample.
 
         Returns
@@ -177,7 +182,54 @@ class DGEList(object):
 
         return DGEList(counts=counts, samples=samples, genes=genes)
 
-    def __repr__(self):
+    def cpm(
+        self,
+        log: bool=False,
+        prior_count: float=PRIOR_COUNT
+    ):
+        """Return the DGEList normalized to read counts per million."""
+        raise NotImplementedError
+        self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
+        if log:
+            self.counts[self.counts == 0] = prior_count
+            self.counts = np.log(self.counts)
+        return self
+
+    def rpkm(
+        self,
+        gene_lengths: Mapping,
+        log: bool=False,
+        prior_count: float=PRIOR_COUNT
+    ):
+        """Return the DGEList normalized to reads per kilobase of gene length
+        per million reads.
+
+        """
+        raise NotImplementedError
+
+        # TODO: Implement here
+
+        self = self.cpm(log=log, prior_count=prior_count)
+        return self
+
+    def tpm(
+        self,
+        transcripts: Mapping,
+        log: bool=False,
+        prior_count: float=PRIOR_COUNT
+    ):
+        """Return the DGEList normalized to reads per kilobase of transcript
+        length.
+
+        """
+        raise NotImplementedError
+
+        # TODO: Implement here
+
+        self = self.cpm(log=log, prior_count=prior_count)
+        return self
+
+    def __repr__(self) -> str:
         """Give a pretty non-executeable representation of this object."""
         num_samples = len(self.samples) if self.samples is not None else 0
         num_genes = len(self.genes) if self.genes is not None else 0
