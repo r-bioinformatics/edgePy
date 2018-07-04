@@ -1,28 +1,28 @@
-Functionality
+#Functionality
 
-* OMICs analysis is made easy with R tools such as “edgeR” and “limma” packages. R has serious limitations when applied to large datasets. 
+OMICs analysis is made easy with R tools such as “edgeR” and “limma” packages. R has serious limitations when applied to large datasets. 
 
 The First objective of edgePY is to offer an alternative free tool for such analysis.
 
-### Functionality
+# Components
 
     Input(1) -> Normalization(2) -> Analysis(3) -> Visualization/Results(4).
 
-#### Input 
+## Input 
  
     Read correctly the file -> Set the groups based on the samples
 
 A data matrix separated by tab. Of genes/proteins in lines and samples/observations in columns. Groups for the main analysis usually are defined there, or assigned to the samples.
 
-#### Normalization
+## Normalization
 
     Quality ->  Library -> (TMM or RLE or upperquartile or none) -> Norm. Matrix
 
-#### Analysis
+## Analysis
 
     Norm. Matrix -> ebayes (Prob. Stats) -> treat Function ( ) -> commonDispersion -> DE genes list 
 
-#### Visualization/Results
+## Visualization/Results
 
     DE genes list -> Heatmap / Volcano plot / Dispersion / Statistics / pvalue 
 
