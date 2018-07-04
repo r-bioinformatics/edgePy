@@ -1,4 +1,4 @@
-#Functionality
+# Functionality
 
 OMICs analysis is made easy with R tools such as “edgeR” and “limma” packages. R has serious limitations when applied to large datasets. 
 
