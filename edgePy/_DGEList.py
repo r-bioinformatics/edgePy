@@ -2,7 +2,7 @@ import re
 
 import numpy as np
 
-from typing import Mapping
+from typing import Generator, Iterable, Mapping, Optional
 
 __all__ = [
     'DGEList'
@@ -16,29 +16,20 @@ class DGEList(object):
     """Class containing read counts over genes for multiple samples and their
     corresponding metadata.
 
-    Parameters
-    ----------
-    counts : np.matrix, optional
-        A two-dimensional array with the dtype of `int`. Columns correspond to
-        samples and row to genes.
-    samples : np.array, optional
-        Array of sample names., same length as ncol(counts).
-    genes : np.array, optional
-        Array of gene names, same length as nrow(counts).
-    norm_factors : np.array, optional
-        Weighting factors for each sample, same length as ncol(counts).
-    group : np.array, optional
-        ...
-    remove_zeroes : bool
-        Whether to remove genes with zero counts for all samples.
+    Args:
+        counts: Columns correspond to samples and row to genes.
+        samples: Array of sample names, same length as ncol(counts).
+        genes: Array of gene names, same length as nrow(counts).
+        norm_factors: Weighting factors for each sample.
+        group: ...
+        remove_zeroes: To remove genes with zero counts for all samples.
 
-    Examples
-    --------
-    >>> import gzip
-    >>> from edgePy.io import get_dataset_path
-    >>> dataset = 'GSE49712_HTSeq.txt.gz'
-    >>> DGEList.read_handle(gzip.open(get_dataset_path(dataset)))
-    DGEList(num_samples=10, num_genes=21,717)
+    Examples:
+        >>> import gzip
+        >>> from edgePy.io import get_dataset_path
+        >>> dataset = 'GSE49712_HTSeq.txt.gz'
+        >>> DGEList.read_handle(gzip.open(get_dataset_path(dataset)))
+        DGEList(num_samples=10, num_genes=21,717)
 
     """
 
@@ -47,12 +38,12 @@ class DGEList(object):
 
     def __init__(
         self,
-        counts: np.matrix=None,
-        samples: np.array=None,
-        genes: np.array=None,
-        norm_factors: np.array=None,
-        group: np.array=None,
-        to_remove_zeroes: bool=True
+        counts: Optional[np.matrix]=None,
+        samples: Optional[np.array]=None,
+        genes: Optional[np.array]=None,
+        norm_factors: Optional[np.array]=None,
+        group: Optional[np.array]=None,
+        to_remove_zeroes: Optional[bool]=True
     ):
         if counts is None:
             counts = np.matrix(np.zeros(3))
@@ -67,7 +58,13 @@ class DGEList(object):
         self.group = group
 
     @staticmethod
-    def _format_fields(fields):
+    def _format_fields(fields: Iterable[str]) -> Generator[str]:
+        """Clean fields in the header of any read data.
+
+        Yields:
+            The next field that has been cleaned.
+
+        """
         for field in fields:
             try:
                 field = field.decode()
@@ -79,9 +76,8 @@ class DGEList(object):
     def counts(self) -> np.matrix:
         """The read counts for the genes in all samples.
 
-        Returns
-        -------
-        counts : np.matrix
+        Returns:
+            counts: Columns correspond to samples and row to genes.
 
         """
         return self._counts
@@ -90,12 +86,13 @@ class DGEList(object):
     def counts(self, counts) -> np.matrix:
         """Validate setting ``DGEList.counts`` for the illegal conditions:
 
+            * Must be of type ``np.ndarray``
             * Negative values
             * Values that are not numbers
+            * No values can be N/A
 
-        Parameters
-        ----------
-        counts : np.matrix
+        Args:
+            counts: Columns correspond to samples and row to genes.
 
         """
         if not isinstance(counts, np.ndarray):
@@ -137,28 +134,22 @@ class DGEList(object):
     def library_size(self) -> np.array:
         """The total read counts per sample.
 
-        Returns
-        -------
-        library_size : np.matrix
+        Returns:
+            library_size: The size of the library.
 
         """
         return np.sum(self.counts, 0)
 
     @classmethod
-    def read_handle(cls, handle, **kwargs):
+    def read_handle(cls, handle, **kwargs: Mapping):
         """Read in a file-like object of delimited data for instantiation.
 
-        Parameters
-        ----------
-        handle : file-like object
-            Any handle supporting text streaming io.
-        kwargs : mappable
-            Additional arguments supported by ``np.genfromtxt``.
+        Args:
+            handle: Any handle supporting text streaming io.
+            kwargs: Additional arguments supported by ``np.genfromtxt``.
 
-        Returns
-        -------
-        DGEList
-            Container for storing read counts for samples from target genes.
+        Returns:
+            DGEList: Container for storing read counts for samples.
 
         """
         # First column is the header for the the gene names.

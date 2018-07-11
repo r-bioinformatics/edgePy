@@ -26,7 +26,7 @@ Always ensure that you have fetched the most recent material into your local clo
 
 1. Strictly adhere to PEP8. Code will not be linted although all reviewers will check for style adherence.
 
-2. Use NumPy style docstrings.
+2. Use [Google Style](http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html) docstrings.
 
 3. Implement doctests.
 
