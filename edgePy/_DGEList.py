@@ -58,7 +58,7 @@ class DGEList(object):
         self.group = group
 
     @staticmethod
-    def _format_fields(fields: Iterable[str]) -> Generator[str]:
+    def _format_fields(fields: Iterable[str]) -> Generator[str, None, None]:
         """Clean fields in the header of any read data.
 
         Yields:
