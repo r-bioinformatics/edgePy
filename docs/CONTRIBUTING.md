@@ -14,7 +14,7 @@ Always ensure that you have fetched the most recent material into your local clo
     - `af_transpose_docs`
 
 2. Commit changes.
-3. Execute and create tests regularly. Use `py.test`.
+3. Execute and create tests regularly. Use `unittest` and `nose`.
 4. Request informal review from peers by pointing them to your branch.
 5. Create a Pull Request against `master` when a formal review is needed.
 6. Optionally, squash commits and reword messages as needed for easier review.
@@ -26,7 +26,7 @@ Always ensure that you have fetched the most recent material into your local clo
 
 1. Strictly adhere to PEP8. Code will not be linted although all reviewers will check for style adherence.
 
-2. Use [Google Style](http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html) docstrings.
+2. Use NumPy style docstrings.
 
 3. Implement doctests.
 
@@ -37,30 +37,28 @@ Always ensure that you have fetched the most recent material into your local clo
 An example function showcasing the above requirements:
 
 ```python
-def get_dataset_path(
-    filename: Union[str, Path],
-    dead_arg: Optional[Any]=None
-) -> Path:
-    """Example function with PEP 484 type annotations.
+def get_dataset_path(filename: Union[str, Path]) -> Path:
+    """Return the filesystem path to the packaged data file.
 
-    Args:
-        filename: The first parameter.
-        dead_arg: The second parameter.
+    Parameters
+    ----------
+    filename : str, pathlib.Path
+        The full name of the packaged data file.
 
-    Returns:
-        The path to the dataset, may not really exist.
+    Return
+    ------
+    path : pathlib.Path
+        The filesystem path to the packaged data file.
 
-    Examples:
-        >>> from module.io import get_dataset_path
-        >>> str(get_dataset_path("GSE49712_HTSeq.txt.gz"))  # doctest:+ELLIPSIS
-        '.../data/GSE49712_HTSeq.txt.gz'
-
-    Notes:
-        1. See ``module.rationalize`` for an equivalent method.
+    Examples
+    --------
+    >>> from edgePy.io import get_dataset_path
+    >>> str(get_dataset_path("GSE49712_HTSeq.txt.gz"))  # doctest:+ELLIPSIS
+    '.../edgePy/data/GSE49712_HTSeq.txt.gz'
 
     """
-    import module
-    directory = Path(module.__file__).expanduser().resolve().parent
+    import edgePy
+    directory = Path(edgePy.__file__).expanduser().resolve().parent
     return directory / 'data' / filename
 ```
 
@@ -76,8 +74,7 @@ Run the tests with the following command:
 
 ```bash
 ❯ cd edgePy
-❯ ./tests/test-runner.sh
-❯ ./tests/mypy.sh
+❯ ./tests/run-tests.sh
 ```
 
 
