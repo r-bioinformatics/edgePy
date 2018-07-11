@@ -1,6 +1,6 @@
 import gzip
 
-from unittest import TestCase
+import pytest
 
 from edgePy import DGEList
 from edgePy.io import *  # Explicitly test the import of __all__
@@ -8,37 +8,29 @@ from edgePy.io import *  # Explicitly test the import of __all__
 TEST_DATASET = 'GSE49712_HTSeq.txt.gz'
 
 
-class TestDGEList(TestCase):
-    """Unit tests for ``edgePy.DGEList``"""
+@pytest.fixture
+def dge_list():
+    with gzip.open(get_dataset_path(TEST_DATASET)) as handle:
+        return DGEList.read_handle(handle)
 
-    @classmethod
-    def setUpClass(self):
-        """Imports a dataset for testing"""
 
-        with gzip.open(get_dataset_path(TEST_DATASET)) as handle:
-            self.dge_fixture = DGEList.read_handle(handle)
+def test_too_much():
+    # TODO: Refactor into smaller units.
+    #    - Test blank non-parameterized `DGEList()`
+    #    - Test opening handles, both gzipped or not
+    #    - Test samples and genes are set, validated, typed right
+    assert len(dge_list().samples) == 10
+    assert len(dge_list().genes) == 21717
 
-    def test_too_much(self):
-        """Test instantiation of the ``DGEList`` class"""
 
-        # TODO: Refactor into smaller units.
-        #    - Test blank non-parameterized `DGEList()`
-        #    - Test opening handles, both gzipped or not
-        #    - Test self.samples and self.genes are set, validated, typed right
-        self.assertEqual(len(self.dge_fixture.samples), 10)
-        self.assertEqual(len(self.dge_fixture.genes), 21717)
+def test_repr():
+    assert dge_list().__repr__() == 'DGEList(num_samples=10, num_genes=21,717)'
 
-    def test_repr(self):
-        """Test ``__repr__()``"""
-        self.assertEqual(
-            self.dge_fixture.__repr__(),
-            'DGEList(num_samples=10, num_genes=21,717)'
-        )
 
-    def test_non_implemented(self):
-        with self.assertRaises(NotImplementedError):
-            self.dge_fixture.cpm()
-        with self.assertRaises(NotImplementedError):
-            self.dge_fixture.rpkm(None)
-        with self.assertRaises(NotImplementedError):
-            self.dge_fixture.tpm(None)
+def test_non_implemented():
+    with pytest.raises(NotImplementedError):
+        dge_list().cpm()
+    with pytest.raises(NotImplementedError):
+        dge_list().rpkm(None)
+    with pytest.raises(NotImplementedError):
+        dge_list().tpm(None)
