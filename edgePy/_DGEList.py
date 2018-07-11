@@ -213,7 +213,7 @@ class DGEList(object):
         transcripts: Mapping,
         log: bool=False,
         prior_count: float=PRIOR_COUNT
-    )-> 'DGEList':
+    ) -> 'DGEList':
         """Return the DGEList normalized to reads per kilobase of transcript
         length.
 
