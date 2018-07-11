@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 this="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
