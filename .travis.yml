@@ -9,6 +9,8 @@ install:
 script:
   - ./tests/test-runner.sh
   - if [[ ${TRAVIS_PYTHON_VERSION} == 3.6 ]]; then ./tests/mypy.sh; fi
+  - ./tests/flake8.sh
+  - ./tests/pylint.sh
 after_success:
   - codecov
 notifications:
