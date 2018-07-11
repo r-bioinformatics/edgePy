@@ -37,28 +37,30 @@ Always ensure that you have fetched the most recent material into your local clo
 An example function showcasing the above requirements:
 
 ```python
-def get_dataset_path(filename: Union[str, Path]) -> Path:
-    """Return the filesystem path to the packaged data file.
+def get_dataset_path(
+    filename: Union[str, Path],
+    dead_arg: Optional[Any]=None
+) -> Path:
+    """Example function with PEP 484 type annotations.
 
-    Parameters
-    ----------
-    filename : str, pathlib.Path
-        The full name of the packaged data file.
+    Args:
+        filename: The first parameter.
+        dead_arg: The second parameter.
 
-    Return
-    ------
-    path : pathlib.Path
-        The filesystem path to the packaged data file.
+    Returns:
+        The path to the dataset, may not really exist.
 
-    Examples
-    --------
-    >>> from edgePy.io import get_dataset_path
-    >>> str(get_dataset_path("GSE49712_HTSeq.txt.gz"))  # doctest:+ELLIPSIS
-    '.../edgePy/data/GSE49712_HTSeq.txt.gz'
+    Examples:
+        >>> from module.io import get_dataset_path
+        >>> str(get_dataset_path("GSE49712_HTSeq.txt.gz"))  # doctest:+ELLIPSIS
+        '.../data/GSE49712_HTSeq.txt.gz'
+
+    Notes:
+        1. See ``module.rationalize`` for an equivalent method.
 
     """
-    import edgePy
-    directory = Path(edgePy.__file__).expanduser().resolve().parent
+    import module
+    directory = Path(module.__file__).expanduser().resolve().parent
     return directory / 'data' / filename
 ```
 
@@ -74,7 +76,7 @@ Run the tests with the following command:
 
 ```bash
 ❯ cd edgePy
-❯ ./tests/run-tests.sh
+❯ ./tests/test-runner.sh
 ```
 
 
