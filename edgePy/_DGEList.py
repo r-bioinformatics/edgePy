@@ -117,7 +117,7 @@ class DGEList(object):
     def samples(self, samples: np.ndarray) -> None:
         # TODO: Validate samples here
         # - Samples same length as ncol(self.counts) if defined
-        samples = np.array(list(DGEList._format_fields(samples)))
+        samples = np.array(list(self._format_fields(samples)))
         self._samples = samples
 
     @property
@@ -129,7 +129,7 @@ class DGEList(object):
     def genes(self, genes: np.ndarray) -> None:
         # TODO: Validate genes here
         # - Genes same length as nrow(self.counts) if defined
-        genes = np.array(list(DGEList._format_fields(genes)))
+        genes = np.array(list(self._format_fields(genes)))
         self._genes = genes
 
     @property
@@ -173,7 +173,7 @@ class DGEList(object):
         # Delete the first column as it is copied on assignment to `genes`.
         counts = np.delete(frame, 0, axis=1)
 
-        return DGEList(counts=counts, samples=samples, genes=genes)
+        return cls(counts=counts, samples=samples, genes=genes)
 
     def cpm(
         self,
