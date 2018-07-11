@@ -2,6 +2,7 @@ import re
 
 from io import StringIO
 
+# TODO: Implement `mypy` stubs for NumPy imports
 import numpy as np  # type: ignore
 
 from typing import Generator, Iterable, Mapping, Optional, Union
