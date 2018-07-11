@@ -34,3 +34,11 @@ class TestDGEList(TestCase):
             self.dge_fixture.__repr__(),
             'DGEList(num_samples=10, num_genes=21,717)'
         )
+
+    def test_non_implemented(self):
+        with self.assertRaises(NotImplementedError):
+            self.dge_fixture.cpm()
+        with self.assertRaises(NotImplementedError):
+            self.dge_fixture.rpkm(None)
+        with self.assertRaises(NotImplementedError):
+            self.dge_fixture.tpm(None)
