@@ -14,7 +14,7 @@ Always ensure that you have fetched the most recent material into your local clo
     - `af_transpose_docs`
 
 2. Commit changes.
-3. Execute and create tests regularly. Use `unittest` and `nose`.
+3. Execute and create tests regularly. Use `py.test`.
 4. Request informal review from peers by pointing them to your branch.
 5. Create a Pull Request against `master` when a formal review is needed.
 6. Optionally, squash commits and reword messages as needed for easier review.
