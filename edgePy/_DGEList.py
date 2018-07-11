@@ -115,10 +115,11 @@ class DGEList(object):
         return self._samples
 
     @samples.setter
-    def samples(self, samples: np.ndarray) -> None:
+    def samples(self, samples: Optional[np.ndarray]) -> None:
         # TODO: Validate samples here
         # - Samples same length as ncol(self.counts) if defined
-        samples = np.array(list(self._format_fields(samples)))
+        if samples is not None:
+            samples = np.array(list(self._format_fields(samples)))
         self._samples = samples
 
     @property
@@ -127,10 +128,11 @@ class DGEList(object):
         return self._genes
 
     @genes.setter
-    def genes(self, genes: np.ndarray) -> None:
+    def genes(self, genes: Optional[np.ndarray]) -> None:
         # TODO: Validate genes here
         # - Genes same length as nrow(self.counts) if defined
-        genes = np.array(list(self._format_fields(genes)))
+        if genes is not None:
+            genes = np.array(list(self._format_fields(genes)))
         self._genes = genes
 
     @property
@@ -183,11 +185,11 @@ class DGEList(object):
     ) -> 'DGEList':
         """Return the DGEList normalized to read counts per million."""
         raise NotImplementedError
-        self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
-        if log:
-            self.counts[self.counts == 0] = prior_count
-            self.counts = np.log(self.counts)
-        return self
+        #self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
+        #if log:
+        #    self.counts[self.counts == 0] = prior_count
+        #    self.counts = np.log(self.counts)
+        #return self
 
     def rpkm(
         self,
@@ -203,7 +205,7 @@ class DGEList(object):
 
         # TODO: Implement here
 
-        self = self.cpm(log=log, prior_count=prior_count)
+        #self = self.cpm(log=log, prior_count=prior_count)
         return self
 
     def tpm(
@@ -220,7 +222,7 @@ class DGEList(object):
 
         # TODO: Implement here
 
-        self = self.cpm(log=log, prior_count=prior_count)
+        #self = self.cpm(log=log, prior_count=prior_count)
         return self
 
     def __repr__(self) -> str:

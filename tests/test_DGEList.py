@@ -14,6 +14,12 @@ def dge_list():
         return DGEList.read_handle(handle)
 
 
+def test_blank_init():
+    dge_list = DGEList(to_remove_zeroes=False)
+    dge_list.counts
+    dge_list.library_size
+
+
 def test_too_much():
     # TODO: Refactor into smaller units.
     #    - Test blank non-parameterized `DGEList()`
