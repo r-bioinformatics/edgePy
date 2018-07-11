@@ -3,7 +3,7 @@
 import gzip
 
 from pathlib import Path
-from typing import Union
+from typing import Any, Callable, List, Mapping, Optional, Tuple, Union
 
 
 __all__ = [
@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-def get_open_function(filename):
+def get_open_function(filename: str) -> Tuple[Any, bool]:
     decode_required = filename.endswith("gz")
     open_function = gzip.open if decode_required else open
     return open_function, decode_required
@@ -22,13 +22,13 @@ def get_open_function(filename):
 
 class GroupImporter(object):
 
-    def __init__(self, filename):
-        self.filename = str(filename)
-        self.samples = {}
-        self.groups = {}
+    def __init__(self, filename: Union[str, Path]) -> None:
+        self.filename: str = str(filename)
+        self.samples: dict = {}
+        self.groups: dict = {}
         self.read_file()
 
-    def read_file(self):
+    def read_file(self) -> None:
         open_function, decode_required = get_open_function(filename=self.filename)
         with open_function(self.filename) as f:
             for line in f:
@@ -50,18 +50,16 @@ class GroupImporter(object):
 
 class DataImporter(object):
 
-    def __init__(self, filename):
-        self.filename = str(filename) if filename else None
-        if not self.filename:
-            raise ValueError("No data source filename")
-        self.raw_data = []
-        self.data = {}
-        self.samples = None
+    def __init__(self, filename: Union[str, Path]) -> None:
+        self.filename: str = str(filename)
+        self.raw_data: List = []
+        self.data: dict = {}
+        self.samples: List = []
 
         self.read_file()
         self.validate()
 
-    def read_file(self):
+    def read_file(self) -> None:
         open_function, decode_required = get_open_function(filename=self.filename)
 
         header_read = False
@@ -81,16 +79,16 @@ class DataImporter(object):
                     self.raw_data.append(line)
 
     @staticmethod
-    def clean_headers(samples):
+    def clean_headers(samples: List[str]) -> List[str]:
         return [s.replace("\"", "").strip() for s in samples]
 
-    def validate(self):
+    def validate(self) -> None:
         columns = len(self.raw_data[1])
         for row in self.raw_data:
             if len(row) != columns:
                 raise Exception("Inconsistent number of rows")
 
-    def process_data(self):
+    def process_data(self) -> None:
         for line in self.raw_data:
             gene = line[0]
             self.data[gene] = [float(point) for point in line[1:]]
