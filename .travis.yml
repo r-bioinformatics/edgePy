@@ -1,29 +1,15 @@
-sudo: false
-
 language: python
-
+cache: pip
 python:
   - 3.6
   - 3.7-dev
   - nightly
-
 install:
   - pip install '.[ci]'
-
 script:
-  - |
-    nosetests \
-      --verbosity=2 \
-      --ignore-files '^\.'\
-      --ignore-files '^setup\.py$' \
-      --with-doctest \
-      --with-coverage \
-      --cover-package=edgePy \
-      --cover-xml \
-      --where .
-
+  - ./tests/test-runner.sh
+  - ./tests/mypy.sh
 after_success:
   - codecov
-
 notifications:
   email: false

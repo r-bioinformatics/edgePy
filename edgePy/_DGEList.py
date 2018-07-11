@@ -1,15 +1,17 @@
 import re
 
-import numpy as np
+from io import StringIO
 
-from typing import Generator, Iterable, Mapping, Optional
+import numpy as np  # type: ignore
+
+from typing import Generator, Iterable, Mapping, Optional, Union
 
 __all__ = [
     'DGEList'
 ]
 
 
-PRIOR_COUNT = 0.25
+PRIOR_COUNT: float = 0.25
 
 
 class DGEList(object):
@@ -44,7 +46,7 @@ class DGEList(object):
         norm_factors: Optional[np.array]=None,
         group: Optional[np.array]=None,
         to_remove_zeroes: Optional[bool]=True
-    ):
+    ) -> None:
         if counts is None:
             counts = np.matrix(np.zeros(3))
         if norm_factors is None:
@@ -58,7 +60,9 @@ class DGEList(object):
         self.group = group
 
     @staticmethod
-    def _format_fields(fields: Iterable[str]) -> Generator[str, None, None]:
+    def _format_fields(
+        fields: Iterable[Union[str, bytes]]
+    ) -> Generator[str, None, None]:
         """Clean fields in the header of any read data.
 
         Yields:
@@ -66,10 +70,8 @@ class DGEList(object):
 
         """
         for field in fields:
-            try:
+            if isinstance(field, bytes):
                 field = field.decode()
-            except AttributeError:
-                pass
             yield DGEList._field_strip_re.sub('', field)
 
     @property
@@ -83,7 +85,7 @@ class DGEList(object):
         return self._counts
 
     @counts.setter
-    def counts(self, counts) -> np.matrix:
+    def counts(self, counts: np.ndarray) -> np.matrix:
         """Validate setting ``DGEList.counts`` for the illegal conditions:
 
             * Must be of type ``np.ndarray``
@@ -112,7 +114,7 @@ class DGEList(object):
         return self._samples
 
     @samples.setter
-    def samples(self, samples):
+    def samples(self, samples: np.ndarray) -> None:
         # TODO: Validate samples here
         # - Samples same length as ncol(self.counts) if defined
         samples = np.array(list(DGEList._format_fields(samples)))
@@ -124,7 +126,7 @@ class DGEList(object):
         return self._genes
 
     @genes.setter
-    def genes(self, genes):
+    def genes(self, genes: np.ndarray) -> None:
         # TODO: Validate genes here
         # - Genes same length as nrow(self.counts) if defined
         genes = np.array(list(DGEList._format_fields(genes)))
@@ -141,7 +143,7 @@ class DGEList(object):
         return np.sum(self.counts, 0)
 
     @classmethod
-    def read_handle(cls, handle, **kwargs: Mapping):
+    def read_handle(cls, handle: StringIO, **kwargs: Mapping) -> 'DGEList':
         """Read in a file-like object of delimited data for instantiation.
 
         Args:
@@ -160,7 +162,7 @@ class DGEList(object):
         frame = np.genfromtxt(
             fname=handle,
             dtype=np.int,
-            converters={0: lambda _: genes.append(_) or 0},
+            converters={0: lambda _: genes.append(_) or 0},  # type: ignore
             autostrip=kwargs.pop('autostrip', True),
             replace_space=kwargs.pop('replace_space', '_'),
             case_sensitive=kwargs.pop('case_sensitive', True),
@@ -177,7 +179,7 @@ class DGEList(object):
         self,
         log: bool=False,
         prior_count: float=PRIOR_COUNT
-    ):
+    ) -> 'DGEList':
         """Return the DGEList normalized to read counts per million."""
         raise NotImplementedError
         self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
@@ -191,7 +193,7 @@ class DGEList(object):
         gene_lengths: Mapping,
         log: bool=False,
         prior_count: float=PRIOR_COUNT
-    ):
+    ) -> 'DGEList':
         """Return the DGEList normalized to reads per kilobase of gene length
         per million reads.
 
@@ -208,7 +210,7 @@ class DGEList(object):
         transcripts: Mapping,
         log: bool=False,
         prior_count: float=PRIOR_COUNT
-    ):
+    )-> 'DGEList':
         """Return the DGEList normalized to reads per kilobase of transcript
         length.
 

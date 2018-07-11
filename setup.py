@@ -28,7 +28,7 @@ setup(
     py_modules=[PACKAGE],
     install_requires=[],
     extras_require={
-        'ci': ['nose', 'codecov'],
+        'ci': ['nose', 'codecov', 'mypy-lang', 'typed_ast'],
     },
     scripts=[
         # "scripts/edgePy",  # TODO: Uncomment to install / test script.
