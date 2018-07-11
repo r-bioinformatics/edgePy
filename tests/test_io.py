@@ -1,17 +1,9 @@
 import pkgutil
 import gzip
 
-from nose.tools import eq_
-from nose.tools import assert_raises
-from nose.tools import assert_false
-from nose.tools import assert_true
-
 from unittest import TestCase
 
-from edgePy.io import DataImporter
-from edgePy.io import GroupImporter
-from edgePy.io import get_dataset_path
-from edgePy.io import get_open_function
+from edgePy.io import *  # A bad habit in practice, this tests `__all__`
 
 
 class TestCommonFunctions(TestCase):
@@ -20,13 +12,13 @@ class TestCommonFunctions(TestCase):
 
         file_name = "blah.gz"
         open_function, decode_required = get_open_function(filename=file_name)
-        eq_(gzip.open, open_function)
-        assert_true(decode_required)
+        self.assertEqual(gzip.open, open_function)
+        self.assertTrue(decode_required)
 
         file_name = "blah.txt"
         open_function, decode_required = get_open_function(filename=file_name)
-        eq_(open, open_function)
-        assert_false(decode_required)
+        self.assertEqual(open, open_function)
+        self.assertFalse(decode_required)
 
 
 class TestImporter(TestCase):
@@ -37,15 +29,15 @@ class TestImporter(TestCase):
         filename = get_dataset_path('GSE49712_HTSeq.txt.gz')
         import_module = DataImporter(filename)
 
-        eq_(10, len(import_module.samples))
-        eq_(21716, len(import_module.raw_data))
+        self.assertEqual(10, len(import_module.samples))
+        self.assertEqual(21716, len(import_module.raw_data))
 
         import_module.process_data()
-        eq_(10, len(import_module.samples))
-        eq_(21716, len(import_module.data))
+        self.assertEqual(10, len(import_module.samples))
+        self.assertEqual(21716, len(import_module.data))
 
     def test_failure(self):
-        assert_raises(Exception, DataImporter, None)
+        self.assertRaises(Exception, DataImporter, None)
 
 
 class TestGroupImporter(TestCase):
@@ -54,17 +46,17 @@ class TestGroupImporter(TestCase):
         filename = get_dataset_path('groups.txt')
         group_importer = GroupImporter(filename)
 
-        eq_(2, len(group_importer.groups))
-        eq_(5, len(group_importer.groups['Group 1']))
-        eq_(5, len(group_importer.groups['Group 2']))
-        eq_("Group 1", group_importer.samples['A_1'])
-        eq_("Group 1", group_importer.samples['A_3'])
-        eq_("Group 1", group_importer.samples['A_5'])
-        eq_("Group 2", group_importer.samples['B_2'])
-        eq_("Group 2", group_importer.samples['B_4'])
+        self.assertEqual(2, len(group_importer.groups))
+        self.assertEqual(5, len(group_importer.groups['Group 1']))
+        self.assertEqual(5, len(group_importer.groups['Group 2']))
+        self.assertEqual("Group 1", group_importer.samples['A_1'])
+        self.assertEqual("Group 1", group_importer.samples['A_3'])
+        self.assertEqual("Group 1", group_importer.samples['A_5'])
+        self.assertEqual("Group 2", group_importer.samples['B_2'])
+        self.assertEqual("Group 2", group_importer.samples['B_4'])
 
     def test_failure(self):
-        assert_raises(Exception, GroupImporter, None)
+        self.assertRaises(Exception, GroupImporter, None)
 
 
 class TestPackagedData(TestCase):
