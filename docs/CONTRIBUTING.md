@@ -77,6 +77,7 @@ Run the tests with the following command:
 ```bash
 ❯ cd edgePy
 ❯ ./tests/test-runner.sh
+❯ ./tests/mypy.sh
 ```
 
 
