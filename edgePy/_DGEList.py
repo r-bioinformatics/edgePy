@@ -1,38 +1,39 @@
 import re
 
-from io import StringIO
-
-# TODO: Implement `mypy` stubs for NumPy imports
-import numpy as np  # type: ignore
-
-from typing import Generator, Iterable, Mapping, Optional, Union
+import numpy as np
 
 __all__ = [
     'DGEList'
 ]
 
 
-PRIOR_COUNT: float = 0.25
-
-
 class DGEList(object):
     """Class containing read counts over genes for multiple samples and their
     corresponding metadata.
 
-    Args:
-        counts: Columns correspond to samples and row to genes.
-        samples: Array of sample names, same length as ncol(counts).
-        genes: Array of gene names, same length as nrow(counts).
-        norm_factors: Weighting factors for each sample.
-        group: ...
-        remove_zeroes: To remove genes with zero counts for all samples.
+    Parameters
+    ----------
+    counts : np.matrix, optional
+        A two-dimensional array with the dtype of `int`. Columns correspond to
+        samples and row to genes.
+    samples : np.array, optional
+        Array of sample names., same length as ncol(counts).
+    genes : np.array, optional
+        Array of gene names, same length as nrow(counts).
+    norm_factors : np.array, optional
+        Weighting factors for each sample, same length as ncol(counts).
+    group : np.array, optional
+        ...
+    remove_zeroes : bool
+        Whether to remove genes with zero counts for all samples.
 
-    Examples:
-        >>> import gzip
-        >>> from edgePy.io import get_dataset_path
-        >>> dataset = 'GSE49712_HTSeq.txt.gz'
-        >>> DGEList.read_handle(gzip.open(get_dataset_path(dataset)))
-        DGEList(num_samples=10, num_genes=21,717)
+    Examples
+    --------
+    >>> import gzip
+    >>> from edgePy.io import get_dataset_path
+    >>> dataset = 'GSE49712_HTSeq.txt.gz'
+    >>> DGEList.read_handle(gzip.open(get_dataset_path(dataset)))
+    DGEList(num_samples=10, num_genes=21,717)
 
     """
 
@@ -41,13 +42,13 @@ class DGEList(object):
 
     def __init__(
         self,
-        counts: Optional[np.matrix]=None,
-        samples: Optional[np.array]=None,
-        genes: Optional[np.array]=None,
-        norm_factors: Optional[np.array]=None,
-        group: Optional[np.array]=None,
-        to_remove_zeroes: Optional[bool]=True
-    ) -> None:
+        counts=None,
+        samples=None,
+        genes=None,
+        norm_factors=None,
+        group=None,
+        to_remove_zeroes=True
+    ):
         if counts is None:
             counts = np.matrix(np.zeros(3))
         if norm_factors is None:
@@ -61,41 +62,35 @@ class DGEList(object):
         self.group = group
 
     @staticmethod
-    def _format_fields(
-        fields: Iterable[Union[str, bytes]]
-    ) -> Generator[str, None, None]:
-        """Clean fields in the header of any read data.
-
-        Yields:
-            The next field that has been cleaned.
-
-        """
+    def _format_fields(fields):
         for field in fields:
-            if isinstance(field, bytes):
+            try:
                 field = field.decode()
+            except AttributeError:
+                pass
             yield DGEList._field_strip_re.sub('', field)
 
     @property
-    def counts(self) -> np.matrix:
+    def counts(self):
         """The read counts for the genes in all samples.
 
-        Returns:
-            counts: Columns correspond to samples and row to genes.
+        Returns
+        -------
+        counts : np.matrix
 
         """
         return self._counts
 
     @counts.setter
-    def counts(self, counts: np.ndarray) -> np.matrix:
+    def counts(self, counts):
         """Validate setting ``DGEList.counts`` for the illegal conditions:
 
-            * Must be of type ``np.ndarray``
             * Negative values
             * Values that are not numbers
-            * No values can be N/A
 
-        Args:
-            counts: Columns correspond to samples and row to genes.
+        Parameters
+        ----------
+        counts : np.matrix
 
         """
         if not isinstance(counts, np.ndarray):
@@ -110,51 +105,55 @@ class DGEList(object):
         self._counts = np.matrix(counts)
 
     @property
-    def samples(self) -> np.array:
+    def samples(self):
         """Array of sample names."""
         return self._samples
 
     @samples.setter
-    def samples(self, samples: Optional[np.ndarray]) -> None:
+    def samples(self, samples):
         # TODO: Validate samples here
         # - Samples same length as ncol(self.counts) if defined
-        if samples is not None:
-            samples = np.array(list(self._format_fields(samples)))
+        samples = np.array(list(DGEList._format_fields(samples)))
         self._samples = samples
 
     @property
-    def genes(self) -> np.array:
+    def genes(self):
         """Array of gene names."""
         return self._genes
 
     @genes.setter
-    def genes(self, genes: Optional[np.ndarray]) -> None:
+    def genes(self, genes):
         # TODO: Validate genes here
         # - Genes same length as nrow(self.counts) if defined
-        if genes is not None:
-            genes = np.array(list(self._format_fields(genes)))
+        genes = np.array(list(DGEList._format_fields(genes)))
         self._genes = genes
 
     @property
-    def library_size(self) -> np.array:
+    def library_size(self):
         """The total read counts per sample.
 
-        Returns:
-            library_size: The size of the library.
+        Returns
+        -------
+        library_size : np.matrix
 
         """
         return np.sum(self.counts, 0)
 
     @classmethod
-    def read_handle(cls, handle: StringIO, **kwargs: Mapping) -> 'DGEList':
+    def read_handle(cls, handle, **kwargs):
         """Read in a file-like object of delimited data for instantiation.
 
-        Args:
-            handle: Any handle supporting text streaming io.
-            kwargs: Additional arguments supported by ``np.genfromtxt``.
+        Parameters
+        ----------
+        handle : file-like object
+            Any handle supporting text streaming io.
+        kwargs : mappable
+            Additional arguments supported by ``np.genfromtxt``.
 
-        Returns:
-            DGEList: Container for storing read counts for samples.
+        Returns
+        -------
+        DGEList
+            Container for storing read counts for samples from target genes.
 
         """
         # First column is the header for the the gene names.
@@ -165,7 +164,7 @@ class DGEList(object):
         frame = np.genfromtxt(
             fname=handle,
             dtype=np.int,
-            converters={0: lambda _: genes.append(_) or 0},  # type: ignore
+            converters={0: lambda _: genes.append(_) or 0},
             autostrip=kwargs.pop('autostrip', True),
             replace_space=kwargs.pop('replace_space', '_'),
             case_sensitive=kwargs.pop('case_sensitive', True),
@@ -176,56 +175,9 @@ class DGEList(object):
         # Delete the first column as it is copied on assignment to `genes`.
         counts = np.delete(frame, 0, axis=1)
 
-        return cls(counts=counts, samples=samples, genes=genes)
+        return DGEList(counts=counts, samples=samples, genes=genes)
 
-    def cpm(
-        self,
-        log: bool=False,
-        prior_count: float=PRIOR_COUNT
-    ) -> 'DGEList':
-        """Return the DGEList normalized to read counts per million."""
-        raise NotImplementedError
-        #self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
-        #if log:
-        #    self.counts[self.counts == 0] = prior_count
-        #    self.counts = np.log(self.counts)
-        #return self
-
-    def rpkm(
-        self,
-        gene_lengths: Mapping,
-        log: bool=False,
-        prior_count: float=PRIOR_COUNT
-    ) -> 'DGEList':
-        """Return the DGEList normalized to reads per kilobase of gene length
-        per million reads.
-
-        """
-        raise NotImplementedError
-
-        # TODO: Implement here
-
-        #self = self.cpm(log=log, prior_count=prior_count)
-        return self
-
-    def tpm(
-        self,
-        transcripts: Mapping,
-        log: bool=False,
-        prior_count: float=PRIOR_COUNT
-    ) -> 'DGEList':
-        """Return the DGEList normalized to reads per kilobase of transcript
-        length.
-
-        """
-        raise NotImplementedError
-
-        # TODO: Implement here
-
-        #self = self.cpm(log=log, prior_count=prior_count)
-        return self
-
-    def __repr__(self) -> str:
+    def __repr__(self):
         """Give a pretty non-executeable representation of this object."""
         num_samples = len(self.samples) if self.samples is not None else 0
         num_genes = len(self.genes) if self.genes is not None else 0
