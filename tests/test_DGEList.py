@@ -30,11 +30,11 @@ def test_too_much():
 
 def test_setting_DGElist_counts():
     with pytest.raises(TypeError):
-        dge_list().counts(None)
+        dge_list().counts = None
     with pytest.raises(ValueError):
-        dge_list().counts(np.array(-1, 1, 1))
+        dge_list().counts = np.array(-1, 1, 1)
     with pytest.raises(ValueError):
-        dge_list().counts(np.array(1, 1, np.nan)) 
+        dge_list().counts = np.array(1, 1, np.nan)
 
 def test_repr():
     assert dge_list().__repr__() == 'DGEList(num_samples=10, num_genes=21,717)'
