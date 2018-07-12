@@ -99,7 +99,7 @@ class DGEList(object):
 
         """
         if not isinstance(counts, np.ndarray):
-            raise ValueError('Counts matrix must be of type ``np.ndarray``.')
+            raise TypeError('Counts matrix must be of type ``np.ndarray``.')
         elif np.any(counts < 0):
             raise ValueError('Counts matrix cannot contain negative values.')
         elif np.any(counts == np.nan):
