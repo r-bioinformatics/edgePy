@@ -1,16 +1,10 @@
 language: python
-cache: pip
 python:
   - 3.6
-  - 3.7-dev
-  - nightly
 install:
-  - pip install '.[ci]'
+  - pip install tox-travis
 script:
-  - ./tests/test-runner.sh
-  - if [[ ${TRAVIS_PYTHON_VERSION} == 3.6 ]]; then ./tests/mypy.sh; fi
-  - ./tests/flake8.sh
-  - ./tests/pylint.sh
+  - tox
 after_success:
   - codecov
 notifications:

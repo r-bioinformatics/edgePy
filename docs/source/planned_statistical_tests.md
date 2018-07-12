@@ -1,3 +1,5 @@
+# Planned statistical tests
+
 | statistical test | R src location | test link - python | libary name - python | Notes |
 |:-----------------|----------------|--------------------|----------------------------|---|
 | Multiple exact binomial tests | edgeR/R/binomTest.R | https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.binom_test.html | scipy | 

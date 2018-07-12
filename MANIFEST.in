@@ -1,1 +1,0 @@
-recursive-include edgePy/data *.csv* *.tsv* *.txt*
