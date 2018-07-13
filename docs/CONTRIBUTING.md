@@ -80,4 +80,28 @@ Run the tests with the following command:
 ❯ ./tests/mypy.sh
 ```
 
+## Updating the documentation
+
+New documentation will need to be built by Sphinx in order to update the HTML pages that _readthedocs.org_ displays. 
+
+Make sure to have the documentation dependnecies installed by installing the 'doc' requirement group _e.g._:
+
+```bash
+> pip install -e 'edgePy[doc]'
+```
+
+If you created a new documentation file, make sure it's located at `\docs`. 
+
+Add the name of the new documentation file under the appropriate tree in `\docs\index.rst`.
+
+Run make html _e.g._:
+
+```bash
+> cd docs
+> make html
+```
+
+In a windows environment, you'll need to have MinGW installed to run the make command, and you may have to switch to the cmd terminal. 
+
+The make operation should update the html documents in the `\docs\_build\html` directory. Once pushed, those changes will be reflected the next time that the _readthedocs.org_ website is rebuilt.
 
