@@ -28,7 +28,8 @@ setup(
     py_modules=[PACKAGE],
     install_requires=[],
     extras_require={
-        'ci': ['codecov', 'flake8', 'mypy', 'pylint', 'pytest', 'pytest-cov'],
+        'ci': ['pytest', 'pytest-cov', 'codecov', 'mypy'],
+        'docs': ['recommonmark', 'sphinx'],
     },
     scripts=[
         # "scripts/edgePy",  # TODO: Uncomment to install / test script.
