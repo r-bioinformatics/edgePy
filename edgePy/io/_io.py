@@ -3,7 +3,7 @@
 import gzip
 
 from pathlib import Path
-from typing import Any, Callable, List, Mapping, Optional, Tuple, Union
+from typing import Any, List, Tuple, Union
 
 
 __all__ = [
