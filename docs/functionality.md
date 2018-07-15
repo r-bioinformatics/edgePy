@@ -10,21 +10,21 @@ The First objective of edgePY is to offer an alternative free tool for such anal
 
 ## Input 
  
-    Read correctly the file -> Set the groups based on the samples
+    Read correctly the file 
 
 A data matrix separated by tab. Of genes/proteins in lines and samples/observations in columns. Groups for the main analysis usually are defined there, or assigned to the samples.
 
 ## Normalization
 
-    Quality ->  Library -> (TMM or RLE or upperquartile or none) -> Norm. Matrix
+    Quality ->  Library -> (TMM or RLE or upperquartile or none) -> commonDispersion -> TagwiseDispersion -> Norm. Matrix
 
 ## Analysis
 
-    Norm. Matrix -> ebayes (Prob. Stats) -> treat Function ( ) -> commonDispersion -> DE genes list 
+    Norm. Matrix -> Set the sample groups to be compared  -> Statistical analysis of choice (ebayes/treat/QLF) -> DE genes list and statistics
 
 ## Visualization/Results
 
-    DE genes list -> Heatmap / Volcano plot / Dispersion / Statistics / pvalue 
+    DE genes list / Statistics -> Visualization ( Venn / The mean-variance relationship of log-CPM / Heatmaps / Volcano plots / Dispersion plots 
 
 
 More details should be added as we progress in the coding.
