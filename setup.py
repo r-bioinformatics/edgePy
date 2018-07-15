@@ -26,7 +26,9 @@ setup(
     download_url=ARTIFACT,
     url=f'https://github.com/{AUTHOR}/{PACKAGE}',
     py_modules=[PACKAGE],
-    install_requires=[],
+    install_requires=[
+        'pandas'
+    ],
     extras_require={
         'ci': ['codecov', 'flake8', 'mypy', 'pylint', 'pytest', 'pytest-cov'],
     },
