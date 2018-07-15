@@ -26,9 +26,11 @@ setup(
     download_url=ARTIFACT,
     url=f'https://github.com/{AUTHOR}/{PACKAGE}',
     py_modules=[PACKAGE],
-    install_requires=[],
+    install_requires=[
+        'numpy'
+    ],
     extras_require={
-        'ci': ['pytest', 'pytest-cov', 'codecov', 'mypy'],
+        'ci': ['codecov', 'flake8', 'mypy', 'pylint', 'pytest', 'pytest-cov'],
         'docs': ['recommonmark', 'sphinx'],
     },
     scripts=[
