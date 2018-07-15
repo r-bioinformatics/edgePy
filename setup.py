@@ -41,7 +41,7 @@ setup(
             'data/*.txt*',
         ]
     },
-    license='GPLv3',
+    license='MIT',
     zip_safe=True,
     keywords='bioinformatics gene differential expression edgeR',
     project_urls={
@@ -52,7 +52,7 @@ setup(
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'License :: OSI Approved :: MIT License',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
