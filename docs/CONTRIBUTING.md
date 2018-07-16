@@ -81,11 +81,13 @@ Run the tests with the following command:
 
 ## Updating the documentation
 
-New documentation will need to be built by Sphinx in order to update the HTML pages that _readthedocs.org_ displays.
-
-If you created a new documentation file, make sure it's located at `\docs`.
+If you created a new documentation file, make sure that it is in markdown (**.md**) or reStructuredText (**.rst**) formats, preferably the latter. The new file should also be located under `\docs`.
 
 Add the name of the new documentation file under the appropriate tree in `\docs\index.rst`.
+
+At this point, you are done adding to the documentation. readthedocs.org will automatically run the *conf.py* file and update the docs accordingly on each commit. 
+
+Optionally for local testing, you can build local HTML files of the documentation as follows:
 
 Build the documentation in HTML format with:
 
@@ -97,4 +99,3 @@ Build the documentation in HTML format with:
 In a windows environment, you need to have `MinGW` installed to run the make command, and you may have to switch to the `cmd` terminal.
 
 The make operation should update the html documents in the `\docs\_build\html` directory.
-Once pushed, those changes will be reflected the next time that the _readthedocs.org_ website is rebuilt.
