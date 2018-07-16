@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/r-bioinformatics/edgePy.svg?branch=master)](https://travis-ci.org/r-bioinformatics/edgePy)
 [![codecov](https://codecov.io/gh/r-bioinformatics/edgePy/branch/master/graph/badge.svg)](https://codecov.io/gh/r-bioinformatics/edgePy)
 [![PyPI Version](https://badge.fury.io/py/edgePy.svg)](https://pypi.org/project/edgePy)
+[![Documentation Status](https://readthedocs.org/projects/edgepy/badge/?version=latest)](http://edgepy.readthedocs.io/en/latest/?badge=latest)
 [![GitHub License](https://img.shields.io/github/license/r-bioinformatics/edgePy.svg)](https://github.com/r-bioinformatics/edgePy/blob/master/LICENSE)
 
 The `edgePy` library will become an implementation of [`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html) for differential expression analysis in the Python language.
