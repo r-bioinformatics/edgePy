@@ -8,13 +8,13 @@ Welcome to EdgePy's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Main Documentation
    
-   Links
-   data-formats
    functionality
+   data-formats
    planned_statistical_tests
    CONTRIBUTING
+   Links
 
 
 
