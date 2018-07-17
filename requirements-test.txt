@@ -1,4 +1,4 @@
-codecov==2.0.15
+coverage==4.5
 flake8==3.5.0
 mypy==0.620
 pylint==2.0.0
