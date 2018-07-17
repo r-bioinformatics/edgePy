@@ -62,7 +62,7 @@ def get_dataset_path(
 
 New documentation files must be of the following format:
 - reStructuredText (**.rst**) -- _preferred_
-- Markdown (**.md**)s
+- Markdown (**.md**)
 
 A new file can be added to the appropriate gloassary tree in `edgePy/docs/source/index.rst`.
 
@@ -80,10 +80,27 @@ This will create or update the HTML documents in the `\docs\_build\html` directo
 
 ## Developing in a Virtual Environment
 
+The development environment is listed as an additional `Tox` environment:
+
+```bash
+❯ tox -lv
+
+using tox.ini: .../edgePy/tox.ini
+using tox-3.1.2 from .../python3.6/dist-packages/tox/__init__.py
+default environments:
+py36      -> run the test suite with (basepython)
+py36-lint -> check the code style
+py36-type -> type check the library
+py36-docs -> test building of HTML docs
+
+additional environments:
+dev       -> the official edgePy development environment
+```
+
+To create and activate that environment issue the following:
+
 ```bash
 ❯ cd edgePy
-# Install Tox if you do not have it
-❯ pip install tox
 # Create the development environment (force recreation)
 ❯ tox --recreate -e dev
 # Activate the development environment
@@ -103,6 +120,8 @@ This will create or update the HTML documents in the `\docs\_build\html` directo
 
 All tests are coordinated by `Tox`. Running the unit tests, code coverage, code style (linting) checks, static analysis of typing, and successful compilation of the docs is as simple as the following commands!
 
+> **Note**: This command takes a long time the first time it is invoked since all virtual environments need to be created!
+
 ```bash
 ❯ cd edgePy
 ❯ tox
@@ -115,6 +134,7 @@ You can select only a part of the test suite by looking at which `Tox` groups ar
 ```bash
 ❯ cd edgePy
 ❯ tox -lv
+
 using tox.ini: ../edgePy/tox.ini
 using tox-3.1.2 from ../python3.6/dist-packages/tox/__init__.py
 default environments:
@@ -124,7 +144,7 @@ py36-type -> type check the library
 py36-docs -> test building of HTML docs
 ```
 
-Choose a group to run with the following syntax:
+Choose a specific group to run with the following syntax:
 
 ```bash
 ❯ cd edgePy
