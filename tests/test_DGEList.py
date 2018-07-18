@@ -36,6 +36,11 @@ def test_setting_DGElist_counts():
     with pytest.raises(ValueError):
         dge_list().counts = np.array(1, 1, np.nan)
 
+def testing_setting_counts_and_values():
+    with pytest.raises(ValueError):
+        dge_list().counts = np.array(1, 1, 1)
+        dge_list().samples = np.array(1, 2)
+
 def test_repr():
     assert dge_list().__repr__() == 'DGEList(num_samples=10, num_genes=21,717)'
 
