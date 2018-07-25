@@ -54,10 +54,11 @@ class DGEList(object):
             norm_factors = np.ones(np.size(counts, 1))
 
         self.to_remove_zeroes = to_remove_zeroes
-        self.samples = samples
-        self.genes = genes
-        self.norm_factors = norm_factors
-        self.group = group
+        self._samples = samples
+        self._genes = genes
+        self._norm_factors = norm_factors
+        self._group = group
+
 
 
     @staticmethod
@@ -100,9 +101,9 @@ class DGEList(object):
         """
         if not isinstance(counts, np.ndarray):
             raise TypeError('Counts matrix must be of type ``np.ndarray``.')
-        elif np.any(counts < 0):
+        if np.any(counts < 0):
             raise ValueError('Counts matrix cannot contain negative values.')
-        elif np.any(counts == np.nan):
+        if np.any(counts == np.nan):
             raise ValueError('Counts matrix must have only real values.')
         if self.to_remove_zeroes:
             counts = counts[np.all(counts != 0, axis=1)]
@@ -227,8 +228,8 @@ class DGEList(object):
 
     def __repr__(self) -> str:
         """Give a pretty non-executeable representation of this object."""
-        num_samples = len(self.samples) if self.samples is not None else 0
-        num_genes = len(self.genes) if self.genes is not None else 0
+        num_samples = len(self._samples) if self._samples is not None else 0
+        num_genes = len(self._genes) if self._genes is not None else 0
 
         return (
             f'{self.__class__.__name__}('

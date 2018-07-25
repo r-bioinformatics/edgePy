@@ -97,11 +97,11 @@ class ExportToCVS(object):
         return sorted(sample_list), dataset, sorted(gene_list)
 
     def create_DGEList(self, sample_list, data_set, gene_list):
+        """ sample list and gene list must be pre-sorted
+            Use this to create the DGE object for future work."""
 
+        print("Creating DGE list object...")
         dge_list = DGEList()
-
-        gene_list.sort()
-        sample_list.sort()
 
         temp_data_store = np.zeros((len(sample_list), len(gene_list)))
 
@@ -110,7 +110,9 @@ class ExportToCVS(object):
 
         for idx_s, sample in enumerate(sample_list):
             for idx_g, gene in enumerate(gene_list):
-                temp_data_store[idx_s, idx_g] = data_set[sample][gene]
+                if sample in data_set and gene in data_set[sample]:
+                    if data_set[sample][gene]:
+                        temp_data_store[idx_s, idx_g] = data_set[sample][gene]
 
         dge_list.counts = temp_data_store
 
@@ -121,7 +123,7 @@ def main():
     args = parse_arguments()
     default_class = ExportToCVS(args)
     sample_list, data_set, gene_list = default_class.get_data_from_mongo()
-    dge_list =  default_class.create_DGEList(sample_list, data_set, gene_list)
+    dge_list = default_class.create_DGEList(sample_list, data_set, gene_list)
 
     print(dge_list)
 
