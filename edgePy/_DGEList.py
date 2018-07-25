@@ -46,7 +46,8 @@ class DGEList(object):
         genes: Optional[np.array] = None,
         norm_factors: Optional[np.array] = None,
         group: Optional[np.array] = None,
-        to_remove_zeroes: Optional[bool] = True
+        to_remove_zeroes: Optional[bool] = True,
+        mapped_read_count: Optional[np.array] = None  # must have the same number of ints as samples
     ) -> None:
         if counts is None:
             counts = np.matrix(np.zeros(3))

@@ -85,3 +85,15 @@ def get_canonical_rpkm(result):
         if int(trans['canonical']) == 1:
             return trans['rpkm']
     return None
+
+
+def get_canonical_raw(result):
+    transcript_list = result['transcripts']
+    for trans in transcript_list.values():
+        if int(trans['canonical']) == 1:
+            raw = 0
+            for exon in trans['exons']:
+                raw += int(trans['exons'][exon]['raw'])
+            return raw
+    return None
+

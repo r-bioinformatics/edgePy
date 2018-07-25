@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 
 from edgePy.io.mongodb.mongo_wrapper import MongoWrapper
-from edgePy.io.mongodb.gene_functions import get_canonical_rpkm
+from edgePy.io.mongodb.gene_functions import get_canonical_raw
 from edgePy.io.mongodb.gene_functions import get_genelist_from_file
 from edgePy.io.mongodb.gene_functions import translate_genes
 
@@ -85,7 +85,7 @@ class ExportToCVS(object):
             if count % 100000 == 0:
                 print(f"{count} rows processed")
             sample = result['sample_name']
-            rpkm = get_canonical_rpkm(result)
+            rpkm = get_canonical_raw(result)
             gene = result['gene']
             # print("{}-{}".format(sample, gene))
             if sample not in dataset:
