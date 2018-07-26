@@ -55,10 +55,10 @@ class DGEList(object):
             norm_factors = np.ones(np.size(counts, 1))
 
         self.to_remove_zeroes = to_remove_zeroes
-        self._samples = samples
-        self._genes = genes
-        self._norm_factors = norm_factors
-        self._group = group
+        self.samples = samples
+        self.genes = genes
+        self.norm_factors = norm_factors
+        self.group = group
 
 
 
