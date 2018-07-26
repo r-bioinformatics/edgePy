@@ -25,7 +25,7 @@ class DGEList(object):
         genes: Array of gene names, same length as nrow(counts).
         norm_factors: Weighting factors for each sample.
         group: ...
-        remove_zeroes: To remove genes with zero counts for all samples.
+        to_remove_zeroes: To remove genes with zero counts for all samples.
 
     Examples:
         >>> import gzip
@@ -41,13 +41,12 @@ class DGEList(object):
 
     def __init__(
         self,
-        counts: Optional[np.matrix] = None,
+        counts: Optional[np.ndarray] = None,
         samples: Optional[np.array] = None,
         genes: Optional[np.array] = None,
         norm_factors: Optional[np.array] = None,
         group: Optional[np.array] = None,
         to_remove_zeroes: Optional[bool] = True,
-        mapped_read_count: Optional[np.array] = None  # must have the same number of ints as samples
     ) -> None:
         if counts is None:
             counts = np.matrix(np.zeros(3))
@@ -59,8 +58,6 @@ class DGEList(object):
         self.genes = genes
         self.norm_factors = norm_factors
         self.group = group
-
-
 
     @staticmethod
     def _format_fields(
@@ -88,7 +85,7 @@ class DGEList(object):
         return self._counts
 
     @counts.setter
-    def counts(self, counts: np.ndarray) -> np.matrix:
+    def counts(self, counts: np.ndarray) -> None:
         """Validate setting ``DGEList.counts`` for the illegal conditions:
 
             * Must be of type ``np.ndarray``
@@ -109,7 +106,7 @@ class DGEList(object):
         if self.to_remove_zeroes:
             counts = counts[np.all(counts != 0, axis=1)]
 
-        self._counts = np.matrix(counts)
+        self._counts = counts
 
     @property
     def samples(self) -> np.array:
@@ -123,6 +120,7 @@ class DGEList(object):
         if samples is not None:
             samples = np.array(list(self._format_fields(samples)))
         self._samples = samples
+        self._total_counts = np.zeros(len(samples))
 
     @property
     def genes(self) -> np.array:
@@ -198,7 +196,7 @@ class DGEList(object):
         gene_lengths: Mapping,
         log: bool = False,
         prior_count: float = PRIOR_COUNT
-    ) -> 'DGEList':
+    ) -> None:
         """Return the DGEList normalized to reads per kilobase of gene length
         per million reads.
 
@@ -208,14 +206,14 @@ class DGEList(object):
         # TODO: Implement here
 
         # self = self.cpm(log=log, prior_count=prior_count)
-        return self
+        pass
 
     def tpm(
         self,
         transcripts: Mapping,
         log: bool = False,
         prior_count: float = PRIOR_COUNT
-    ) -> 'DGEList':
+    ) -> None:
         """Return the DGEList normalized to reads per kilobase of transcript
         length.
 
@@ -225,7 +223,7 @@ class DGEList(object):
         # TODO: Implement here
 
         # self = self.cpm(log=log, prior_count=prior_count)
-        return self
+        pass
 
     def __repr__(self) -> str:
         """Give a pretty non-executeable representation of this object."""
