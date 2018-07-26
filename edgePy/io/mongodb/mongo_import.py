@@ -101,12 +101,8 @@ class ExportToCVS(object):
             Use this to create the DGE object for future work."""
 
         print("Creating DGE list object...")
-        dge_list = DGEList()
 
-        temp_data_store = np.zeros((len(sample_list), len(gene_list)))
-
-        dge_list.samples = np.array(sample_list)
-        dge_list.genes = np.array(gene_list)
+        temp_data_store = np.zeros(shape=(len(sample_list), len(gene_list)))
 
         for idx_s, sample in enumerate(sample_list):
             for idx_g, gene in enumerate(gene_list):
@@ -114,9 +110,9 @@ class ExportToCVS(object):
                     if data_set[sample][gene]:
                         temp_data_store[idx_s, idx_g] = data_set[sample][gene]
 
-        dge_list.counts = temp_data_store
-
-        return dge_list
+        return DGEList(counts=temp_data_store,
+                       genes=np.array(gene_list),
+                       samples=np.array(sample_list))
 
 
 def main():
