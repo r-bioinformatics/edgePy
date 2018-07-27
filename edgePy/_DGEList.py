@@ -119,11 +119,11 @@ class DGEList(object):
         # TODO: Validate samples here
         # - Samples same length as ncol(self.counts) if defined
         if samples is not None:
+            if self.counts is not None and len(samples) != self.counts.shape[1]:
+                raise ValueError("Shape of counts does not match samples")
+
             samples = np.array(list(self._format_fields(samples)))
 
-            if self.counts is not None:
-                if self.counts.shape[1] != len(samples):
-                    raise ValueError("Shape of counts does not match samples")
         self._samples = samples
 
     @property
