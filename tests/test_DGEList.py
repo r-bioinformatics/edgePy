@@ -36,10 +36,26 @@ def test_setting_DGElist_counts():
     with pytest.raises(ValueError):
         dge_list().counts = np.array(1, 1, np.nan)
 
-def testing_setting_counts_and_values():
-    with pytest.raises(ValueError):
-        dge_list().counts = np.array(1, 1, 1)
-        dge_list().samples = np.array(1, 2)
+def testing_setting_samples_and_counts():
+    # Empty list should pass
+    DGEList(to_remove_zeroes = False)
+
+    # Lists with just counts should pass
+    DGEList(counts = np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]]),
+    to_remove_zeroes = False)
+
+    # Lists with just samples should pass
+    DGEList(samples = np.array(['1','2','3']),to_remove_zeroes = False)
+
+    # Properly formed samples and counts should pass
+    DGEList(samples = np.array(['1', '2', '3']), 
+        counts = np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]]), to_remove_zeroes = False)
+
+    # Lists with ill-matched samples and counts should fail
+    pytest.raises(ValueError, 
+    "DGEList(samples = np.array(['2', '3']),"
+    " counts = np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]]),"
+    " to_remove_zeroes = False)")
 
 def test_repr():
     assert dge_list().__repr__() == 'DGEList(num_samples=10, num_genes=21,717)'

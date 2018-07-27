@@ -116,7 +116,6 @@ class DGEList(object):
 
     @samples.setter
     def samples(self, samples: Optional[np.ndarray]) -> None:
-        # TODO: Validate samples here
         # - Samples same length as ncol(self.counts) if defined
         if samples is not None:
             if self.counts is not None and len(samples) != self.counts.shape[1]:
