@@ -46,18 +46,29 @@ class DGEList(object):
         genes: Optional[np.array] = None,
         norm_factors: Optional[np.array] = None,
         group: Optional[np.array] = None,
-        to_remove_zeroes: Optional[bool] = True,
+        to_remove_zeroes: Optional[bool] = False,
+        filename=None,
     ) -> None:
-        if counts is None:
-            counts = np.matrix(np.zeros(3))
-        if norm_factors is None:
-            norm_factors = np.ones(np.size(counts, 1))
 
         self.to_remove_zeroes = to_remove_zeroes
-        self.samples = samples
-        self.genes = genes
-        self.norm_factors = norm_factors
-        self.group = group
+        if filename:
+            if counts or samples or genes or norm_factors or group:
+                raise Exception("if filename is provided, you can't also provide other parameters")
+            self._counts = None
+            self.import_file(filename)
+
+        else:
+            if counts is None:
+                raise Exception("counts must be provided at init")
+
+            if norm_factors is None:
+                norm_factors = np.ones(np.size(counts, 1))
+
+            self.counts = counts
+            self.samples = samples
+            self.genes = genes
+            self.norm_factors = norm_factors
+            self.group = group
 
     @staticmethod
     def _format_fields(
@@ -97,6 +108,17 @@ class DGEList(object):
             counts: Columns correspond to samples and row to genes.
 
         """
+        if hasattr(self, '_counts'):
+            # do checks for things here.  You shouldn't modify counts if it has already been set.  Create a new obj.
+            if hasattr(self, '_samples') and self._samples is not None:
+                sample_count, gene_count = counts.shape
+                if sample_count != self._samples.shape[0] or gene_count != self._genes.shape[0]:
+                        raise ValueError("Attempting to substitute counts data into DGEList object with different "
+                                         "dimensions fails.")
+        elif counts is None:
+            self._counts = None
+            return
+
         if not isinstance(counts, np.ndarray):
             raise TypeError('Counts matrix must be of type ``np.ndarray``.')
         if np.any(counts < 0):
@@ -104,7 +126,7 @@ class DGEList(object):
         if np.any(counts == np.nan):
             raise ValueError('Counts matrix must have only real values.')
         if self.to_remove_zeroes:
-            counts = counts[np.all(counts != 0, axis=1)]
+            counts = counts[np.all(counts != 0, axis=1)]  # this is not working.  Does not remove rows with only zeros.
 
         self._counts = counts
 
@@ -178,14 +200,9 @@ class DGEList(object):
 
         return cls(counts=counts, samples=samples, genes=genes)
 
-    def cpm(
-        self,
-        log: bool = False,
-        prior_count: float = PRIOR_COUNT
-    ) -> 'DGEList':
+    def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> 'DGEList':
         """Return the DGEList normalized to read counts per million."""
-        raise NotImplementedError
-        # self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
+        self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
         # if log:
         #     self.counts[self.counts == 0] = prior_count
         #     self.counts = np.log(self.counts)
@@ -235,3 +252,31 @@ class DGEList(object):
             f'num_samples={num_samples:,}, '
             f'num_genes={num_genes:,})'
         )
+
+    def export_file(self, filename):
+        """ Convert the object to a byte representation, which can be stored or imported."""
+
+        # TODO: validate file name
+
+        np.savez(filename,
+                 samples=self.samples,
+                 genes=self.genes,
+                 norm_factors=self.norm_factors,
+                 counts=self.counts,
+                 group=self.group)
+
+    def import_file(self, filename):
+        """
+        Import a file name stored in the dge export format.
+        :param filename:
+        :return:
+        """
+
+        print(f"Importing data from .dge file ({filename})....")
+
+        npzfile = np.load(filename)
+        self.counts = npzfile['counts']
+        self.genes = npzfile['genes']
+        self.samples = npzfile['samples']
+        self.norm_factors = npzfile['norm_factors']
+        self.group = npzfile['group']

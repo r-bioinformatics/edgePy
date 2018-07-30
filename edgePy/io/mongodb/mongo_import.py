@@ -23,11 +23,11 @@ def parse_arguments(parser=None):
     return args
 
 
-class ExportToCVS(object):
+class ImportFromMongodb(object):
 
     def __init__(self, args):
         config = configparser.ConfigParser()
-        config.read(args.config)
+        config.read(args.mongo_config)
 
         self.mongo_host = config.get("Mongo", "host")
         self.mongo_port = config.get("Mongo", "port")
@@ -36,8 +36,8 @@ class ExportToCVS(object):
                                          port=config.get("Mongo", "port"),
                                          connect=False)
 
-        self.key_name = args.key_name
-        self.key_value = args.key_value
+        self.key_name = args.mongo_key_name
+        self.key_value = args.mongo_key_value
 
         self.gene_list = None
         if args.gene_list:
@@ -75,7 +75,7 @@ class ExportToCVS(object):
         cursor = self.mongo_reader.find_as_cursor('Tenaya', 'RNASeq', query=query, projection={'_id': 0})
 
         # make it a list of lists
-        print("Importing data....")
+        print(f"Importing data from mongo ({self.mongo_host})....")
         dataset = {}
         gene_list = set()
         sample_list = set()
@@ -112,16 +112,8 @@ class ExportToCVS(object):
 
         return DGEList(counts=temp_data_store,
                        genes=np.array(gene_list),
-                       samples=np.array(sample_list))
-
-
-def main():
-    args = parse_arguments()
-    default_class = ExportToCVS(args)
-    sample_list, data_set, gene_list = default_class.get_data_from_mongo()
-    dge_list = default_class.create_DGEList(sample_list, data_set, gene_list)
-
-    print(dge_list)
+                       samples=np.array(sample_list),
+                       to_remove_zeroes=False)
 
 
 if __name__ == '__main__':
