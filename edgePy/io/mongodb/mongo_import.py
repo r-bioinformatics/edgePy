@@ -96,7 +96,8 @@ class ImportFromMongodb(object):
 
         return sorted(sample_list), dataset, sorted(gene_list)
 
-    def create_DGEList(self, sample_list, data_set, gene_list):
+    @staticmethod
+    def create_DGEList(sample_list, data_set, gene_list):
         """ sample list and gene list must be pre-sorted
             Use this to create the DGE object for future work."""
 
@@ -114,7 +115,3 @@ class ImportFromMongodb(object):
                        genes=np.array(gene_list),
                        samples=np.array(sample_list),
                        to_remove_zeroes=False)
-
-
-if __name__ == '__main__':
-    main()

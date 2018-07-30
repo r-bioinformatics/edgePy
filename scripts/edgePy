@@ -21,8 +21,6 @@ def parse_arguments(args):
     parser.add_argument("--mongo_key_name", default="Project")
     parser.add_argument("--mongo_key_value", default="RNA-Seq1")
 
-
-
     args = parser.parse_args(args)
 
     return args
