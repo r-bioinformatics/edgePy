@@ -3,7 +3,10 @@ import gzip
 
 import pytest
 
-from src.data_import import *  # A bad habit in practice, this tests `__all__`
+from src.data_import.data_import import get_open_function
+from src.data_import.data_import import get_dataset_path
+from src.data_import.data_import import GroupImporter
+from src.data_import.data_import import DataImporter
 
 
 # TestCommonFunctions

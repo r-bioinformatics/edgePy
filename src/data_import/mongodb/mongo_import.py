@@ -48,10 +48,11 @@ class ImportFromMongodb(object):
     def get_data_from_mongo(self):
 
         if self.key_name and self.key_value:
-            if self.key_value == 'regex':
-                query = {self.key_name: {'$regex': 'myocyte|fibroblast'}}
-            else:
-                query = {self.key_name: self.key_value}
+            query = {self.key_name: self.key_value}
+
+            # if self.key_value == 'regex':
+            #     query = {self.key_name: {'$regex': 'myocyte|fibroblast'}}
+
         elif self.key_name and not self.key_value:
             query = {self.key_name: {'$exists': True}}
         elif not self.key_name and not self.key_value:
@@ -67,6 +68,7 @@ class ImportFromMongodb(object):
         for result in cursor:
             print(result)
             sample_names.add(result['sample_name'])
+            # sample_category[result['sample_name']] = 'myocyte' if 'myocyte' in result[self.key_name] else 'fibroblast'
             sample_category[result['sample_name']] = result[self.key_name]
         sample_names = list(sample_names)
         print(f"get data.... for sample_names {sample_names}")
@@ -97,24 +99,27 @@ class ImportFromMongodb(object):
             sample_list.add(sample)
             gene_list.add(gene)
 
-        return sorted(sample_list), dataset, sorted(gene_list)
+        return sorted(sample_list), dataset, sorted(gene_list), sample_category
 
     @staticmethod
-    def create_DGEList(sample_list, data_set, gene_list):
+    def create_DGEList(sample_list, data_set, gene_list, sample_category):
         """ sample list and gene list must be pre-sorted
             Use this to create the DGE object for future work."""
 
         print("Creating DGE list object...")
 
         temp_data_store = np.zeros(shape=(len(sample_list), len(gene_list)))
+        group = []
 
         for idx_s, sample in enumerate(sample_list):
             for idx_g, gene in enumerate(gene_list):
                 if sample in data_set and gene in data_set[sample]:
                     if data_set[sample][gene]:
                         temp_data_store[idx_s, idx_g] = data_set[sample][gene]
+            group.append(sample_category[sample])
 
         return DGEList(counts=temp_data_store,
                        genes=np.array(gene_list),
                        samples=np.array(sample_list),
+                       group=np.array(group),
                        to_remove_zeroes=False)

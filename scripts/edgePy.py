@@ -2,7 +2,6 @@
 import argparse
 
 from src.DGEList import DGEList
-import os
 
 from src.data_import.data_import import DataImporter
 from src.data_import.data_import import GroupImporter
@@ -41,8 +40,8 @@ class edgePy(object):
 
         elif args.mongo_config:
             mongo_importer = ImportFromMongodb(args)
-            sample_list, data_set, gene_list = mongo_importer.get_data_from_mongo()
-            self.dge_list = mongo_importer.create_DGEList(sample_list, data_set, gene_list)
+            sample_list, data_set, gene_list, sample_category = mongo_importer.get_data_from_mongo()
+            self.dge_list = mongo_importer.create_DGEList(sample_list, data_set, gene_list, sample_category)
 
             self.dge_list.export_file('./src/data/example_data.cpe')
 

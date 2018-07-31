@@ -1,8 +1,8 @@
-import data_import
+import io
 
 from setuptools import setup
 
-with data_import.open('README.md', encoding='utf-8') as f:
+with io.open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
 VERSION = '0.1.0'
@@ -36,7 +36,7 @@ setup(
     scripts=[
         # "scripts/edgePy",  # TODO: Uncomment to install / test script.
     ],
-    package_dir={'edgePy': 'edgePy'},
+    package_dir={'edgePy': 'src'},
     package_data={
         'edgePy': [
             'data/*.csv*',
