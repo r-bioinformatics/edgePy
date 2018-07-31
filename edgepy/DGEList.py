@@ -11,7 +11,6 @@ __all__ = [
     'DGEList'
 ]
 
-
 PRIOR_COUNT: float = 0.25
 
 
@@ -29,7 +28,7 @@ class DGEList(object):
 
     Examples:
         >>> import gzip
-        >>> from edgePy.io import get_dataset_path
+        >>> from edgepy.io import get_dataset_path
         >>> dataset = 'GSE49712_HTSeq.txt.gz'
         >>> DGEList.read_handle(gzip.open(get_dataset_path(dataset)))
         DGEList(num_samples=10, num_genes=21,717)
@@ -40,14 +39,14 @@ class DGEList(object):
     _field_strip_re = re.compile(r'[\s"]+')
 
     def __init__(
-        self,
-        counts: Optional[np.ndarray] = None,
-        samples: Optional[np.array] = None,
-        genes: Optional[np.array] = None,
-        norm_factors: Optional[np.array] = None,
-        group: Optional[np.array] = None,
-        to_remove_zeroes: Optional[bool] = False,
-        filename=None,
+            self,
+            counts: Optional[np.ndarray] = None,
+            samples: Optional[np.array] = None,
+            genes: Optional[np.array] = None,
+            norm_factors: Optional[np.array] = None,
+            group: Optional[np.array] = None,
+            to_remove_zeroes: Optional[bool] = False,
+            filename=None,
     ) -> None:
 
         self.to_remove_zeroes = to_remove_zeroes
@@ -72,7 +71,7 @@ class DGEList(object):
 
     @staticmethod
     def _format_fields(
-        fields: Iterable[Union[str, bytes]]
+            fields: Iterable[Union[str, bytes]]
     ) -> Generator[str, None, None]:
         """Clean fields in the header of any read data.
 
@@ -113,8 +112,8 @@ class DGEList(object):
             if hasattr(self, '_samples') and self._samples is not None:
                 sample_count, gene_count = counts.shape
                 if sample_count != self._samples.shape[0] or gene_count != self._genes.shape[0]:
-                        raise ValueError("Attempting to substitute counts data into DGEList object with different "
-                                         "dimensions fails.")
+                    raise ValueError("Attempting to substitute counts data into DGEList object with different "
+                                     "dimensions fails.")
         elif counts is None:
             self._counts = None
             return
@@ -209,10 +208,10 @@ class DGEList(object):
         # return self
 
     def rpkm(
-        self,
-        gene_lengths: Mapping,
-        log: bool = False,
-        prior_count: float = PRIOR_COUNT
+            self,
+            gene_lengths: Mapping,
+            log: bool = False,
+            prior_count: float = PRIOR_COUNT
     ) -> None:
         """Return the DGEList normalized to reads per kilobase of gene length
         per million reads.
@@ -226,10 +225,10 @@ class DGEList(object):
         pass
 
     def tpm(
-        self,
-        transcripts: Mapping,
-        log: bool = False,
-        prior_count: float = PRIOR_COUNT
+            self,
+            transcripts: Mapping,
+            log: bool = False,
+            prior_count: float = PRIOR_COUNT
     ) -> None:
         """Return the DGEList normalized to reads per kilobase of transcript
         length.
@@ -258,12 +257,12 @@ class DGEList(object):
 
         # TODO: validate file name
 
-        np.savez(filename,
-                 samples=self.samples,
-                 genes=self.genes,
-                 norm_factors=self.norm_factors,
-                 counts=self.counts,
-                 group=self.group)
+        np.savez_compressed(filename,
+                            samples=self.samples,
+                            genes=self.genes,
+                            norm_factors=self.norm_factors,
+                            counts=self.counts,
+                            group=self.group)
 
     def import_file(self, filename):
         """

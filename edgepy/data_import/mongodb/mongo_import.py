@@ -2,12 +2,12 @@ import configparser
 import argparse
 import numpy as np
 
-from edgePy.io.mongodb.mongo_wrapper import MongoWrapper
-from edgePy.io.mongodb.gene_functions import get_canonical_raw
-from edgePy.io.mongodb.gene_functions import get_genelist_from_file
-from edgePy.io.mongodb.gene_functions import translate_genes
+from edgepy.data_import.mongodb.mongo_wrapper import MongoWrapper
+from edgepy.data_import.mongodb.gene_functions import get_canonical_raw
+from edgepy.data_import.mongodb.gene_functions import get_genelist_from_file
+from edgepy.data_import.mongodb.gene_functions import translate_genes
 
-from edgePy._DGEList import DGEList
+from edgepy.DGEList import DGEList
 
 
 def parse_arguments(parser=None):

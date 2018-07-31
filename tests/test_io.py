@@ -3,7 +3,7 @@ import gzip
 
 import pytest
 
-from edgePy.io import *  # A bad habit in practice, this tests `__all__`
+from edgepy.data_import import *  # A bad habit in practice, this tests `__all__`
 
 
 # TestCommonFunctions

@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 import argparse
-import sys
 
-from edgePy.io import DataImporter
-from edgePy.io import GroupImporter
+from edgepy.DGEList import DGEList
 
-from edgePy._DGEList import DGEList
-from edgePy.io.mongodb.mongo_import import ImportFromMongodb
+from edgepy.data_import.data_import import DataImporter
+from edgepy.data_import.data_import import GroupImporter
+
+from edgepy.data_import.mongodb.mongo_import import ImportFromMongodb
 
 
-def parse_arguments(args):
-    parser = argparse.ArgumentParser()
+def parse_arguments(parser=None):
+    if not parser:
+        parser = argparse.ArgumentParser()
+
     parser.add_argument("--count_file", help="name of the count file")
     parser.add_argument("--groups_file", help="name of the groups file")
     parser.add_argument("--dge_file", help='import from .dge file;')
@@ -21,7 +23,7 @@ def parse_arguments(args):
     parser.add_argument("--mongo_key_name", default="Project")
     parser.add_argument("--mongo_key_value", default="RNA-Seq1")
 
-    args = parser.parse_args(args)
+    args = parser.parse_args()
 
     return args
 
@@ -40,6 +42,8 @@ class edgePy(object):
             sample_list, data_set, gene_list = mongo_importer.get_data_from_mongo()
             self.dge_list = mongo_importer.create_DGEList(sample_list, data_set, gene_list)
 
+            self.dge_list.export_file('edgePy_src/data/example_data.cpe')
+
         else:
             importer = DataImporter(args.count_file)
             groups = GroupImporter(args.group_file)
@@ -55,7 +59,7 @@ class edgePy(object):
 
 def main():
 
-    args = parse_arguments(sys.argv)
+    args = parse_arguments()
     default_class = edgePy(args)
     default_class.run()
 

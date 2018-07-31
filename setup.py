@@ -1,8 +1,8 @@
-import io
+import data_import
 
 from setuptools import setup
 
-with io.open('README.md', encoding='utf-8') as f:
+with data_import.open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
 VERSION = '0.1.0'
