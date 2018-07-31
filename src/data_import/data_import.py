@@ -111,11 +111,11 @@ def get_dataset_path(filename: Union[str, Path]) -> Path:
 
     Examples
     --------
-    >>> from edgepy.io import get_dataset_path
+    >>> from src.io import get_dataset_path
     >>> str(get_dataset_path("GSE49712_HTSeq.txt.gz"))  # doctest:+ELLIPSIS
     '.../edgePy/data/GSE49712_HTSeq.txt.gz'
 
     """
-    import edgepy
-    directory = Path(edgepy.__file__).expanduser().resolve().parent
+    import src
+    directory = Path(src.__file__).expanduser().resolve().parent
     return directory / 'data' / filename

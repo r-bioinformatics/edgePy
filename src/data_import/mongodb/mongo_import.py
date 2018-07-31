@@ -2,12 +2,12 @@ import configparser
 import argparse
 import numpy as np
 
-from edgepy.data_import.mongodb.mongo_wrapper import MongoWrapper
-from edgepy.data_import.mongodb.gene_functions import get_canonical_raw
-from edgepy.data_import.mongodb.gene_functions import get_genelist_from_file
-from edgepy.data_import.mongodb.gene_functions import translate_genes
+from src.data_import.mongodb.mongo_wrapper import MongoWrapper
+from src.data_import.mongodb.gene_functions import get_canonical_raw
+from src.data_import.mongodb.gene_functions import get_genelist_from_file
+from src.data_import.mongodb.gene_functions import translate_genes
 
-from edgepy.DGEList import DGEList
+from src.DGEList import DGEList
 
 
 def parse_arguments(parser=None):
@@ -48,7 +48,10 @@ class ImportFromMongodb(object):
     def get_data_from_mongo(self):
 
         if self.key_name and self.key_value:
-            query = {self.key_name: self.key_value}
+            if self.key_value == 'regex':
+                query = {self.key_name: {'$regex': 'myocyte|fibroblast'}}
+            else:
+                query = {self.key_name: self.key_value}
         elif self.key_name and not self.key_value:
             query = {self.key_name: {'$exists': True}}
         elif not self.key_name and not self.key_value:

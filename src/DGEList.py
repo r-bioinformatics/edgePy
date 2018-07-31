@@ -28,7 +28,7 @@ class DGEList(object):
 
     Examples:
         >>> import gzip
-        >>> from edgepy.io import get_dataset_path
+        >>> from src.data_import.data_import import get_dataset_path
         >>> dataset = 'GSE49712_HTSeq.txt.gz'
         >>> DGEList.read_handle(gzip.open(get_dataset_path(dataset)))
         DGEList(num_samples=10, num_genes=21,717)
@@ -257,6 +257,8 @@ class DGEList(object):
 
         # TODO: validate file name
 
+        print(f"Exporting data to compressed .dge file ({filename}.npz)....")
+
         np.savez_compressed(filename,
                             samples=self.samples,
                             genes=self.genes,
@@ -279,3 +281,4 @@ class DGEList(object):
         self.samples = npzfile['samples']
         self.norm_factors = npzfile['norm_factors']
         self.group = npzfile['group']
+

@@ -2,8 +2,8 @@ import gzip
 import numpy as np
 import pytest
 
-from edgepy import DGEList
-from edgepy.data_import import *  # Explicitly test the import of __all__
+from src import DGEList
+from src.data_import import *  # Explicitly test the import of __all__
 
 TEST_DATASET = 'GSE49712_HTSeq.txt.gz'
 

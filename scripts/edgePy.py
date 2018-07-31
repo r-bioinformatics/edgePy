@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 import argparse
 
-from edgepy.DGEList import DGEList
+from src.DGEList import DGEList
+import os
 
-from edgepy.data_import.data_import import DataImporter
-from edgepy.data_import.data_import import GroupImporter
+from src.data_import.data_import import DataImporter
+from src.data_import.data_import import GroupImporter
 
-from edgepy.data_import.mongodb.mongo_import import ImportFromMongodb
+from src.data_import.mongodb.mongo_import import ImportFromMongodb
 
 
 def parse_arguments(parser=None):
@@ -36,13 +37,14 @@ class edgePy(object):
 
         if args.dge_file:
             self.dge_list = DGEList(filename=args.dge_file)
+            print(self.dge_list)
 
         elif args.mongo_config:
             mongo_importer = ImportFromMongodb(args)
             sample_list, data_set, gene_list = mongo_importer.get_data_from_mongo()
             self.dge_list = mongo_importer.create_DGEList(sample_list, data_set, gene_list)
 
-            self.dge_list.export_file('edgePy_src/data/example_data.cpe')
+            self.dge_list.export_file('./src/data/example_data.cpe')
 
         else:
             importer = DataImporter(args.count_file)
