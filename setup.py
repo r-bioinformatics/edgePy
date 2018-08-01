@@ -27,7 +27,7 @@ setup(
     url=f'https://github.com/{AUTHOR}/{PACKAGE}',
     py_modules=[PACKAGE],
     install_requires=[
-        'numpy'
+        'numpy', 'pymongo'
     ],
     extras_require={
         'ci': ['codecov', 'flake8', 'mypy', 'pylint', 'pytest', 'pytest-cov'],
