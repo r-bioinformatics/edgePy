@@ -51,7 +51,8 @@ def test_cycle_dge_npz():
 
     import tempfile
     import os
-    file_name = tempfile.mkdtemp(prefix='edgePy_tmp') + os.sep + next(tempfile._get_candidate_names())
+    tempdir = tempfile.mkdtemp(prefix='edgePy_tmp')
+    file_name = tempdir + os.sep + next(tempfile._get_candidate_names())
     dge_list_first = dge_list()
     dge_list_first.export_file(filename=file_name)
 
@@ -62,6 +63,8 @@ def test_cycle_dge_npz():
     assert dge_list_first.norm_factors.shape == dge_list_second.norm_factors.shape
     if dge_list_first.group:
         assert dge_list_first.group.shape == dge_list_second.group.shape
+    os.remove(file_name + ".npz")
+    os.rmdir(tempdir)
 
 
 def test_repr():
