@@ -17,9 +17,11 @@ def dge_list():
 
 def test_minimal_init():
 
-    dge_list = DGEList(to_remove_zeroes=False, counts=np.zeros(shape=(5,5)))
-    dge_list.counts
-    dge_list.library_size
+    dge_list = DGEList(to_remove_zeroes=False,
+                       counts=np.ones(shape=(5,5)),
+                       samples=['A','B', 'C', 'D', 'E'],
+                       genes=['ENSG001','ENSG002', 'ENSG003', 'ENSG004', 'ENSG005'])
+    assert dge_list.__repr__() == 'DGEList(num_samples=5, num_genes=5)'
 
 
 def test_too_much():
@@ -31,8 +33,6 @@ def test_too_much():
     assert len(dge_list().genes) == 21717
 
 
-
-
 def test_setting_DGElist_counts():
 
     dge_list = DGEList(counts=np.zeros(shape=(5, 10)))
@@ -42,11 +42,9 @@ def test_setting_DGElist_counts():
     with pytest.raises(ValueError):
         c = np.array([[1, 1, 1], [-1, 1, 1]])
         DGEList(counts=c)
-        # dge_list.counts = np.array(-1, 1, 1)
     with pytest.raises(ValueError):
         c = np.array([[1, 1, 1], [np.nan, 1, 1]])
         DGEList(counts=c)
-        # dge_list.counts = np.array(1, 1, np.nan)
 
 
 def test_repr():
