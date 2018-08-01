@@ -257,7 +257,7 @@ class DGEList(object):
             f'num_genes={num_genes:,})'
         )
 
-    def export_file(self, filename):
+    def export_file(self, filename) -> None:
         """ Convert the object to a byte representation, which can be stored or imported."""
 
         # TODO: validate file name
@@ -271,7 +271,7 @@ class DGEList(object):
                             counts=self.counts,
                             group=self.group)
 
-    def import_file(self, filename):
+    def import_file(self, filename) -> None:
         """
         Import a file name stored in the dge export format.
         :param filename:
