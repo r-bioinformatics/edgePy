@@ -9,7 +9,7 @@ from src.data_import.mongodb.gene_functions import translate_genes
 
 from src.DGEList import DGEList\
 
-from typing import Dict, Hashable, Any, Tuple, List
+from typing import Dict, Hashable, Any, Tuple, List, Optional
 
 
 def parse_arguments(parser: Any=None) -> Any:
@@ -72,10 +72,9 @@ class ImportFromMongodb(object):
             sample_names.add(result['sample_name'])
             # sample_category[result['sample_name']] = 'myocyte' if 'myocyte' in result[self.key_name] else 'fibroblast'
             sample_category[result['sample_name']] = result[self.key_name]
-        sample_names = list(sample_names)
-        print(f"get data.... for sample_names {sample_names}")
+        print(f"get data.... for sample_names {list(sample_names)}")
 
-        query = {'sample_name': {'$in': sample_names}}
+        query = {'sample_name': {'$in': list(sample_names)}}
         if self.gene_list:
             print(self.gene_list)
             query['gene'] = {'$in': list(self.gene_list)}
@@ -83,7 +82,7 @@ class ImportFromMongodb(object):
 
         # make it a list of lists
         print(f"Importing data from mongo ({self.mongo_host})....")
-        dataset: Dict[Hashable, Dict[Hashable, int]] = {}
+        dataset: Dict[Hashable, Dict[Hashable, Optional[int]]] = {}
         gene_list = set()
         sample_list = set()
         count = 0
