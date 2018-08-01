@@ -7,10 +7,12 @@ from src.data_import.mongodb.gene_functions import get_canonical_raw
 from src.data_import.mongodb.gene_functions import get_genelist_from_file
 from src.data_import.mongodb.gene_functions import translate_genes
 
-from src.DGEList import DGEList
+from src.DGEList import DGEList\
+
+from typing import Dict, Hashable, Any, Tuple, List
 
 
-def parse_arguments(parser=None):
+def parse_arguments(parser=None) -> Any:
     if not parser:
         parser = argparse.ArgumentParser()
 
@@ -25,7 +27,7 @@ def parse_arguments(parser=None):
 
 class ImportFromMongodb(object):
 
-    def __init__(self, args):
+    def __init__(self, args) -> None:
         config = configparser.ConfigParser()
         config.read(args.mongo_config)
 
@@ -45,7 +47,7 @@ class ImportFromMongodb(object):
             ensg_genes, gene_symbols = translate_genes(input_genes, self.mongo_reader)
             self.gene_list = ensg_genes
 
-    def get_data_from_mongo(self):
+    def get_data_from_mongo(self) -> Tuple[List[str], Dict[Hashable, Any], List[str], Dict[Hashable, Any]]:
 
         if self.key_name and self.key_value:
             query = {self.key_name: self.key_value}
@@ -102,7 +104,10 @@ class ImportFromMongodb(object):
         return sorted(sample_list), dataset, sorted(gene_list), sample_category
 
     @staticmethod
-    def create_DGEList(sample_list, data_set, gene_list, sample_category):
+    def create_DGEList(sample_list: List[str],
+                       data_set: Dict[Hashable, Any],
+                       gene_list: List[str],
+                       sample_category: Dict[Hashable, str]) -> object:
         """ sample list and gene list must be pre-sorted
             Use this to create the DGE object for future work."""
 
