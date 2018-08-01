@@ -2,7 +2,7 @@
 A simple library for wrapping around mongo collections and access issues.
 """
 
-import pymongo
+import pymongo  # type: ignore
 from pymongo.errors import BulkWriteError
 from pymongo import InsertOne, UpdateOne
 from typing import Dict, Hashable, Any, Iterable, List, Union
