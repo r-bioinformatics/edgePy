@@ -47,6 +47,23 @@ def test_setting_DGElist_counts():
         DGEList(counts=c)
 
 
+def test_cycle_dge_npz():
+
+    import tempfile
+    import os
+    file_name = tempfile.mkdtemp(prefix='edgePy_tmp') + os.sep + next(tempfile._get_candidate_names())
+    dge_list_first = dge_list()
+    dge_list_first.export_file(filename=file_name)
+
+    dge_list_second = DGEList(filename=file_name + ".npz")
+    assert dge_list_first.counts.shape == dge_list_second.counts.shape
+    assert dge_list_first.genes.shape == dge_list_second.genes.shape
+    assert dge_list_first.samples.shape == dge_list_second.samples.shape
+    assert dge_list_first.norm_factors.shape == dge_list_second.norm_factors.shape
+    if dge_list_first.group:
+        assert dge_list_first.group.shape == dge_list_second.group.shape
+
+
 def test_repr():
     assert dge_list().__repr__() == 'DGEList(num_samples=10, num_genes=21,717)'
 
