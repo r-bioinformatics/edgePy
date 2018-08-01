@@ -17,6 +17,7 @@ def translate_genes(genes: Optional[List[str]], mongo_reader: Any) -> Tuple[List
     ensg_genes = []
     non_ensg_genes = []
     gene_symbols = {}
+    query: Dict[Hashable, Any]
 
     if genes:
         for gene in genes:
@@ -25,11 +26,7 @@ def translate_genes(genes: Optional[List[str]], mongo_reader: Any) -> Tuple[List
             else:
                 non_ensg_genes.append(gene)
     if ensg_genes or not genes:
-        if not genes:
-            query: Dict[Hashable, str] = {}
-        else:
-            query: Dict[Hashable, str] = {'_id': {'$in': ensg_genes}}
-
+        query = {'_id': {'$in': ensg_genes}} if genes else {}
         symbol_gene_list = mongo_reader.find_as_cursor('ensembl_90_37', 'symbol_by_ensg',
                                                        query=query)
         for symbol_gene in symbol_gene_list:
@@ -39,10 +36,7 @@ def translate_genes(genes: Optional[List[str]], mongo_reader: Any) -> Tuple[List
             if ensg not in gene_symbols:
                 gene_symbols[ensg] = ensg
     if non_ensg_genes or not genes:
-        if not genes:
-            query = {}
-        else:
-            query = {'_id': {'$in': non_ensg_genes}}
+        query = {'_id': {'$in': non_ensg_genes}} if genes else {}
         translated_gene_list = mongo_reader.find_as_cursor('ensembl_90_37', 'ensg_by_symbol',
                                                            query=query)
         for trans_gene in translated_gene_list:

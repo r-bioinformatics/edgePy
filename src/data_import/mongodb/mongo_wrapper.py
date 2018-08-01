@@ -3,14 +3,14 @@ A simple library for wrapping around mongo collections and access issues.
 """
 
 import pymongo  # type: ignore
-from pymongo.errors import BulkWriteError
-from pymongo import InsertOne, UpdateOne
+from pymongo.errors import BulkWriteError   # type: ignore
+from pymongo import InsertOne, UpdateOne   # type: ignore
 from typing import Dict, Hashable, Any, Iterable, List, Union
 
 
 class MongoWrapper(object):
 
-    def __init__(self, host: str, port: int, connect: bool=True, verbose: bool=False) -> None:
+    def __init__(self, host: str, port: Union[str, int], connect: bool=True, verbose: bool=False) -> None:
         self.host = host
         self.port = int(port)
         self.session = pymongo.MongoClient(host=self.host, port=self.port, connect=connect)
@@ -33,7 +33,7 @@ class MongoWrapper(object):
         cursor = self.find_as_cursor(database=database, collection=collection, query=query, projection=projection)
         return [c for c in cursor]
 
-    def find_as_dict(self, database: str, collection: str, query: Dict[Hashable, Any]=None, field='_id',
+    def find_as_dict(self, database: str, collection: str, query: Dict[Hashable, Any]=None, field: str='_id',
                        projection: Dict[Hashable, Any]=None) -> Iterable:
         cursor = self.find_as_cursor(database=database, collection=collection, query=query, projection=projection)
         return {c[field]: c for c in cursor}

@@ -12,7 +12,7 @@ from src.DGEList import DGEList\
 from typing import Dict, Hashable, Any, Tuple, List
 
 
-def parse_arguments(parser=None) -> Any:
+def parse_arguments(parser: Any=None) -> Any:
     if not parser:
         parser = argparse.ArgumentParser()
 
@@ -27,7 +27,7 @@ def parse_arguments(parser=None) -> Any:
 
 class ImportFromMongodb(object):
 
-    def __init__(self, args) -> None:
+    def __init__(self, args: Any) -> None:
         config = configparser.ConfigParser()
         config.read(args.mongo_config)
 
