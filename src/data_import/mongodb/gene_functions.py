@@ -1,9 +1,9 @@
 
 """The core Python code for generating data."""
-from typing import Dict, Optional, List, Tuple, Any
+from typing import Dict, Optional, List, Tuple, Any, Mapping
 
 
-def get_genelist_from_file(filename) -> Optional[List]:
+def get_genelist_from_file(filename: str) -> Optional[List]:
     if not filename:
         return None
     gene_list = []
@@ -13,7 +13,7 @@ def get_genelist_from_file(filename) -> Optional[List]:
     return gene_list
 
 
-def translate_genes(genes, mongo_reader) -> Tuple[List[str], Dict[str, str]]:
+def translate_genes(genes: Optional[List[str]], mongo_reader: Any) -> Tuple[List[str], Dict[str, str]]:
     ensg_genes = []
     non_ensg_genes = []
     gene_symbols = {}
@@ -54,7 +54,7 @@ def translate_genes(genes, mongo_reader) -> Tuple[List[str], Dict[str, str]]:
     return ensg_genes, gene_symbols
 
 
-def get_gene_list(mongo_reader) -> Dict[str, str]:
+def get_gene_list(mongo_reader: Any) -> Dict[str, str]:
     genes = mongo_reader.find_as_cursor('ensembl_90_37', 'symbol_by_ensg', query={})
     gene_symbols = {}
     for symbol_gene in genes:
@@ -63,7 +63,7 @@ def get_gene_list(mongo_reader) -> Dict[str, str]:
     return gene_symbols
 
 
-def get_sample_details(group_by, mongo_reader) -> Dict[Any, Dict[Any, str]]:
+def get_sample_details(group_by: str, mongo_reader: Any) -> Dict[Any, Dict[Any, str]]:
 
     sample_details = {}
     search = {group_by: {'$exists': True}}
@@ -80,7 +80,7 @@ def get_sample_details(group_by, mongo_reader) -> Dict[Any, Dict[Any, str]]:
     return sample_details
 
 
-def get_canonical_rpkm(result) -> Optional[int]:
+def get_canonical_rpkm(result: Dict[Any]) -> Optional[int]:
     transcript_list = result['transcripts']
     for trans in transcript_list.values():
         if int(trans['canonical']) == 1:
@@ -88,7 +88,7 @@ def get_canonical_rpkm(result) -> Optional[int]:
     return None
 
 
-def get_canonical_raw(result) -> Optional[int]:
+def get_canonical_raw(result: Dict[Any]) -> Optional[int]:
     transcript_list = result['transcripts']
     for trans in transcript_list.values():
         if int(trans['canonical']) == 1:
