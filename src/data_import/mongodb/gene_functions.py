@@ -1,6 +1,6 @@
 
 """The core Python code for generating data."""
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional, List, Tuple, Any
 
 
 def get_genelist_from_file(filename) -> Optional[List]:
@@ -13,7 +13,7 @@ def get_genelist_from_file(filename) -> Optional[List]:
     return gene_list
 
 
-def translate_genes(genes, mongo_reader) -> Tuple[List[str], Dict]:
+def translate_genes(genes, mongo_reader) -> Tuple[List[str], Dict[str, str]]:
     ensg_genes = []
     non_ensg_genes = []
     gene_symbols = {}
@@ -54,7 +54,7 @@ def translate_genes(genes, mongo_reader) -> Tuple[List[str], Dict]:
     return ensg_genes, gene_symbols
 
 
-def get_gene_list(mongo_reader) -> Dict:
+def get_gene_list(mongo_reader) -> Dict[str, str]:
     genes = mongo_reader.find_as_cursor('ensembl_90_37', 'symbol_by_ensg', query={})
     gene_symbols = {}
     for symbol_gene in genes:
@@ -63,7 +63,7 @@ def get_gene_list(mongo_reader) -> Dict:
     return gene_symbols
 
 
-def get_sample_details(group_by, mongo_reader) -> Dict:
+def get_sample_details(group_by, mongo_reader) -> Dict[Any, Dict[Any, str]]:
 
     sample_details = {}
     search = {group_by: {'$exists': True}}
