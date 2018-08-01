@@ -29,12 +29,12 @@ class MongoWrapper(object):
         return cursor
 
     def find_as_list(self, database: str, collection: str, query: Dict[Hashable, Any]=None,
-                       projection: Dict[Hashable, Any]=None) -> Iterable:
+                     projection: Dict[Hashable, Any]=None) -> Iterable:
         cursor = self.find_as_cursor(database=database, collection=collection, query=query, projection=projection)
         return [c for c in cursor]
 
     def find_as_dict(self, database: str, collection: str, query: Dict[Hashable, Any]=None, field: str='_id',
-                       projection: Dict[Hashable, Any]=None) -> Iterable:
+                     projection: Dict[Hashable, Any]=None) -> Iterable:
         cursor = self.find_as_cursor(database=database, collection=collection, query=query, projection=projection)
         return {c[field]: c for c in cursor}
 
