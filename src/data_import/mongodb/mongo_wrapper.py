@@ -10,7 +10,7 @@ from typing import Dict, Hashable, Any, Iterable, List, Union
 
 class MongoWrapper(object):
 
-    def __init__(self, host, port, connect=True, verbose=False):
+    def __init__(self, host, port, connect=True, verbose=False) -> None:
         self.host = host
         self.port = int(port)
         self.session = pymongo.MongoClient(host=self.host, port=self.port, connect=connect)
@@ -29,36 +29,36 @@ class MongoWrapper(object):
         return cursor
 
     def find_as_list(self, database: str, collection: str, query: Dict[Hashable, Any]=None,
-                       projection: Dict[Hashable, Any]=None):
+                       projection: Dict[Hashable, Any]=None) -> Iterable:
         cursor = self.find_as_cursor(database=database, collection=collection, query=query, projection=projection)
         return [c for c in cursor]
 
     def find_as_dict(self, database: str, collection: str, query: Dict[Hashable, Any]=None,
-                       projection: Dict[Hashable, Any]=None):
+                       projection: Dict[Hashable, Any]=None) -> Iterable:
         cursor = self.find_as_cursor(database=database, collection=collection, query=query, projection=projection)
         return {c[field]: c for c in cursor}
 
-    def insert(self, database: str, collection: str, data_list: List[Any]):
+    def insert(self, database: str, collection: str, data_list: List[Any]) -> None:
         mongo_db = self.session[database][collection]
         try:
             mongo_db.test.insert_many(data_list, ordered=False)
         except BulkWriteError as bwe:
             print(bwe.details)
 
-    def create_index(self, database: str, collection: str, key: str):
+    def create_index(self, database: str, collection: str, key: str) -> None:
         self.session[database][collection].create_index(key)
 
 
 class MongoInserter(MongoWrapper):
 
-    def __init__(self, host: str, port: int, database: str, collection: str, connect: bool=True):
+    def __init__(self, host: str, port: int, database: str, collection: str, connect: bool=True) -> None:
         MongoWrapper.__init__(self, host, port, connect=connect)
         self.database = database
         self.collection = collection
         self.to_insert = []
         self.mongo_col = self.session[database][collection]
 
-    def flush(self):
+    def flush(self) -> None:
         if self.to_insert:
             try:
                 result = self.mongo_col.bulk_write(self.to_insert, ordered=False)
@@ -69,27 +69,27 @@ class MongoInserter(MongoWrapper):
                 raise Exception("Mongo bulk write failed.")
         del self.to_insert[:]
 
-    def add(self, record: Union[List[Any], Dict[Hashable, Any]]):
+    def add(self, record: Union[List[Any], Dict[Hashable, Any]]) -> None:
         self.to_insert.append(InsertOne(record))
         if len(self.to_insert) > 1000:
             self.flush()
 
-    def close(self):
+    def close(self) -> None:
         self.flush()
 
-    def create_index_key(self, key: str):
+    def create_index_key(self, key: str) -> None:
         self.create_index(self.database, self.collection, key)
 
 
 class MongoUpdater(MongoWrapper):
 
-    def __init__(self, host: str, port: int, database: str, collection: str, connect: bool=True):
+    def __init__(self, host: str, port: int, database: str, collection: str, connect: bool=True) -> None:
         MongoWrapper.__init__(self, host, port, connect=connect)
         self.database = database
         self.to_update = []
         self.mongo_col = self.session[database][collection]
 
-    def flush(self):
+    def flush(self) -> None:
         if self.to_update:
             try:
                 result = self.mongo_col.bulk_write(self.to_update, ordered=False)
@@ -100,10 +100,10 @@ class MongoUpdater(MongoWrapper):
                 raise Exception("Mongo bulk write failed.")
         del self.to_update[:]
 
-    def add(self, updatedict: Dict[Hashable, Any], setdict: Dict[Hashable, Any]):
+    def add(self, updatedict: Dict[Hashable, Any], setdict: Dict[Hashable, Any]) -> None:
         self.to_update.append(UpdateOne(updatedict, setdict))
         if len(self.to_update) > 1000:
             self.flush()
 
-    def close(self):
+    def close(self) -> None:
         self.flush()
