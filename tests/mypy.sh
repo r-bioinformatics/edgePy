@@ -10,4 +10,4 @@ mypy \
   --warn-redundant-casts \
   --disallow-untyped-defs \
   --disallow-untyped-calls \
-  "${this}"/../edgePy
+  "${this}"/../src

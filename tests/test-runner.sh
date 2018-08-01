@@ -5,4 +5,4 @@ this="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 py.test \
   --verbose \
   --doctest-modules \
-  --cov="${this}"/../edgePy
+  --cov="${this}"/../src
