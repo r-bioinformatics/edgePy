@@ -1,8 +1,8 @@
 
 """The core Python code for generating data."""
+from typing import Dict, Optional, List, Tuple
 
-
-def get_genelist_from_file(filename):
+def get_genelist_from_file(filename) -> List:
     if not filename:
         return None
     gene_list = []
@@ -12,7 +12,7 @@ def get_genelist_from_file(filename):
     return gene_list
 
 
-def translate_genes(genes, mongo_reader):
+def translate_genes(genes, mongo_reader) -> Tuple[List, Dict]:
     ensg_genes = []
     non_ensg_genes = []
     gene_symbols = {}
@@ -53,7 +53,7 @@ def translate_genes(genes, mongo_reader):
     return ensg_genes, gene_symbols
 
 
-def get_gene_list(mongo_reader):
+def get_gene_list(mongo_reader) -> Dict:
     genes = mongo_reader.find_as_cursor('ensembl_90_37', 'symbol_by_ensg', query={})
     gene_symbols = {}
     for symbol_gene in genes:
@@ -62,7 +62,7 @@ def get_gene_list(mongo_reader):
     return gene_symbols
 
 
-def get_sample_details(group_by, mongo_reader):
+def get_sample_details(group_by, mongo_reader) -> Dict:
 
     sample_details = {}
     search = {group_by: {'$exists': True}}
@@ -79,7 +79,7 @@ def get_sample_details(group_by, mongo_reader):
     return sample_details
 
 
-def get_canonical_rpkm(result):
+def get_canonical_rpkm(result) -> Optional[int]:
     transcript_list = result['transcripts']
     for trans in transcript_list.values():
         if int(trans['canonical']) == 1:
@@ -87,7 +87,7 @@ def get_canonical_rpkm(result):
     return None
 
 
-def get_canonical_raw(result):
+def get_canonical_raw(result) -> Optional[int]:
     transcript_list = result['transcripts']
     for trans in transcript_list.values():
         if int(trans['canonical']) == 1:
