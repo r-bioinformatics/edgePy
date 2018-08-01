@@ -55,7 +55,7 @@ class MongoInserter(MongoWrapper):
         MongoWrapper.__init__(self, host, port, connect=connect)
         self.database = database
         self.collection = collection
-        self.to_insert = []
+        self.to_insert: List = []
         self.mongo_col = self.session[database][collection]
 
     def flush(self) -> None:
