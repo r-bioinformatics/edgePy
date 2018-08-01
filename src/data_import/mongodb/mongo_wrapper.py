@@ -5,6 +5,7 @@ A simple library for wrapping around mongo collections and access issues.
 import pymongo
 from pymongo.errors import BulkWriteError
 from pymongo import InsertOne, UpdateOne
+from typing import Dict, Hashable, Any, Iterable, List, Union
 
 
 class MongoWrapper(object):
@@ -15,7 +16,9 @@ class MongoWrapper(object):
         self.session = pymongo.MongoClient(host=self.host, port=self.port, connect=connect)
         self.verbose = verbose
 
-    def find_as_cursor(self, database, collection, query=None, projection=None):
+    def find_as_cursor(self, database: str, collection: str, query: Dict[Hashable, Any]=None,
+                       projection: Dict[Hashable, Any]=None) -> Iterable:
+
         mongo_db = self.session[database][collection]
         try:
             cursor = mongo_db.find(query, projection)
@@ -25,28 +28,30 @@ class MongoWrapper(object):
 
         return cursor
 
-    def find_as_list(self, database, collection, query=None, projection=None):
+    def find_as_list(self, database: str, collection: str, query: Dict[Hashable, Any]=None,
+                       projection: Dict[Hashable, Any]=None):
         cursor = self.find_as_cursor(database=database, collection=collection, query=query, projection=projection)
         return [c for c in cursor]
 
-    def find_as_dict(self, database, collection, query, field='_id', projection=None):
+    def find_as_dict(self, database: str, collection: str, query: Dict[Hashable, Any]=None,
+                       projection: Dict[Hashable, Any]=None):
         cursor = self.find_as_cursor(database=database, collection=collection, query=query, projection=projection)
         return {c[field]: c for c in cursor}
 
-    def insert(self, database, collection, data_list):
+    def insert(self, database: str, collection: str, data_list: List[Any]):
         mongo_db = self.session[database][collection]
         try:
             mongo_db.test.insert_many(data_list, ordered=False)
         except BulkWriteError as bwe:
             print(bwe.details)
 
-    def create_index(self, database, collection, key):
+    def create_index(self, database: str, collection: str, key: str):
         self.session[database][collection].create_index(key)
 
 
 class MongoInserter(MongoWrapper):
 
-    def __init__(self, host, port, database, collection, connect=True):
+    def __init__(self, host: str, port: int, database: str, collection: str, connect: bool=True):
         MongoWrapper.__init__(self, host, port, connect=connect)
         self.database = database
         self.collection = collection
@@ -64,7 +69,7 @@ class MongoInserter(MongoWrapper):
                 raise Exception("Mongo bulk write failed.")
         del self.to_insert[:]
 
-    def add(self, record):
+    def add(self, record: Union[List[Any], Dict[Hashable, Any]]):
         self.to_insert.append(InsertOne(record))
         if len(self.to_insert) > 1000:
             self.flush()
@@ -72,13 +77,13 @@ class MongoInserter(MongoWrapper):
     def close(self):
         self.flush()
 
-    def create_index_key(self, key):
+    def create_index_key(self, key: str):
         self.create_index(self.database, self.collection, key)
 
 
 class MongoUpdater(MongoWrapper):
 
-    def __init__(self, host, port, database, collection, connect=True):
+    def __init__(self, host: str, port: int, database: str, collection: str, connect: bool=True):
         MongoWrapper.__init__(self, host, port, connect=connect)
         self.database = database
         self.to_update = []
@@ -95,7 +100,7 @@ class MongoUpdater(MongoWrapper):
                 raise Exception("Mongo bulk write failed.")
         del self.to_update[:]
 
-    def add(self, updatedict, setdict):
+    def add(self, updatedict: Dict[Hashable, Any], setdict: Dict[Hashable, Any]):
         self.to_update.append(UpdateOne(updatedict, setdict))
         if len(self.to_update) > 1000:
             self.flush()

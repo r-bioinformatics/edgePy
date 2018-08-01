@@ -1,6 +1,6 @@
 
 """The core Python code for generating data."""
-from typing import Dict, Optional, List, Tuple, Any, Mapping
+from typing import Dict, Optional, List, Tuple, Any, Hashable
 
 
 def get_genelist_from_file(filename: str) -> Optional[List]:
@@ -63,7 +63,7 @@ def get_gene_list(mongo_reader: Any) -> Dict[str, str]:
     return gene_symbols
 
 
-def get_sample_details(group_by: str, mongo_reader: Any) -> Dict[Any, Dict[Any, str]]:
+def get_sample_details(group_by: str, mongo_reader: Any) -> Dict[Hashable, Dict[Hashable, str]]:
 
     sample_details = {}
     search = {group_by: {'$exists': True}}
