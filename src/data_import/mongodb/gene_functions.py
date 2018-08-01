@@ -2,7 +2,8 @@
 """The core Python code for generating data."""
 from typing import Dict, Optional, List, Tuple
 
-def get_genelist_from_file(filename) -> List:
+
+def get_genelist_from_file(filename) -> Optional[List]:
     if not filename:
         return None
     gene_list = []
@@ -12,7 +13,7 @@ def get_genelist_from_file(filename) -> List:
     return gene_list
 
 
-def translate_genes(genes, mongo_reader) -> Tuple[List, Dict]:
+def translate_genes(genes, mongo_reader) -> Tuple[List[str], Dict]:
     ensg_genes = []
     non_ensg_genes = []
     gene_symbols = {}
