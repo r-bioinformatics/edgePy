@@ -80,7 +80,7 @@ def get_sample_details(group_by: str, mongo_reader: Any) -> Dict[Any, Dict[Any, 
     return sample_details
 
 
-def get_canonical_rpkm(result: Dict[Any]) -> Optional[int]:
+def get_canonical_rpkm(result: Dict[str, Any]) -> Optional[int]:
     transcript_list = result['transcripts']
     for trans in transcript_list.values():
         if int(trans['canonical']) == 1:
@@ -88,7 +88,7 @@ def get_canonical_rpkm(result: Dict[Any]) -> Optional[int]:
     return None
 
 
-def get_canonical_raw(result: Dict[Any]) -> Optional[int]:
+def get_canonical_raw(result: Dict[str, Any]) -> Optional[int]:
     transcript_list = result['transcripts']
     for trans in transcript_list.values():
         if int(trans['canonical']) == 1:
