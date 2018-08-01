@@ -96,4 +96,3 @@ def get_canonical_raw(result):
                 raw += int(trans['exons'][exon]['raw'])
             return raw
     return None
-

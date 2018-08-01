@@ -286,4 +286,3 @@ class DGEList(object):
         self.samples = npzfile['samples']
         self.norm_factors = npzfile['norm_factors']
         self.group = npzfile['group']
-
