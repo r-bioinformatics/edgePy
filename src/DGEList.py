@@ -46,7 +46,7 @@ class DGEList(object):
             norm_factors: Optional[np.array] = None,
             group: Optional[np.array] = None,
             to_remove_zeroes: Optional[bool] = False,
-            filename=None,
+            filename: Optional[str]=None,
     ) -> None:
 
         self.to_remove_zeroes = to_remove_zeroes
@@ -257,7 +257,7 @@ class DGEList(object):
             f'num_genes={num_genes:,})'
         )
 
-    def export_file(self, filename) -> None:
+    def export_file(self, filename: str) -> None:
         """ Convert the object to a byte representation, which can be stored or imported."""
 
         # TODO: validate file name
@@ -271,7 +271,7 @@ class DGEList(object):
                             counts=self.counts,
                             group=self.group)
 
-    def import_file(self, filename) -> None:
+    def import_file(self, filename: str) -> None:
         """
         Import a file name stored in the dge export format.
         :param filename:
