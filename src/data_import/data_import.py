@@ -111,9 +111,9 @@ def get_dataset_path(filename: Union[str, Path]) -> Path:
 
     Examples
     --------
-    >>> from src.io import get_dataset_path
+    >>> from src.data_import.data_import import get_dataset_path
     >>> str(get_dataset_path("GSE49712_HTSeq.txt.gz"))  # doctest:+ELLIPSIS
-    '.../edgePy/data/GSE49712_HTSeq.txt.gz'
+    '.../src/data/GSE49712_HTSeq.txt.gz'
 
     """
     import src

@@ -15,8 +15,9 @@ def dge_list():
         return DGEList.read_handle(handle)
 
 
-def test_blank_init():
-    dge_list = DGEList(to_remove_zeroes=False)
+def test_minimal_init():
+
+    dge_list = DGEList(to_remove_zeroes=False, counts=np.zeros(shape=(5,5)))
     dge_list.counts
     dge_list.library_size
 
@@ -30,13 +31,22 @@ def test_too_much():
     assert len(dge_list().genes) == 21717
 
 
+
+
 def test_setting_DGElist_counts():
-    with pytest.raises(TypeError):
-        dge_list().counts = None
+
+    dge_list = DGEList(counts=np.zeros(shape=(5, 10)))
+    assert 5 == dge_list.counts.shape[0]
+    assert 10 == dge_list.counts.shape[1]
+
     with pytest.raises(ValueError):
-        dge_list().counts = np.array(-1, 1, 1)
+        c = np.array([[1, 1, 1], [-1, 1, 1]])
+        DGEList(counts=c)
+        # dge_list.counts = np.array(-1, 1, 1)
     with pytest.raises(ValueError):
-        dge_list().counts = np.array(1, 1, np.nan)
+        c = np.array([[1, 1, 1], [np.nan, 1, 1]])
+        DGEList(counts=c)
+        # dge_list.counts = np.array(1, 1, np.nan)
 
 
 def test_repr():

@@ -107,6 +107,10 @@ class DGEList(object):
             counts: Columns correspond to samples and row to genes.
 
         """
+        if counts is None:
+            self._counts = None
+            return
+
         if hasattr(self, '_counts'):
             # do checks for things here.  You shouldn't modify counts if it has already been set.  Create a new obj.
             if hasattr(self, '_samples') and self._samples is not None:
@@ -114,16 +118,13 @@ class DGEList(object):
                 if sample_count != self._samples.shape[0] or gene_count != self._genes.shape[0]:
                     raise ValueError("Attempting to substitute counts data into DGEList object with different "
                                      "dimensions fails.")
-        elif counts is None:
-            self._counts = None
-            return
 
         if not isinstance(counts, np.ndarray):
             raise TypeError('Counts matrix must be of type ``np.ndarray``.')
-        if np.any(counts < 0):
-            raise ValueError('Counts matrix cannot contain negative values.')
-        if np.any(counts == np.nan):
+        if np.isnan(counts).any():
             raise ValueError('Counts matrix must have only real values.')
+        if (counts < 0).any():
+            raise ValueError('Counts matrix cannot contain negative values.')
         if self.to_remove_zeroes:
             counts = counts[np.all(counts != 0, axis=1)]  # this is not working.  Does not remove rows with only zeros.
 
@@ -140,8 +141,8 @@ class DGEList(object):
         # - Samples same length as ncol(self.counts) if defined
         if samples is not None:
             samples = np.array(list(self._format_fields(samples)))
+            self._total_counts = np.zeros(len(samples))
         self._samples = samples
-        self._total_counts = np.zeros(len(samples))
 
     @property
     def genes(self) -> np.array:
@@ -201,11 +202,15 @@ class DGEList(object):
 
     def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> 'DGEList':
         """Return the DGEList normalized to read counts per million."""
-        self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
+        # self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
         # if log:
         #     self.counts[self.counts == 0] = prior_count
         #     self.counts = np.log(self.counts)
         # return self
+
+        raise NotImplementedError
+
+        # TODO: Implement here
 
     def rpkm(
             self,

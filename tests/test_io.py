@@ -63,4 +63,4 @@ def test_GroupImporter_failure():
 # Unit tests for packaged (optionally zipped during install) data.
 def test_get_data_stream():
     """Tests finding packaged data with ``pkgutil.get_data()``"""
-    pkgutil.get_data('edgePy', 'data/GSE49712_HTSeq.txt.gz')
+    pkgutil.get_data('src', 'data/GSE49712_HTSeq.txt.gz')
