@@ -26,9 +26,9 @@ def translate_genes(genes: Optional[List[str]], mongo_reader: Any) -> Tuple[List
                 non_ensg_genes.append(gene)
     if ensg_genes or not genes:
         if not genes:
-            query = {}
+            query: Dict[Hashable, str] = {}
         else:
-            query = {'_id': {'$in': ensg_genes}}
+            query: Dict[Hashable, str] = {'_id': {'$in': ensg_genes}}
 
         symbol_gene_list = mongo_reader.find_as_cursor('ensembl_90_37', 'symbol_by_ensg',
                                                        query=query)
@@ -63,7 +63,7 @@ def get_gene_list(mongo_reader: Any) -> Dict[str, str]:
     return gene_symbols
 
 
-def get_sample_details(group_by: str, mongo_reader: Any) -> Dict[Hashable, Dict[Hashable, str]]:
+def get_sample_details(group_by: str, mongo_reader: Any) -> Dict[Any, Dict[str, Any]]:
 
     sample_details = {}
     search = {group_by: {'$exists': True}}

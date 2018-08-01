@@ -1,6 +1,6 @@
 import configparser
 import argparse
-import numpy as np
+import numpy as np  # type: ignore
 
 from src.data_import.mongodb.mongo_wrapper import MongoWrapper
 from src.data_import.mongodb.gene_functions import get_canonical_raw
@@ -83,7 +83,7 @@ class ImportFromMongodb(object):
 
         # make it a list of lists
         print(f"Importing data from mongo ({self.mongo_host})....")
-        dataset = {}
+        dataset: Dict[Hashable, Dict[Hashable, int]] = {}
         gene_list = set()
         sample_list = set()
         count = 0
