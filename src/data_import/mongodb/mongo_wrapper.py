@@ -60,7 +60,7 @@ class MongoInserter(MongoWrapper):
         self.database = database
         self.collection = collection
         self.to_insert: List = []
-        self.mongo_col = self.session[database][collection]
+        self.mongo_col = self.get_db(database, collection)
 
     def flush(self) -> None:
         if self.to_insert:

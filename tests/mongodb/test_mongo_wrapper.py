@@ -1,6 +1,8 @@
 
 
 from src.data_import.mongodb.mongo_wrapper import MongoWrapper
+from src.data_import.mongodb.mongo_wrapper import MongoInserter
+from src.data_import.mongodb.mongo_wrapper import MongoUpdater
 
 
 def test_mongo_wrapper_find_as_cursor(mongodb):
@@ -46,32 +48,49 @@ def test_mongo_wrapper_create_index(mongodb):
 
 
 def test_mongo_inserter_flush(mongodb):
+    """This is not testable - the mongodb pytest module does not support bulk writes. """
+
+    mi = MongoInserter('localhost', 27017, 'pytest', 'test')
+    mi.session = mongodb
+    # mi.add(['A', 'B', 'C'])
+    mi.flush()
+
     pass
 
 
 def test_mongo_inserter_add(mongodb):
-    pass
+    mi = MongoInserter('localhost', 27017, 'pytest', 'test')
+    mi.session = mongodb
+    mi.add(['A', 'B', 'C'])
 
 
 def test_mongo_inserter_close(mongodb):
-    pass
+    mi = MongoInserter('localhost', 27017, 'pytest', 'test')
+    mi.session = mongodb
+    # mi.add(['A', 'B', 'C'])
+    mi.close()
 
 
 def test_mongo_inserter_create_index_key(mongodb):
-    pass
-
-
-def test_mongo_updater(mongodb):
-    pass
+    mi = MongoInserter('localhost', 27017, 'pytest', 'test')
+    mi.session = mongodb
+    mi.create_index('pytest', 'test', '_id')
 
 
 def test_mongo_updater_flush(mongodb):
-    pass
+    """This is not testable - the mongodb pytest module does not support bulk writes. """
+    mu = MongoUpdater('localhost', 27017, 'pytest', 'test')
+    mu.session = mongodb
+    mu.flush()
 
 
 def test_mongo_updater_add(mongodb):
-    pass
+    mu = MongoUpdater('localhost', 27017, 'pytest', 'test')
+    mu.session = mongodb
+    mu.add({}, {'a': 'b'})
 
 
 def test_mongo_updater_close(mongodb):
-    pass
+    mu = MongoUpdater('localhost', 27017, 'pytest', 'test')
+    mu.session = mongodb
+    mu.close()
