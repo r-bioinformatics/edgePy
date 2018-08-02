@@ -57,12 +57,12 @@ def test_cycle_dge_npz():
     dge_list_first.export_file(filename=file_name)
 
     dge_list_second = DGEList(filename=file_name + ".npz")
-    assert dge_list_first.counts.shape == dge_list_second.counts.shape
-    assert dge_list_first.genes.shape == dge_list_second.genes.shape
-    assert dge_list_first.samples.shape == dge_list_second.samples.shape
-    assert dge_list_first.norm_factors.shape == dge_list_second.norm_factors.shape
+    assert np.array_equal(dge_list_first.counts, dge_list_second.counts)
+    assert np.array_equal(dge_list_first.genes, dge_list_second.genes)
+    assert np.array_equal(dge_list_first.samples, dge_list_second.samples)
+    assert np.array_equal(dge_list_first.norm_factors, dge_list_second.norm_factors)
     if dge_list_first.group:
-        assert dge_list_first.group.shape == dge_list_second.group.shape
+        assert np.array_equal(dge_list_first.group, dge_list_second.group)
     os.remove(file_name + ".npz")
     os.rmdir(tempdir)
 
