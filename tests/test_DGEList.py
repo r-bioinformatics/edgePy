@@ -71,6 +71,13 @@ def test_repr():
     assert dge_list().__repr__() == 'DGEList(num_samples=10, num_genes=21,717)'
 
 
+def test_broken_dge_call():
+    with pytest.raises(Exception):
+        DGEList(filename='fake_filename', counts=np.array([[1, 1, 1], [1, 1, 1]]))
+    with pytest.raises(Exception):
+        DGEList(counts=None)
+
+
 def test_non_implemented():
     with pytest.raises(NotImplementedError):
         dge_list().cpm()

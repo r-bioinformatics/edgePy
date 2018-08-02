@@ -2,11 +2,13 @@ import pkgutil
 import gzip
 
 import pytest
+import numpy as np
 
 from src.data_import.data_import import get_open_function
 from src.data_import.data_import import get_dataset_path
 from src.data_import.data_import import GroupImporter
 from src.data_import.data_import import DataImporter
+from src.data_import.data_import import create_DGEList
 
 
 # TestCommonFunctions
@@ -64,3 +66,26 @@ def test_GroupImporter_failure():
 def test_get_data_stream():
     """Tests finding packaged data with ``pkgutil.get_data()``"""
     pkgutil.get_data('src', 'data/GSE49712_HTSeq.txt.gz')
+
+
+def test_create_DGEList():
+    """Tests the function that converts data into a DGE_List object"""
+    samples = ["AAA", "BBB", "CCC"]
+    genes = ['ENSG001', 'ENSG002']
+    data_set = {'AAA': {'ENSG001': 10, 'ENSG002': 20},
+                'BBB': {'ENSG001': 15, 'ENSG002': 40},
+                'CCC': {'ENSG001': 20, 'ENSG002': 80}}
+    categories = {'AAA': 'One',
+                  'BBB': 'Two',
+                  'CCC': 'One'}
+
+    dge_list = create_DGEList(sample_list=samples,
+                              data_set=data_set,
+                              gene_list=genes,
+                              sample_category=categories
+                              )
+
+    assert np.array_equal(dge_list.samples, np.array(samples))
+    assert np.array_equal(dge_list.counts, np.array([[10, 20], [15, 40], [20, 80]]))
+    assert np.array_equal(dge_list.group, np.array(['One', 'Two', 'One']))
+    assert np.array_equal(dge_list.genes, np.array(genes))
