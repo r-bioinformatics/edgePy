@@ -30,7 +30,7 @@ setup(
         'numpy', 'pymongo'
     ],
     extras_require={
-        'ci': ['codecov', 'flake8', 'mypy', 'pylint', 'pytest', 'pytest-cov'],
+        'ci': ['codecov', 'flake8', 'mypy', 'pylint', 'pytest', 'pytest-cov', 'pytest-mongodb'],
         'docs': ['recommonmark', 'sphinx'],
     },
     scripts=[

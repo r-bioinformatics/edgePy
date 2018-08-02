@@ -16,12 +16,17 @@ class MongoWrapper(object):
         self.session = pymongo.MongoClient(host=self.host, port=self.port, connect=connect)
         self.verbose = verbose
 
+    def get_db(self, database: str, collection: str):
+        if database == 'pytest':
+            return self.session[collection]
+        else:
+            return self.session[database][collection]
+
     def find_as_cursor(self, database: str, collection: str, query: Dict[Hashable, Any]=None,
                        projection: Dict[Hashable, Any]=None) -> Iterable:
 
-        mongo_db = self.session[database][collection]
         try:
-            cursor = mongo_db.find(query, projection)
+            cursor = self.get_db(database, collection).find(query, projection)
         except Exception as exception:
             print(exception)
             raise Exception("Mongo find failed")
@@ -39,14 +44,13 @@ class MongoWrapper(object):
         return {c[field]: c for c in cursor}
 
     def insert(self, database: str, collection: str, data_list: List[Any]) -> None:
-        mongo_db = self.session[database][collection]
         try:
-            mongo_db.test.insert_many(data_list, ordered=False)
+            self.get_db(database, collection).test.insert_many(data_list, ordered=False)
         except BulkWriteError as bwe:
             print(bwe.details)
 
     def create_index(self, database: str, collection: str, key: str) -> None:
-        self.session[database][collection].create_index(key)
+        self.get_db(database, collection).create_index(key)
 
 
 class MongoInserter(MongoWrapper):
@@ -87,7 +91,7 @@ class MongoUpdater(MongoWrapper):
         MongoWrapper.__init__(self, host, port, connect=connect)
         self.database = database
         self.to_update: List[Any] = []
-        self.mongo_col = self.session[database][collection]
+        self.mongo_col = self.get_db(database, collection)
 
     def flush(self) -> None:
         if self.to_update:
