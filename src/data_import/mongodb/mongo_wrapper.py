@@ -16,7 +16,7 @@ class MongoWrapper(object):
         self.session = pymongo.MongoClient(host=self.host, port=self.port, connect=connect)
         self.verbose = verbose
 
-    def get_db(self, database: str, collection: str):
+    def get_db(self, database: str, collection: str) -> Any:
         if database == 'pytest':
             return self.session[collection]
         else:
