@@ -5,7 +5,7 @@ import gzip
 from pathlib import Path
 from typing import Any, List, Tuple, Union, Dict, Hashable
 from src.DGEList import DGEList
-import numpy as np
+import numpy as np   # type: ignore
 
 __all__ = [
     'GroupImporter',
