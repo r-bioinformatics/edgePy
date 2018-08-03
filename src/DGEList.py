@@ -61,7 +61,10 @@ class DGEList(object):
                 raise Exception("counts must be provided at init")
 
             if norm_factors is None:
-                norm_factors = np.ones(np.size(counts, 1))
+                try:
+                    norm_factors = np.ones(np.size(counts, 1))
+                except IndexError:
+                    raise ValueError("counts must have more than one sample - eg, have two dimensions")
 
             self.counts = counts
             self.samples = samples

@@ -7,6 +7,7 @@ from src.data_import.data_import import get_dataset_path
 
 
 TEST_DATASET = 'GSE49712_HTSeq.txt.gz'
+TEST_DATASET_NPZ = 'GSE49712_HTSeq.npz'
 
 
 @pytest.fixture
@@ -33,6 +34,12 @@ def test_too_much():
     assert len(dge_list().genes) == 21717
 
 
+def test_too_many_options():
+    with pytest.raises(Exception):
+        DGEList(counts=np.zeros(shape=(5, 10)),
+                filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+
+
 def test_setting_DGElist_counts():
 
     dge_list = DGEList(counts=np.zeros(shape=(5, 10)))
@@ -45,6 +52,12 @@ def test_setting_DGElist_counts():
     with pytest.raises(ValueError):
         c = np.array([[1, 1, 1], [np.nan, 1, 1]])
         DGEList(counts=c)
+    with pytest.raises(ValueError):
+        c = np.array([1, 1, 1])
+        DGEList(counts=c)
+    with pytest.raises(TypeError):
+        c = [1, 1, 1]
+        dge_list.counts = c
 
 
 def test_cycle_dge_npz():
