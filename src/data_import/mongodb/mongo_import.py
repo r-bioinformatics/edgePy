@@ -42,9 +42,9 @@ class ImportFromMongodb(object):
         self.key_value = mongo_key_value
 
         self.input_gene_file = gene_list_file
-        self.gene_list = None
+        self.gene_list: Union[List[str], None] = None
 
-    def translate_gene_list(self, database: str):
+    def translate_gene_list(self, database: str) -> None:
 
         if self.input_gene_file:
             input_genes = get_genelist_from_file(self.input_gene_file)
@@ -56,20 +56,21 @@ class ImportFromMongodb(object):
         if self.input_gene_file and not self.gene_list:
             self.translate_gene_list(database)
 
+        query: Dict[Hashable, Any] = {}
         if self.key_name and self.key_value:
-            query: Dict[Hashable, Any] = {self.key_name: self.key_value}
+            query[self.key_name] = self.key_value
 
             # if self.key_value == 'regex':
             #     query = {self.key_name: {'$regex': 'myocyte|fibroblast'}}
 
         elif self.key_name and not self.key_value:
-            query = {self.key_name: {'$exists': True}}
+            query[self.key_name] = {'$exists': True}
         elif not self.key_name and not self.key_value:
-            query = {}
+            pass
         else:
             raise Exception("Invalid input - you can't specify a key_value without specifying a key_name")
 
-        projection = {'sample_name': 1, '_id': 0}
+        projection: Dict[Hashable, Any] = {'sample_name': 1, '_id': 0}
         if self.key_name:
             projection[self.key_name] = 1
 
@@ -84,7 +85,7 @@ class ImportFromMongodb(object):
             sample_category[result['sample_name']] = result[self.key_name] if self.key_name else result['sample_name']
         print(f"get data.... for sample_names {list(sample_names)}")
 
-        query= {'sample_name': {'$in': list(sample_names)}}
+        query = {'sample_name': {'$in': list(sample_names)}}
         if self.gene_list:
             print(self.gene_list)
             query['gene'] = {'$in': list(self.gene_list)}
