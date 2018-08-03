@@ -44,20 +44,20 @@ class ImportFromMongodb(object):
         self.input_gene_file = gene_list_file
         self.gene_list = None
 
-    def translate_gene_list(self, database):
+    def translate_gene_list(self, database: str):
 
         if self.input_gene_file:
             input_genes = get_genelist_from_file(self.input_gene_file)
             ensg_genes, gene_symbols = translate_genes(input_genes, self.mongo_reader, database=database)
             self.gene_list = ensg_genes
 
-    def get_data_from_mongo(self, database='Tenaya') -> Tuple[List[str], Dict[Hashable, Any], List[str], Dict[Hashable, Any]]:
+    def get_data_from_mongo(self, database: str='Tenaya') -> Tuple[List[str], Dict[Hashable, Any], List[str], Dict[Hashable, Any]]:
 
         if self.input_gene_file and not self.gene_list:
             self.translate_gene_list(database)
 
         if self.key_name and self.key_value:
-            query = {self.key_name: self.key_value}
+            query: Dict[Hashable, Any] = {self.key_name: self.key_value}
 
             # if self.key_value == 'regex':
             #     query = {self.key_name: {'$regex': 'myocyte|fibroblast'}}
@@ -84,7 +84,7 @@ class ImportFromMongodb(object):
             sample_category[result['sample_name']] = result[self.key_name] if self.key_name else result['sample_name']
         print(f"get data.... for sample_names {list(sample_names)}")
 
-        query = {'sample_name': {'$in': list(sample_names)}}
+        query= {'sample_name': {'$in': list(sample_names)}}
         if self.gene_list:
             print(self.gene_list)
             query['gene'] = {'$in': list(self.gene_list)}
