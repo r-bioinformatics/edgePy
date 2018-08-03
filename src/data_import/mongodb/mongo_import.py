@@ -7,7 +7,7 @@ from src.data_import.mongodb.gene_functions import get_genelist_from_file
 from src.data_import.mongodb.gene_functions import translate_genes
 
 
-from typing import Dict, Hashable, Any, Tuple, List, Optional
+from typing import Dict, Hashable, Any, Tuple, List, Optional, Union
 
 
 def parse_arguments(parser: Any=None) -> Any:
@@ -25,27 +25,36 @@ def parse_arguments(parser: Any=None) -> Any:
 
 class ImportFromMongodb(object):
 
-    def __init__(self, args: Any) -> None:
-        config = configparser.ConfigParser()
-        config.read(args.mongo_config)
+    def __init__(self, host: str, port: int,
+                 mongo_key_name: Union[str, None],
+                 mongo_key_value: Union[str, None],
+                 gene_list_file: Union[str, None],
+                 database: str) -> None:
 
-        self.mongo_host = config.get("Mongo", "host")
-        self.mongo_port = config.get("Mongo", "port")
+        self.mongo_host = host
+        self.mongo_port = port
 
-        self.mongo_reader = MongoWrapper(host=config.get("Mongo", "host"),
-                                         port=config.get("Mongo", "port"),
+        self.mongo_reader = MongoWrapper(host=self.mongo_host,
+                                         port=self.mongo_port,
                                          connect=False)
 
-        self.key_name = args.mongo_key_name
-        self.key_value = args.mongo_key_value
+        self.key_name = mongo_key_name
+        self.key_value = mongo_key_value
 
+        self.input_gene_file = gene_list_file
         self.gene_list = None
-        if args.gene_list:
-            input_genes = get_genelist_from_file(args.gene_list)
-            ensg_genes, gene_symbols = translate_genes(input_genes, self.mongo_reader)
+
+    def translate_gene_list(self, database):
+
+        if self.input_gene_file:
+            input_genes = get_genelist_from_file(self.input_gene_file)
+            ensg_genes, gene_symbols = translate_genes(input_genes, self.mongo_reader, database=database)
             self.gene_list = ensg_genes
 
-    def get_data_from_mongo(self) -> Tuple[List[str], Dict[Hashable, Any], List[str], Dict[Hashable, Any]]:
+    def get_data_from_mongo(self, database='Tenaya') -> Tuple[List[str], Dict[Hashable, Any], List[str], Dict[Hashable, Any]]:
+
+        if self.input_gene_file and not self.gene_list:
+            self.translate_gene_list(database)
 
         if self.key_name and self.key_value:
             query = {self.key_name: self.key_value}
@@ -60,23 +69,27 @@ class ImportFromMongodb(object):
         else:
             raise Exception("Invalid input - you can't specify a key_value without specifying a key_name")
 
-        cursor = self.mongo_reader.find_as_cursor('Tenaya', 'samples',
-                                                  query=query,
-                                                  projection={'sample_name': 1, self.key_name: 1, '_id': 0})
+        projection = {'sample_name': 1, '_id': 0}
+        if self.key_name:
+            projection[self.key_name] = 1
+
+        cursor = self.mongo_reader.find_as_cursor(database=database, collection='samples',
+                                                  query=query, projection=projection)
         sample_names = set()
         sample_category = {}
         for result in cursor:
             print(result)
             sample_names.add(result['sample_name'])
             # sample_category[result['sample_name']] = 'myocyte' if 'myocyte' in result[self.key_name] else 'fibroblast'
-            sample_category[result['sample_name']] = result[self.key_name]
+            sample_category[result['sample_name']] = result[self.key_name] if self.key_name else result['sample_name']
         print(f"get data.... for sample_names {list(sample_names)}")
 
         query = {'sample_name': {'$in': list(sample_names)}}
         if self.gene_list:
             print(self.gene_list)
             query['gene'] = {'$in': list(self.gene_list)}
-        cursor = self.mongo_reader.find_as_cursor('Tenaya', 'RNASeq', query=query, projection={'_id': 0})
+        cursor = self.mongo_reader.find_as_cursor(database=database, collection='RNASeq',
+                                                  query=query, projection={'_id': 0})
 
         # make it a list of lists
         print(f"Importing data from mongo ({self.mongo_host})....")

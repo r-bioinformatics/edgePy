@@ -7,6 +7,7 @@ from src.data_import.data_import import DataImporter
 from src.data_import.data_import import GroupImporter
 from src.data_import.data_import import create_DGEList
 from src.data_import.mongodb.mongo_import import ImportFromMongodb
+import configparser
 
 
 def parse_arguments(parser=None):
@@ -39,7 +40,14 @@ class EdgePy(object):
             print(self.dge_list)
 
         elif args.mongo_config:
-            mongo_importer = ImportFromMongodb(args)
+            config = configparser.ConfigParser()
+            config.read(args.mongo_config)
+
+            mongo_importer = ImportFromMongodb(host=config.get("Mongo", "host"),
+                                               port=config.get("Mongo", "port"),
+                                               mongo_key_name=args.mongo_key_name,
+                                               mongo_key_value=args.mongo_key_value,
+                                               gene_list_file=args.gene_list)
             sample_list, data_set, gene_list, sample_category = mongo_importer.get_data_from_mongo()
             self.dge_list = create_DGEList(sample_list, data_set, gene_list, sample_category)
 
