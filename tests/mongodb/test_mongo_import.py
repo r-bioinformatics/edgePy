@@ -1,20 +1,30 @@
 
 
 from src.data_import.mongodb.mongo_import import ImportFromMongodb
+from src.data_import.mongodb.mongo_import import parse_arguments
 
 from src.data_import.data_import import get_dataset_path
 
 
-def test_bot_init_sets_token():
-    pass
-
-
-def test_ImportFromMongodb(mongodb):
-    assert 'ensg_by_symbol' in mongodb.collection_names()
-
-
 def test_parse_arguments():
-    pass
+    config = "file.txt"
+    gene_list = "groups.txt"
+    key_name = 'Project'
+    key_value = 'Publie Data'
+
+    ci_values = [
+        '--config', config,
+        '--gene_list', gene_list,
+        '--key_name', 'Project',
+        '--key_value', 'Publie Data'
+    ]
+
+    args = parse_arguments(None, ci_values=ci_values)
+
+    assert config == args.config
+    assert gene_list == args.gene_list
+    assert key_name == args.key_name
+    assert key_value == args.key_value
 
 
 def test_get_data_from_mongo_nofilters(mongodb):
@@ -22,8 +32,7 @@ def test_get_data_from_mongo_nofilters(mongodb):
                            port=27017,
                            mongo_key_name=None,
                            mongo_key_value=None,
-                           gene_list_file=None,
-                           database='pytest')
+                           gene_list_file=None)
     im.mongo_reader.session = mongodb
     sample_list, dataset, gene_list, sample_category = im.get_data_from_mongo(database='pytest')
     assert sample_list == ['SRR5189264', 'SRR5189265', 'SRR5189266']
@@ -47,8 +56,7 @@ def test_get_data_from_mongo_filters(mongodb):
                            port=27017,
                            mongo_key_name='Project',
                            mongo_key_value='Public Data',
-                           gene_list_file=None,
-                           database='pytest')
+                           gene_list_file=None)
     im.mongo_reader.session = mongodb
     sample_list, dataset, gene_list, sample_category = im.get_data_from_mongo(database='pytest')
     assert sample_list == ['SRR5189264', 'SRR5189265', 'SRR5189266']
@@ -73,8 +81,7 @@ def test_get_data_from_mongo_gene_list(mongodb):
                            port=27017,
                            mongo_key_name='Project',
                            mongo_key_value='Public Data',
-                           gene_list_file=filename,
-                           database='pytest')
+                           gene_list_file=filename)
     im.mongo_reader.session = mongodb
     sample_list, dataset, gene_list, sample_category = im.get_data_from_mongo(database='pytest')
     assert sample_list == ['SRR5189264', 'SRR5189265', 'SRR5189266']

@@ -10,7 +10,7 @@ from src.data_import.mongodb.gene_functions import translate_genes
 from typing import Dict, Hashable, Any, Tuple, List, Optional, Union
 
 
-def parse_arguments(parser: Any=None) -> Any:
+def parse_arguments(parser: Any=None, ci_values:List[str]=None) -> Any:
     if not parser:
         parser = argparse.ArgumentParser()
 
@@ -19,7 +19,10 @@ def parse_arguments(parser: Any=None) -> Any:
     parser.add_argument("--key_value", default="RNA-Seq1")
     parser.add_argument("--gene_list", default=None)
 
-    args = parser.parse_args()
+    if ci_values:
+        args = parser.parse_args(ci_values)
+    else:
+        args = parse_arguments()
     return args
 
 
@@ -28,8 +31,7 @@ class ImportFromMongodb(object):
     def __init__(self, host: str, port: int,
                  mongo_key_name: Union[str, None],
                  mongo_key_value: Union[str, None],
-                 gene_list_file: Union[str, None],
-                 database: str) -> None:
+                 gene_list_file: Union[str, None]) -> None:
 
         self.mongo_host = host
         self.mongo_port = port
