@@ -13,7 +13,8 @@ def get_genelist_from_file(filename: str) -> Optional[List]:
     return gene_list
 
 
-def translate_genes(genes: Optional[List[str]], mongo_reader: Any) -> Tuple[List[str], Dict[str, str]]:
+def translate_genes(genes: Optional[List[str]], mongo_reader: Any,
+                    database: str='ensembl_90_37') -> Tuple[List[str], Dict[str, str]]:
     ensg_genes = []
     non_ensg_genes = []
     gene_symbols = {}
@@ -27,7 +28,7 @@ def translate_genes(genes: Optional[List[str]], mongo_reader: Any) -> Tuple[List
                 non_ensg_genes.append(gene)
     if ensg_genes or not genes:
         query = {'_id': {'$in': ensg_genes}} if genes else {}
-        symbol_gene_list = mongo_reader.find_as_cursor('ensembl_90_37', 'symbol_by_ensg',
+        symbol_gene_list = mongo_reader.find_as_cursor(database, 'symbol_by_ensg',
                                                        query=query)
         for symbol_gene in symbol_gene_list:
             for symbol in symbol_gene['symbols']:
@@ -37,7 +38,7 @@ def translate_genes(genes: Optional[List[str]], mongo_reader: Any) -> Tuple[List
                 gene_symbols[ensg] = ensg
     if non_ensg_genes or not genes:
         query = {'_id': {'$in': non_ensg_genes}} if genes else {}
-        translated_gene_list = mongo_reader.find_as_cursor('ensembl_90_37', 'ensg_by_symbol',
+        translated_gene_list = mongo_reader.find_as_cursor(database, 'ensg_by_symbol',
                                                            query=query)
         for trans_gene in translated_gene_list:
             symbol = trans_gene['_id']
@@ -48,8 +49,8 @@ def translate_genes(genes: Optional[List[str]], mongo_reader: Any) -> Tuple[List
     return ensg_genes, gene_symbols
 
 
-def get_gene_list(mongo_reader: Any) -> Dict[str, str]:
-    genes = mongo_reader.find_as_cursor('ensembl_90_37', 'symbol_by_ensg', query={})
+def get_gene_list(mongo_reader: Any, database: str='ensembl_90_37') -> Dict[str, str]:
+    genes = mongo_reader.find_as_cursor(database, 'symbol_by_ensg', query={})
     gene_symbols = {}
     for symbol_gene in genes:
         for symbol in symbol_gene['symbols']:
@@ -57,11 +58,11 @@ def get_gene_list(mongo_reader: Any) -> Dict[str, str]:
     return gene_symbols
 
 
-def get_sample_details(group_by: str, mongo_reader: Any) -> Dict[Any, Dict[str, Any]]:
+def get_sample_details(group_by: str, mongo_reader: Any, database: str='Tenaya') -> Dict[Any, Dict[str, Any]]:
 
     sample_details = {}
     search = {group_by: {'$exists': True}}
-    sample_grouping = mongo_reader.find_as_cursor('Tenaya', 'samples',
+    sample_grouping = mongo_reader.find_as_cursor(database, 'samples',
                                                   query=search,
                                                   projection={'_id': 0, group_by: 1, 'sample_name': 1,
                                                               'Description': 1})

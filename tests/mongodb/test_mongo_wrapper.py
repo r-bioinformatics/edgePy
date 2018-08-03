@@ -16,7 +16,7 @@ def test_mongo_wrapper_find_as_cursor(mongodb):
         print(i)
         count += 1
 
-    assert 1 == count
+    assert 3 == count
 
 
 def test_mongo_wrapper_find_as_list(mongodb):
@@ -24,7 +24,7 @@ def test_mongo_wrapper_find_as_list(mongodb):
     mw.session = mongodb
     assert 'ensg_by_symbol' in mongodb.collection_names()
     value = mw.find_as_list('pytest', 'ensg_by_symbol', {}, {})
-    assert value == [{'_id': 'BRCA1'}]
+    assert value == [{'_id': 'BRCA1'}, {'_id': 'BRCA2'}, {'_id': 'TP53'}]
 
 
 def test_mongo_wrapper_find_as_dict(mongodb):
@@ -32,7 +32,9 @@ def test_mongo_wrapper_find_as_dict(mongodb):
     mw.session = mongodb
     assert 'ensg_by_symbol' in mongodb.collection_names()
     value = mw.find_as_dict('pytest', 'ensg_by_symbol', {})
-    assert value == {'BRCA1': {'_id': 'BRCA1', 'ensgs': ['ENSG00000012048']}}
+    assert value == {'BRCA1': {'_id': 'BRCA1', 'ensgs': ['ENSG00000012048']},
+                     'TP53': {'_id': 'TP53', 'ensgs': ['ENSG00000141510']},
+                     'BRCA2': {'_id': 'BRCA2', 'ensgs': ['ENSG00000139618']}}
 
 
 def test_mongo_wrapper_insert(mongodb):
