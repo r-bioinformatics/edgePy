@@ -29,9 +29,9 @@ def parse_arguments(parser: Any=None, ci_values: List[str]=None) -> Any:
 class ImportFromMongodb(object):
 
     def __init__(self, host: str, port: int,
-                 mongo_key_name: Union[str, None],
-                 mongo_key_value: Union[str, None],
-                 gene_list_file: Union[str, None]) -> None:
+                 mongo_key_name: Optional[str],
+                 mongo_key_value: Optional[str],
+                 gene_list_file: Optional[str]) -> None:
 
         self.mongo_host = host
         self.mongo_port = port
@@ -44,7 +44,7 @@ class ImportFromMongodb(object):
         self.key_value = mongo_key_value
 
         self.input_gene_file = gene_list_file
-        self.gene_list: Union[List[str], None] = None
+        self.gene_list: Optional[List[str]] = None
 
     def translate_gene_list(self, database: str) -> None:
 
