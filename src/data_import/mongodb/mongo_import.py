@@ -10,7 +10,7 @@ from src.data_import.mongodb.gene_functions import translate_genes
 from typing import Dict, Hashable, Any, Tuple, List, Optional, Union
 
 
-def parse_arguments(parser: Any=None, ci_values:List[str]=None) -> Any:
+def parse_arguments(parser: Any=None, ci_values: List[str]=None) -> Any:
     if not parser:
         parser = argparse.ArgumentParser()
 
