@@ -1,4 +1,3 @@
-import configparser
 import argparse
 
 from src.data_import.mongodb.mongo_wrapper import MongoWrapper

@@ -61,10 +61,26 @@ def test_get_genelist_from_file():
     assert gene_list == ['TP53', 'BRCA1', 'BRCA2']
 
 
-def test_translate_genes(mongodb):
+def test_get_genelist_from_file_no_file():
+    gene_list = get_genelist_from_file(None)
+    assert gene_list is None
+
+
+def test_translate_genes_symbol(mongodb):
     mw = MongoWrapper('localhost', '27017')
     mw.session = mongodb
     gene_list = get_genelist_from_file(gene_list_file())
+    ensg_genes, gene_symbols = translate_genes(gene_list, mw, 'pytest')
+    assert ensg_genes == ['ENSG00000012048', 'ENSG00000139618', 'ENSG00000141510']
+    assert gene_symbols == {'ENSG00000012048': 'BRCA1',
+                            'ENSG00000139618': 'BRCA2',
+                            'ENSG00000141510': 'TP53'}
+
+
+def test_translate_genes_ensg(mongodb):
+    mw = MongoWrapper('localhost', '27017')
+    mw.session = mongodb
+    gene_list = ['ENSG00000012048', 'ENSG00000139618', 'ENSG00000141510']
     ensg_genes, gene_symbols = translate_genes(gene_list, mw, 'pytest')
     assert ensg_genes == ['ENSG00000012048', 'ENSG00000139618', 'ENSG00000141510']
     assert gene_symbols == {'ENSG00000012048': 'BRCA1',

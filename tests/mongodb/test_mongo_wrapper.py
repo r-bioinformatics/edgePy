@@ -1,5 +1,5 @@
 
-
+import pytest
 from src.data_import.mongodb.mongo_wrapper import MongoWrapper
 from src.data_import.mongodb.mongo_wrapper import MongoInserter
 from src.data_import.mongodb.mongo_wrapper import MongoUpdater
@@ -17,6 +17,13 @@ def test_mongo_wrapper_find_as_cursor(mongodb):
         count += 1
 
     assert 3 == count
+
+
+# def test_mongo_wrapper_find_as_cursor_fail(mongodb):
+#     mw = MongoWrapper('localhost', '27017')
+#     mw.session = mongodb
+#     with pytest.raises(Exception):
+#         mw.find_as_cursor('fakedb', 'fake_table', {'_id_': "something"}, {})
 
 
 def test_mongo_wrapper_find_as_list(mongodb):
