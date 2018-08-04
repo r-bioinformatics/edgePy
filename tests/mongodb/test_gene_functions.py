@@ -61,8 +61,13 @@ def test_get_gene_list(mongodb):
                          'ENSG00000141510': 'TP53'}
 
 
-def test_get_sample_details():
-    pass
+def test_get_sample_details(mongodb):
+    mw = MongoWrapper('localhost', '27017')
+    mw.session = mongodb
+    details = get_sample_details("Project", mw, 'pytest')
+    assert details == {'SRR5189264': {'category': 'Public Data', 'description': 'SRR5189264'},
+                       'SRR5189265': {'category': 'Public Data', 'description': 'SRR5189265'},
+                       'SRR5189266': {'category': 'Public Data', 'description': 'SRR5189266'}}
 
 
 def test_get_canonical_rpkm():
