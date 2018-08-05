@@ -40,6 +40,20 @@ def test_too_many_options():
                 filename=str(get_dataset_path(TEST_DATASET_NPZ)))
 
 
+def test_too_many_options2():
+    with pytest.raises(Exception):
+        DGEList(counts=np.ones(shape=(5, 10)),
+                filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+
+
+def test_library_size():
+    dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+    assert np.array_equal(dge_list.library_size,
+                          np.array([90895095, 82461005, 55676791, 111027083,
+                                    65854416, 91305546, 95585464, 96313896,
+                                    80069980, 52772642]))
+
+
 def test_setting_DGElist_counts():
 
     dge_list = DGEList(counts=np.zeros(shape=(5, 10)))

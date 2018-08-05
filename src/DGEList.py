@@ -228,9 +228,7 @@ class DGEList(object):
         raise NotImplementedError
 
         # TODO: Implement here
-
         # self = self.cpm(log=log, prior_count=prior_count)
-        pass
 
     def tpm(
             self,
@@ -247,7 +245,6 @@ class DGEList(object):
         # TODO: Implement here
 
         # self = self.cpm(log=log, prior_count=prior_count)
-        pass
 
     def __repr__(self) -> str:
         """Give a pretty non-executeable representation of this object."""
