@@ -19,11 +19,11 @@ def test_mongo_wrapper_find_as_cursor(mongodb):
     assert 3 == count
 
 
-# def test_mongo_wrapper_find_as_cursor_fail(mongodb):
-#     mw = MongoWrapper('localhost', '27017')
-#     mw.session = mongodb
-#     with pytest.raises(Exception):
-#         mw.find_as_cursor('fakedb', 'fake_table', {'_id_': "something"}, {})
+def test_mongo_wrapper_find_as_cursor_fail():
+    mw = MongoWrapper('localhost', '27017')
+    # do not set session to mongodb to cause this error.
+    with pytest.raises(Exception):
+        mw.find_as_cursor('pytest', 'fake_table', {'_id_': "something"}, {})
 
 
 def test_mongo_wrapper_find_as_list(mongodb):
