@@ -10,7 +10,8 @@ from typing import Dict, Hashable, Any, Iterable, List, Union
 
 class MongoWrapper(object):
 
-    def __init__(self, host: str, port: Union[str, int], connect: bool=True, verbose: bool=False) -> None:
+    def __init__(self, host: str, port: Union[str, int],
+                 connect: bool=True, verbose: bool=False) -> None:
         self.host = host
         self.port = int(port)
         self.session = pymongo.MongoClient(host=self.host, port=self.port, connect=connect)
@@ -35,12 +36,15 @@ class MongoWrapper(object):
 
     def find_as_list(self, database: str, collection: str, query: Dict[Hashable, Any]=None,
                      projection: Dict[Hashable, Any]=None) -> Iterable:
-        cursor = self.find_as_cursor(database=database, collection=collection, query=query, projection=projection)
+        cursor = self.find_as_cursor(database=database, collection=collection,
+                                     query=query, projection=projection)
         return [c for c in cursor]
 
-    def find_as_dict(self, database: str, collection: str, query: Dict[Hashable, Any]=None, field: str='_id',
+    def find_as_dict(self, database: str, collection: str,
+                     query: Dict[Hashable, Any]=None, field: str='_id',
                      projection: Dict[Hashable, Any]=None) -> Iterable:
-        cursor = self.find_as_cursor(database=database, collection=collection, query=query, projection=projection)
+        cursor = self.find_as_cursor(database=database, collection=collection,
+                                     query=query, projection=projection)
         return {c[field]: c for c in cursor}
 
     def insert(self, database: str, collection: str, data_list: List[Any]) -> None:
@@ -55,7 +59,8 @@ class MongoWrapper(object):
 
 class MongoInserter(MongoWrapper):
 
-    def __init__(self, host: str, port: int, database: str, collection: str, connect: bool=True) -> None:
+    def __init__(self, host: str, port: int, database: str,
+                 collection: str, connect: bool=True) -> None:
         MongoWrapper.__init__(self, host, port, connect=connect)
         self.database = database
         self.collection = collection
@@ -87,7 +92,8 @@ class MongoInserter(MongoWrapper):
 
 class MongoUpdater(MongoWrapper):
 
-    def __init__(self, host: str, port: int, database: str, collection: str, connect: bool=True) -> None:
+    def __init__(self, host: str, port: int, database: str,
+                 collection: str, connect: bool=True) -> None:
         MongoWrapper.__init__(self, host, port, connect=connect)
         self.database = database
         self.to_update: List[Any] = []

@@ -1,7 +1,7 @@
 # Uncompressed project data files
-edgePy/data/*.csv
-edgePy/data/*.tsv
-edgePy/data/*.txt
+# edgePy/data/*.csv
+# edgePy/data/*.tsv
+# edgePy/data/*.txt
 
 # Intellij project files
 .idea

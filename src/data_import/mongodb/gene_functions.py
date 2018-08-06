@@ -58,18 +58,22 @@ def get_gene_list(mongo_reader: Any, database: str='ensembl_90_37') -> Dict[str,
     return gene_symbols
 
 
-def get_sample_details(group_by: str, mongo_reader: Any, database: str='Tenaya') -> Dict[Any, Dict[str, Any]]:
+def get_sample_details(group_by: str, mongo_reader: Any,
+                       database: str='Tenaya') \
+        -> Dict[Any, Dict[str, Any]]:
 
     sample_details = {}
     search = {group_by: {'$exists': True}}
-    sample_grouping = mongo_reader.find_as_cursor(database, 'samples',
-                                                  query=search,
-                                                  projection={'_id': 0, group_by: 1, 'sample_name': 1,
-                                                              'Description': 1})
+    sample_grouping = mongo_reader \
+        .find_as_cursor(database, 'samples',
+                        query=search,
+                        projection={'_id': 0, group_by: 1, 'sample_name': 1,
+                                    'Description': 1})
 
     for sample in sample_grouping:
         sample_details[sample['sample_name']] = {
-            'description': sample['Description'] if 'Description' in sample else sample['sample_name'],
+            'description': sample['Description'] if 'Description' in sample else
+            sample['sample_name'],
             'category': sample[group_by]}
 
     return sample_details

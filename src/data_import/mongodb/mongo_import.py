@@ -6,7 +6,7 @@ from src.data_import.mongodb.gene_functions import get_genelist_from_file
 from src.data_import.mongodb.gene_functions import translate_genes
 
 
-from typing import Dict, Hashable, Any, Tuple, List, Optional, Union
+from typing import Dict, Hashable, Any, Tuple, List, Optional
 
 
 def parse_arguments(parser: Any=None, ci_values: List[str]=None) -> Any:
@@ -49,10 +49,12 @@ class ImportFromMongodb(object):
 
         if self.input_gene_file:
             input_genes = get_genelist_from_file(self.input_gene_file)
-            ensg_genes, gene_symbols = translate_genes(input_genes, self.mongo_reader, database=database)
+            ensg_genes, gene_symbols = \
+                translate_genes(input_genes, self.mongo_reader, database=database)
             self.gene_list = ensg_genes
 
-    def get_data_from_mongo(self, database: str='Tenaya') -> Tuple[List[str], Dict[Hashable, Any], List[str], Dict[Hashable, Any]]:
+    def get_data_from_mongo(self, database: str='Tenaya') \
+            -> Tuple[List[str], Dict[Hashable, Any], List[str], Dict[Hashable, Any]]:
 
         if self.input_gene_file and not self.gene_list:
             self.translate_gene_list(database)
@@ -69,7 +71,8 @@ class ImportFromMongodb(object):
         elif not self.key_name and not self.key_value:
             pass
         else:
-            raise Exception("Invalid input - you can't specify a key_value without specifying a key_name")
+            raise Exception("Invalid input - you can't specify a "
+                            "key_value without specifying a key_name")
 
         projection: Dict[Hashable, Any] = {'sample_name': 1, '_id': 0}
         if self.key_name:
@@ -82,8 +85,8 @@ class ImportFromMongodb(object):
         for result in cursor:
             print(result)
             sample_names.add(result['sample_name'])
-            # sample_category[result['sample_name']] = 'myocyte' if 'myocyte' in result[self.key_name] else 'fibroblast'
-            sample_category[result['sample_name']] = result[self.key_name] if self.key_name else result['sample_name']
+            sample_category[result['sample_name']] = \
+                result[self.key_name] if self.key_name else result['sample_name']
         print(f"get data.... for sample_names {list(sample_names)}")
 
         query = {'sample_name': {'$in': list(sample_names)}}

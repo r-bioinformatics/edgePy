@@ -64,7 +64,8 @@ class DGEList(object):
                 try:
                     norm_factors = np.ones(np.size(counts, 1))
                 except IndexError:
-                    raise ValueError("counts must have more than one sample - eg, have two dimensions")
+                    raise ValueError("counts must have more than one sample "
+                                     "- eg, have two dimensions")
 
             self.counts = counts
             self.samples = samples
@@ -115,11 +116,13 @@ class DGEList(object):
             return
 
         if hasattr(self, '_counts'):
-            # do checks for things here.  You shouldn't modify counts if it has already been set.  Create a new obj.
+            # do checks for things here.  You shouldn't modify counts
+            # if it has already been set.  Create a new obj.
             if hasattr(self, '_samples') and self._samples is not None:
                 sample_count, gene_count = counts.shape
                 if sample_count != self._samples.shape[0] or gene_count != self._genes.shape[0]:
-                    raise ValueError("Attempting to substitute counts data into DGEList object with different "
+                    raise ValueError("Attempting to substitute counts data "
+                                     "into DGEList object with different "
                                      "dimensions fails.")
 
         if not isinstance(counts, np.ndarray):
@@ -129,7 +132,8 @@ class DGEList(object):
         if (counts < 0).any():
             raise ValueError('Counts matrix cannot contain negative values.')
         if self.to_remove_zeroes:
-            counts = counts[np.all(counts != 0, axis=1)]  # this is not working.  Does not remove rows with only zeros.
+            # this is not working.  Does not remove rows with only zeros.
+            counts = counts[np.all(counts != 0, axis=1)]
 
         self._counts = counts
 
