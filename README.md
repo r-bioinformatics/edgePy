@@ -1,5 +1,12 @@
 # edgePy
 
+### Notice:
+
+This project is still in development.  While we are a small band of bioinformaticians with big goals and aspirations, this code base is still too new for use on any real world projects. 
+While there's no official timeline for the project, functionality is being developed rapidly, so please feel free to check back on our progress frequently.  If you'd like to do more 
+than just check on our progress, we're always happy to welcome new members of the community, both to slack group where we're organizing this project, as well as on the git hub repository 
+hosting the project.  To join the slack, send your email to @apfejes (on github) or /u/apfejes on reddit - we're looking forward to working with you.  
+
 [//]: # (TODO: Remove sample-sheet dummy library until we release on PyPi)
 [![PyPI Version](https://badge.fury.io/py/edgePy.svg)](https://pypi.org/project/edgePy)
 [![Build Status](https://travis-ci.org/r-bioinformatics/edgePy.svg?branch=master)](https://travis-ci.org/r-bioinformatics/edgePy)
