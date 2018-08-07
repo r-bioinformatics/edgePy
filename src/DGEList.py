@@ -144,11 +144,19 @@ class DGEList(object):
 
     @samples.setter
     def samples(self, samples: Optional[np.ndarray]) -> None:
-        # TODO: Validate samples here
-        # - Samples same length as ncol(self.counts) if defined
+        """Validate setting ``DGEList.samples`` for the illegal conditions:
+
+            * Must be the same length as the columns in counts`
+
+        Args:
+            samples: 1D string array representing identifiers of count columns
+
+        """
         if samples is not None:
+            if self.counts is not None and len(samples) != self.counts.shape[1]:
+                raise ValueError("Shape of counts does not match samples")
+
             samples = np.array(list(self._format_fields(samples)))
-            self._total_counts = np.zeros(len(samples))
         self._samples = samples
 
     @property
