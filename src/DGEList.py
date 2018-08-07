@@ -154,7 +154,8 @@ class DGEList(object):
         """
         if samples is not None:
             if self.counts is not None and len(samples) != self.counts.shape[1]:
-                raise ValueError(f"Shape of counts does not match samples: len(samples) = {len(samples)},"
+                raise ValueError(f"Shape of counts does not match samples: "
+                                 f"len(samples) = {len(samples)},"
                                  f" self.counts.shape = {self.counts.shape}")
 
             samples = np.array(list(self._format_fields(samples)))
