@@ -25,6 +25,7 @@ class DGEList(object):
         norm_factors: Weighting factors for each sample.
         group: ...
         to_remove_zeroes: To remove genes with zero counts for all samples.
+        filename: a shortcut to import NPZ (zipped numpy format) files.
 
     Examples:
         >>> import gzip
@@ -38,15 +39,14 @@ class DGEList(object):
     # Pattern to delete from field names anytime they are assigned.
     _field_strip_re = re.compile(r'[\s"]+')
 
-    def __init__(
-            self,
-            counts: Optional[np.ndarray] = None,
-            samples: Optional[np.array] = None,
-            genes: Optional[np.array] = None,
-            norm_factors: Optional[np.array] = None,
-            group: Optional[np.array] = None,
-            to_remove_zeroes: Optional[bool] = False,
-            filename: Optional[str]=None,
+    def __init__(self,
+                 counts: Optional[np.ndarray] = None,
+                 samples: Optional[np.array] = None,
+                 genes: Optional[np.array] = None,
+                 norm_factors: Optional[np.array] = None,
+                 group: Optional[np.array] = None,
+                 to_remove_zeroes: Optional[bool] = False,
+                 filename: Optional[str] = None,
     ) -> None:
 
         self.to_remove_zeroes = to_remove_zeroes
