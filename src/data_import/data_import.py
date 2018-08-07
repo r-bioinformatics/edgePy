@@ -124,22 +124,21 @@ def get_dataset_path(filename: Union[str, Path]) -> Path:
 
 
 def create_DGEList(sample_list: List[str],
-                   data_set: Dict[Hashable, Any],
+                   data_set: Dict[Hashable, Any],   # {sample: {gene1: x, gene2: y}},
                    gene_list: List[str],
                    sample_category: Dict[Hashable, str]) -> 'DGEList':
     """ sample list and gene list must be pre-sorted
         Use this to create the DGE object for future work."""
 
     print("Creating DGE list object...")
-
-    temp_data_store = np.zeros(shape=(len(sample_list), len(gene_list)))
+    temp_data_store = np.zeros(shape=(len(gene_list), len(sample_list)))
     group = []
 
     for idx_s, sample in enumerate(sample_list):
         for idx_g, gene in enumerate(gene_list):
             if sample in data_set and gene in data_set[sample]:
                 if data_set[sample][gene]:
-                    temp_data_store[idx_s, idx_g] = data_set[sample][gene]
+                    temp_data_store[idx_g, idx_s] = data_set[sample][gene]
         group.append(sample_category[sample])
 
     return DGEList(counts=temp_data_store,

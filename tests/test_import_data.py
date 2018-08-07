@@ -72,6 +72,7 @@ def test_create_DGEList():
     """Tests the function that converts data into a DGE_List object"""
     samples = ["AAA", "BBB", "CCC"]
     genes = ['ENSG001', 'ENSG002']
+
     data_set = {'AAA': {'ENSG001': 10, 'ENSG002': 20},
                 'BBB': {'ENSG001': 15, 'ENSG002': 40},
                 'CCC': {'ENSG001': 20, 'ENSG002': 80}}
@@ -86,6 +87,8 @@ def test_create_DGEList():
                               )
 
     assert np.array_equal(dge_list.samples, np.array(samples))
-    assert np.array_equal(dge_list.counts, np.array([[10, 20], [15, 40], [20, 80]]))
+    # 2 rows (genes), 3 columns(samples)
+    assert np.array_equal(dge_list.counts, np.array([[10, 15, 20], [20, 40, 80]]))
+
     assert np.array_equal(dge_list.group, np.array(['One', 'Two', 'One']))
     assert np.array_equal(dge_list.genes, np.array(genes))
