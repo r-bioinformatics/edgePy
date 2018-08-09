@@ -108,14 +108,6 @@ To create and activate that environment issue the following:
 
 ```
 
-## Developing on the System Environment (not recommended)
-
-```bash
-❯ cd edgePy
-❯ pip install tox
-❯ pip install --editable .
-```
-
 ## Running the Test Suite
 
 All tests are coordinated by `Tox`. Running the unit tests, code coverage, code style (linting) checks, static analysis of typing, and successful compilation of the docs is as simple as the following commands!
