@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import argparse
 
 from src.DGEList import DGEList

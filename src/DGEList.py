@@ -46,8 +46,7 @@ class DGEList(object):
                  norm_factors: Optional[np.array] = None,
                  group: Optional[np.array] = None,
                  to_remove_zeroes: Optional[bool] = False,
-                 filename: Optional[str] = None,
-    ) -> None:
+                 filename: Optional[str] = None) -> None:
 
         self.to_remove_zeroes = to_remove_zeroes
         if filename:
