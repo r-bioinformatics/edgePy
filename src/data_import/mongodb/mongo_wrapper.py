@@ -130,7 +130,7 @@ class MongoInserter(MongoWrapper):
 
     Args:
         host: the name of the machine hosting the database
-        port: the port number (usually 27017
+        port: the port number (usually 27017)
         database: db name
         collection: collection name
         connect: whether to create the new session, or to attach to an existing session,

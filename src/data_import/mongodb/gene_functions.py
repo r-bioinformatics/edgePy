@@ -4,6 +4,14 @@ from typing import Dict, Optional, List, Tuple, Any, Hashable
 
 
 def get_genelist_from_file(filename: str) -> Optional[List]:
+    """
+    Converts a genelist file into a list of genes.   Simple function, but can be expanded if needed.
+    :param filename: gene list file name.
+    :return:
+    """
+
+    # TODO: should be expanded to handle gzip genelists too.
+
     if not filename:
         return None
     gene_list = []
@@ -15,10 +23,18 @@ def get_genelist_from_file(filename: str) -> Optional[List]:
 
 def translate_genes(genes: Optional[List[str]], mongo_reader: Any,
                     database: str='ensembl_90_37') -> Tuple[List[str], Dict[str, str]]:
+    """
+    Functions to translate a list of genes in to ENGS symbols and vice versa.
+    :param genes: list of genes to filter on.
+    :param mongo_reader: the mongo connector
+    :param database: the name of the database to use.  "pytest" for unit testimg (mocking)
+    :return:a list of ensg symbols, a list of gene symbols
+    """
+
     ensg_genes = []
     non_ensg_genes = []
     gene_symbols = {}
-    query: Dict[Hashable, Any]
+    query: Dict[Hashable, Any] = {}
 
     if genes:
         for gene in genes:
@@ -27,7 +43,8 @@ def translate_genes(genes: Optional[List[str]], mongo_reader: Any,
             else:
                 non_ensg_genes.append(gene)
     if ensg_genes or not genes:
-        query = {'_id': {'$in': ensg_genes}} if genes else {}
+        if genes:
+            query['_id'] = {'$in': ensg_genes}
         symbol_gene_list = mongo_reader.find_as_cursor(database, 'symbol_by_ensg',
                                                        query=query)
         for symbol_gene in symbol_gene_list:
@@ -50,6 +67,13 @@ def translate_genes(genes: Optional[List[str]], mongo_reader: Any,
 
 
 def get_gene_list(mongo_reader: Any, database: str='ensembl_90_37') -> Dict[str, str]:
+    """
+    get the list of genes from the mongo database, to translated ensg ids to symbols.
+    :param mongo_reader: the mongo wrapper
+    :param database: database name to use.
+    :return: None
+    """
+
     genes = mongo_reader.find_as_cursor(database, 'symbol_by_ensg', query={})
     gene_symbols = {}
     for symbol_gene in genes:
@@ -61,6 +85,13 @@ def get_gene_list(mongo_reader: Any, database: str='ensembl_90_37') -> Dict[str,
 def get_sample_details(group_by: str, mongo_reader: Any,
                        database: str='Tenaya') \
         -> Dict[Any, Dict[str, Any]]:
+    """
+    Get details from the samples collection.  Use this to decide which samples to query data for.
+    :param group_by: the name of the key to group samples by (Category-based key)
+    :param mongo_reader: the mongo wrapper
+    :param database: the database to use
+    :return: details required for each sample available.
+    """
 
     sample_details = {}
     search = {group_by: {'$exists': True}}
@@ -80,6 +111,11 @@ def get_sample_details(group_by: str, mongo_reader: Any,
 
 
 def get_canonical_rpkm(result: Dict[str, Any]) -> Optional[int]:
+    """
+    Get the rpkm from the database for a given entry in the data collection.
+    :param result: the entry in the data collection
+    :return: the rpkm value
+    """
     transcript_list = result['transcripts']
     for trans in transcript_list.values():
         if int(trans['canonical']) == 1:
@@ -88,6 +124,12 @@ def get_canonical_rpkm(result: Dict[str, Any]) -> Optional[int]:
 
 
 def get_canonical_raw(result: Dict[str, Any]) -> Optional[int]:
+    """
+    An approximation of the raw count of reads.
+    :param result: the entry from the data collection
+    :return: the raw count (as an integer)
+    """
+
     transcript_list = result['transcripts']
     for trans in transcript_list.values():
         if int(trans['canonical']) == 1:

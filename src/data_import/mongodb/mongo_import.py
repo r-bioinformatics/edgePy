@@ -10,6 +10,14 @@ from typing import Dict, Hashable, Any, Tuple, List, Optional
 
 
 def parse_arguments(parser: Any=None, ci_values: List[str]=None) -> Any:
+
+    """
+    Standard argparse wrapper for interpreting command line arguments.
+    :param parser: if there's an existing parser, provide it, else, this will
+    create a new one.
+    :param ci_values: use for testing purposes only.
+    :return:
+    """
     if not parser:
         parser = argparse.ArgumentParser()
 
@@ -26,6 +34,17 @@ def parse_arguments(parser: Any=None, ci_values: List[str]=None) -> Any:
 
 
 class ImportFromMongodb(object):
+    """
+    A utility for importing mongo data from a proprietary mongodb database - hopefully we'll
+    open this database up in the future.  If not, we can re-engineer it from the examples given.
+
+    Args:
+        host: the name of the machine hosting the database
+        port: the port number (usually 27017)
+        mongo_key_name: a key in the samples collection to filter on
+        mongo_key_value: accepted values in the samples collection to
+        gene_list_file: a list of genes to filter the results on.
+    """
 
     def __init__(self, host: str, port: int,
                  mongo_key_name: Optional[str],
@@ -46,6 +65,11 @@ class ImportFromMongodb(object):
         self.gene_list: Optional[List[str]] = None
 
     def translate_gene_list(self, database: str) -> None:
+        """
+        If there was a list of genes provided, convert them to ENSG symbols.
+        :param database:
+        :return: None
+        """
 
         if self.input_gene_file:
             input_genes = get_genelist_from_file(self.input_gene_file)
@@ -55,6 +79,13 @@ class ImportFromMongodb(object):
 
     def get_data_from_mongo(self, database: str='Tenaya') \
             -> Tuple[List[str], Dict[Hashable, Any], List[str], Dict[Hashable, Any]]:
+        """
+        Run the queries to get the samples, from mongo, and then use that data to retrieve
+        the counts.
+        :param database: name of the database to retrieve data from.
+        :return: the list of samples, the data itself,
+            the gene list and the categories of the samples.
+        """
 
         if self.input_gene_file and not self.gene_list:
             self.translate_gene_list(database)
