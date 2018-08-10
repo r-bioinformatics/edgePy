@@ -2,6 +2,9 @@
 edgePy/data/*.csv
 edgePy/data/*.tsv
 edgePy/data/*.txt
+!edgePy/data/groups.txt
+!edgePy/data/example_gene_list.txt
+
 
 # Intellij project files
 .idea
@@ -35,7 +38,7 @@ eggs/
 lib/
 lib64/
 parts/
-sdist/
+sdist/oh
 var/
 wheels/
 *.egg-info/
