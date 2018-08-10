@@ -5,4 +5,3 @@ pylint==2.0.0
 pytest==3.6.3
 pytest-cov==2.5.1
 pytest-parallel==0.0.2
-smart_open==1.6.0

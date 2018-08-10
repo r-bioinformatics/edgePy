@@ -21,8 +21,8 @@ class GroupImporter(object):
         self.groups: dict = {}
         self.read_file()
 
-    def read_file(self) -> None:
-        with smart_open(self.filename, 'r') as f:
+    def read_file(self, **kwargs) -> None:
+        with smart_open(self.filename, 'r', **kwargs) as f:
             for line in f:
                 line = line.strip().split(":")
                 if len(line) < 2:
@@ -47,10 +47,10 @@ class DataImporter(object):
         self.read_file()
         self.validate()
 
-    def read_file(self) -> None:
+    def read_file(self, **kwargs) -> None:
         header_read = False
 
-        with smart_open(self.filename, 'r') as f:
+        with smart_open(self.filename, 'r', **kwargs) as f:
             for line in f:
                 line = line.strip().split("\t")
                 if not header_read:
