@@ -4,7 +4,7 @@ import gzip
 
 from pathlib import Path
 from typing import Any, List, Tuple, Union, Dict, Hashable
-from src.DGEList import DGEList
+from edgePy.DGEList import DGEList
 import numpy as np   # type: ignore
 
 __all__ = [
@@ -113,13 +113,13 @@ def get_dataset_path(filename: Union[str, Path]) -> Path:
 
     Examples
     --------
-    >>> from src.data_import.data_import import get_dataset_path
+    >>> from edgePy.data_import.data_import import get_dataset_path
     >>> str(get_dataset_path("GSE49712_HTSeq.txt.gz"))  # doctest:+ELLIPSIS
-    '.../src/data/GSE49712_HTSeq.txt.gz'
+    '.../edgePy/data/GSE49712_HTSeq.txt.gz'
 
     """
-    import src
-    directory = Path(src.__file__).expanduser().resolve().parent
+    import edgePy
+    directory = Path(edgePy.__file__).expanduser().resolve().parent
     return directory / 'data' / filename
 
 

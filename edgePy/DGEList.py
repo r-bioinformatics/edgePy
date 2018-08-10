@@ -29,7 +29,7 @@ class DGEList(object):
 
     Examples:
         >>> import gzip
-        >>> from src.data_import.data_import import get_dataset_path
+        >>> from edgePy.data_import.data_import import get_dataset_path
         >>> dataset = 'GSE49712_HTSeq.txt.gz'
         >>> DGEList.read_handle(gzip.open(get_dataset_path(dataset)))
         DGEList(num_samples=10, num_genes=21,717)

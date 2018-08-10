@@ -1,8 +1,8 @@
 
 import pytest
-from src.data_import.mongodb.mongo_wrapper import MongoWrapper
-from src.data_import.mongodb.mongo_wrapper import MongoInserter
-from src.data_import.mongodb.mongo_wrapper import MongoUpdater
+from edgePy.data_import.mongodb.mongo_wrapper import MongoWrapper
+from edgePy.data_import.mongodb.mongo_wrapper import MongoInserter
+from edgePy.data_import.mongodb.mongo_wrapper import MongoUpdater
 
 
 def test_mongo_wrapper_find_as_cursor(mongodb):

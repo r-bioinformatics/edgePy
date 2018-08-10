@@ -4,11 +4,11 @@ import gzip
 import pytest
 import numpy as np
 
-from src.data_import.data_import import get_open_function
-from src.data_import.data_import import get_dataset_path
-from src.data_import.data_import import GroupImporter
-from src.data_import.data_import import DataImporter
-from src.data_import.data_import import create_DGEList
+from edgePy.data_import.data_import import get_open_function
+from edgePy.data_import.data_import import get_dataset_path
+from edgePy.data_import.data_import import GroupImporter
+from edgePy.data_import.data_import import DataImporter
+from edgePy.data_import.data_import import create_DGEList
 
 
 # TestCommonFunctions

@@ -2,8 +2,8 @@ import gzip
 import numpy as np
 import pytest
 
-from src.DGEList import DGEList
-from src.data_import.data_import import get_dataset_path
+from edgePy.DGEList import DGEList
+from edgePy.data_import.data_import import get_dataset_path
 
 
 TEST_DATASET = 'GSE49712_HTSeq.txt.gz'

@@ -10,4 +10,4 @@ Input main content:
 - `Data Matrix` A numeric matrix (Previously `counts`).
 A numeric matrix. Each row represents a single feature and each column represent a single sample.
 
-Sample data can be found in the [`data/`](../src/data/) folder, which was derived from data on the [NCBI Gene Expression Ombnibus](https://www.ncbi.nlm.nih.gov/geo/).
+Sample data can be found in the [`data/`](../edgePy/data/) folder, which was derived from data on the [NCBI Gene Expression Ombnibus](https://www.ncbi.nlm.nih.gov/geo/).

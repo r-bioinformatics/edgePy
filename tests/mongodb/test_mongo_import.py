@@ -1,9 +1,9 @@
 
 
-from src.data_import.mongodb.mongo_import import ImportFromMongodb
-from src.data_import.mongodb.mongo_import import parse_arguments
+from edgePy.data_import.mongodb.mongo_import import ImportFromMongodb
+from edgePy.data_import.mongodb.mongo_import import parse_arguments
 
-from src.data_import.data_import import get_dataset_path
+from edgePy.data_import.data_import import get_dataset_path
 
 
 def test_parse_arguments():

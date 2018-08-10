@@ -1,9 +1,9 @@
 """The core Python code for generating data."""
 import pytest
-from src.data_import.data_import import get_dataset_path
+from edgePy.data_import.data_import import get_dataset_path
 
-from src.data_import.mongodb.gene_functions import *
-from src.data_import.mongodb.mongo_wrapper import MongoWrapper
+from edgePy.data_import.mongodb.gene_functions import *
+from edgePy.data_import.mongodb.mongo_wrapper import MongoWrapper
 
 GENE_LIST_DATASET = 'example_gene_list.txt'
 

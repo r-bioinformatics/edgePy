@@ -1,9 +1,9 @@
 import argparse
 
-from src.data_import.mongodb.mongo_wrapper import MongoWrapper
-from src.data_import.mongodb.gene_functions import get_canonical_raw
-from src.data_import.mongodb.gene_functions import get_genelist_from_file
-from src.data_import.mongodb.gene_functions import translate_genes
+from edgePy.data_import.mongodb.mongo_wrapper import MongoWrapper
+from edgePy.data_import.mongodb.gene_functions import get_canonical_raw
+from edgePy.data_import.mongodb.gene_functions import get_genelist_from_file
+from edgePy.data_import.mongodb.gene_functions import translate_genes
 
 
 from typing import Dict, Hashable, Any, Tuple, List, Optional
