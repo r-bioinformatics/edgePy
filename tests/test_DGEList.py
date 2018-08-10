@@ -81,7 +81,7 @@ def test_cycle_dge_npz():
     tempdir = tempfile.mkdtemp(prefix='edgePy_tmp')
     file_name = tempdir + os.sep + next(tempfile._get_candidate_names())
     dge_list_first = dge_list()
-    dge_list_first.export_file(filename=file_name)
+    dge_list_first.write_npz_file(filename=file_name)
 
     dge_list_second = DGEList(filename=file_name + ".npz")
     assert np.array_equal(dge_list_first.counts, dge_list_second.counts)

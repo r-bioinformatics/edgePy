@@ -50,7 +50,7 @@ class EdgePy(object):
             sample_list, data_set, gene_list, sample_category = mongo_importer.get_data_from_mongo()
             self.dge_list = create_DGEList(sample_list, data_set, gene_list, sample_category)
 
-            self.dge_list.export_file('./src/data/example_data.cpe')
+            self.dge_list.write_npz_file('./src/data/example_data.cpe')
 
         else:
             importer = DataImporter(args.count_file)

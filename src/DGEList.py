@@ -53,7 +53,7 @@ class DGEList(object):
             if counts or samples or genes or norm_factors or group:
                 raise Exception("if filename is provided, you can't also provide other parameters")
             self._counts = None
-            self.import_file(filename)
+            self.read_npz_file(filename)
 
         else:
             if counts is None:
@@ -265,7 +265,7 @@ class DGEList(object):
             f'num_genes={num_genes:,})'
         )
 
-    def export_file(self, filename: str) -> None:
+    def write_npz_file(self, filename: str) -> None:
         """ Convert the object to a byte representation, which can be stored or imported."""
 
         # TODO: validate file name
@@ -279,7 +279,7 @@ class DGEList(object):
                             counts=self.counts,
                             group=self.group)
 
-    def import_file(self, filename: str) -> None:
+    def read_npz_file(self, filename: str) -> None:
         """
         Import a file name stored in the dge export format.
         :param filename:
