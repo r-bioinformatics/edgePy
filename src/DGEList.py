@@ -227,12 +227,8 @@ class DGEList(object):
 
         # TODO: Implement here
 
-    def rpkm(
-            self,
-            gene_lengths: Mapping,
-            log: bool = False,
-            prior_count: float = PRIOR_COUNT
-    ) -> None:
+    def rpkm(self, gene_lengths: Mapping, log: bool = False,
+             prior_count: float = PRIOR_COUNT) -> None:
         """Return the DGEList normalized to reads per kilobase of gene length
         per million reads.
 
