@@ -5,3 +5,4 @@ pylint==2.0.0
 pytest==3.6.3
 pytest-cov==2.5.1
 pytest-parallel==0.0.2
+pre-commit==1.10.5
