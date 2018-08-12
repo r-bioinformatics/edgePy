@@ -26,7 +26,7 @@ Always ensure that you have fetched (_via_ `git pull`) the most recent material 
 2. Use [Google Style](http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html) docstrings.
 3. Implement doctests.
 4. Provide accurate type annotations.
-5. Limit line lengths to 99 characters.
+5. Limit line lengths to 120 characters.
 
 An example function showcasing the above requirements:
 
