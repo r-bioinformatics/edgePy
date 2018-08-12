@@ -6,12 +6,7 @@ from pathlib import Path
 from typing import Any, List, Tuple, Union
 
 
-__all__ = [
-    'GroupImporter',
-    'DataImporter',
-    'get_dataset_path',
-    'get_open_function'
-]
+__all__ = ['GroupImporter', 'DataImporter', 'get_dataset_path', 'get_open_function']
 
 
 def get_open_function(filename: str) -> Tuple[Any, bool]:
@@ -21,7 +16,6 @@ def get_open_function(filename: str) -> Tuple[Any, bool]:
 
 
 class GroupImporter(object):
-
     def __init__(self, filename: Union[str, Path]) -> None:
         self.filename: str = str(filename)
         self.samples: dict = {}
@@ -49,7 +43,6 @@ class GroupImporter(object):
 
 
 class DataImporter(object):
-
     def __init__(self, filename: Union[str, Path]) -> None:
         self.filename: str = str(filename)
         self.raw_data: List = []
@@ -117,5 +110,6 @@ def get_dataset_path(filename: Union[str, Path]) -> Path:
 
     """
     import edgePy
+
     directory = Path(edgePy.__file__).expanduser().resolve().parent
     return directory / 'data' / filename

@@ -7,9 +7,7 @@ import numpy as np  # type: ignore
 
 from typing import Generator, Iterable, Mapping, Optional, Union
 
-__all__ = [
-    'DGEList'
-]
+__all__ = ['DGEList']
 
 
 PRIOR_COUNT: float = 0.25
@@ -46,7 +44,7 @@ class DGEList(object):
         genes: Optional[np.array] = None,
         norm_factors: Optional[np.array] = None,
         group: Optional[np.array] = None,
-        to_remove_zeroes: Optional[bool] = True
+        to_remove_zeroes: Optional[bool] = True,
     ) -> None:
         if counts is None:
             counts = np.matrix(np.zeros(3))
@@ -61,9 +59,7 @@ class DGEList(object):
         self.group = group
 
     @staticmethod
-    def _format_fields(
-        fields: Iterable[Union[str, bytes]]
-    ) -> Generator[str, None, None]:
+    def _format_fields(fields: Iterable[Union[str, bytes]]) -> Generator[str, None, None]:
         """Clean fields in the header of any read data.
 
         Yields:
@@ -170,7 +166,7 @@ class DGEList(object):
             replace_space=kwargs.pop('replace_space', '_'),
             case_sensitive=kwargs.pop('case_sensitive', True),
             invalid_raise=kwargs.pop('invalid_raise', True),
-            **kwargs
+            **kwargs,
         )
 
         # Delete the first column as it is copied on assignment to `genes`.
@@ -178,11 +174,7 @@ class DGEList(object):
 
         return cls(counts=counts, samples=samples, genes=genes)
 
-    def cpm(
-        self,
-        log: bool = False,
-        prior_count: float = PRIOR_COUNT
-    ) -> 'DGEList':
+    def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> 'DGEList':
         """Return the DGEList normalized to read counts per million."""
         raise NotImplementedError
         # self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
@@ -192,10 +184,7 @@ class DGEList(object):
         # return self
 
     def rpkm(
-        self,
-        gene_lengths: Mapping,
-        log: bool = False,
-        prior_count: float = PRIOR_COUNT
+        self, gene_lengths: Mapping, log: bool = False, prior_count: float = PRIOR_COUNT
     ) -> 'DGEList':
         """Return the DGEList normalized to reads per kilobase of gene length
         per million reads.
@@ -209,10 +198,7 @@ class DGEList(object):
         return self
 
     def tpm(
-        self,
-        transcripts: Mapping,
-        log: bool = False,
-        prior_count: float = PRIOR_COUNT
+        self, transcripts: Mapping, log: bool = False, prior_count: float = PRIOR_COUNT
     ) -> 'DGEList':
         """Return the DGEList normalized to reads per kilobase of transcript
         length.

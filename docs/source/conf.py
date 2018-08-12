@@ -39,8 +39,7 @@ release = '0.0.1'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-]
+extensions = []
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -50,12 +49,10 @@ templates_path = ['_templates']
 #
 
 ### MARKDOWN PARSER
-source_parsers = {
-        '.md' : 'recommonmark.parser.CommonMarkParser',
-}
+source_parsers = {'.md': 'recommonmark.parser.CommonMarkParser'}
 
 source_suffix = ['.rst', '.md']
-#source_suffix = '.rst'
+# source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
@@ -92,7 +89,7 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -117,15 +114,12 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     #
     # 'preamble': '',
-
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
@@ -135,8 +129,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'EdgePy.tex', 'EdgePy Documentation',
-     'R-Bioinformatics', 'manual'),
+    (master_doc, 'EdgePy.tex', 'EdgePy Documentation', 'R-Bioinformatics', 'manual')
 ]
 
 
@@ -144,10 +137,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'edgepy', 'EdgePy Documentation',
-     [author], 1)
-]
+man_pages = [(master_doc, 'edgepy', 'EdgePy Documentation', [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------------
@@ -156,7 +146,13 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'EdgePy', 'EdgePy Documentation',
-     author, 'EdgePy', 'One line description of project.',
-     'Miscellaneous'),
+    (
+        master_doc,
+        'EdgePy',
+        'EdgePy Documentation',
+        author,
+        'EdgePy',
+        'One line description of project.',
+        'Miscellaneous',
+    )
 ]
