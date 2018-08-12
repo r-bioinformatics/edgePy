@@ -2,10 +2,10 @@
 
 ### Notice:
 
-This project is still in development.  While we are a small band of bioinformaticians with big goals and aspirations, this code base is still too new for use on any real world projects. 
-While there's no official timeline for the project, functionality is being developed rapidly, so please feel free to check back on our progress frequently.  If you'd like to do more 
-than just check on our progress, we're always happy to welcome new members of the community, both to slack group where we're organizing this project, as well as on the git hub repository 
-hosting the project.  To join the slack, send your email to @apfejes (on github) or /u/apfejes on reddit - we're looking forward to working with you.  
+This project is still in development.  While we are a small band of bioinformaticians with big goals and aspirations, this code base is still too new for use on any real world projects.
+While there's no official timeline for the project, functionality is being developed rapidly, so please feel free to check back on our progress frequently.  If you'd like to do more
+than just check on our progress, we're always happy to welcome new members of the community, both to slack group where we're organizing this project, as well as on the git hub repository
+hosting the project.  To join the slack, send your email to @apfejes (on github) or /u/apfejes on reddit - we're looking forward to working with you.
 
 [//]: # (TODO: Remove sample-sheet dummy library until we release on PyPi)
 [![PyPI Version](https://badge.fury.io/py/edgePy.svg)](https://pypi.org/project/edgePy)
@@ -13,7 +13,9 @@ hosting the project.  To join the slack, send your email to @apfejes (on github)
 [![Documentation Status](https://readthedocs.org/projects/edgepy/badge/?version=latest)](http://edgepy.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/r-bioinformatics/edgePy/branch/master/graph/badge.svg)](https://codecov.io/gh/r-bioinformatics/edgePy)
 [![Checked with MyPy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![GitHub License](https://img.shields.io/pypi/l/sample-sheet.svg)](https://github.com/r-bioinformatics/edgePy/blob/master/LICENSE)
+
 
 The `edgePy` library will become an implementation of [`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html) for differential expression analysis in the Python language.
 This library will have advantages over [`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html) in that it will be well-tested and will run faster by utilizing Cythonized routines.

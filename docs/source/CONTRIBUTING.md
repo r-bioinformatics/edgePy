@@ -58,6 +58,15 @@ def get_dataset_path(
     return directory / 'data' / filename
 ```
 
+### Code Style
+This repository uses [Black](https://github.com/ambv/black) as a code formatter.
+
+It can be ran a few different ways:
+
+1. Manually by running `$ black .` in the repository root
+2. Though [pre-commit](https://pre-commit.com/) a git hook that runs it whenever a commit is made.
+3. It can also be integrated in the of your choice by following the instructions in the [documention](https://github.com/ambv/black#editor-integration).
+
 ## Updating the documentation
 
 New documentation files must be of the following format:
