@@ -1,22 +1,8 @@
 import pkgutil
-import gzip
 
 import pytest
 
 from edgePy.io import *  # A bad habit in practice, this tests `__all__`
-
-
-# TestCommonFunctions
-def test_get_open_function():
-    file_name = "blah.gz"
-    open_function, decode_required = get_open_function(filename=file_name)
-    assert gzip.open == open_function
-    assert decode_required is True
-
-    file_name = "blah.txt"
-    open_function, decode_required = get_open_function(filename=file_name)
-    assert open == open_function
-    assert decode_required is False
 
 
 # Unit tests for ``edgePy.io.Importer``.

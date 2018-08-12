@@ -1,4 +1,4 @@
-import gzip
+from smart_open import smart_open
 import numpy as np
 import pytest
 
@@ -10,7 +10,7 @@ TEST_DATASET = 'GSE49712_HTSeq.txt.gz'
 
 @pytest.fixture
 def dge_list():
-    with gzip.open(get_dataset_path(TEST_DATASET)) as handle:
+    with smart_open(get_dataset_path(TEST_DATASET), 'r') as handle:
         return DGEList.read_handle(handle)
 
 

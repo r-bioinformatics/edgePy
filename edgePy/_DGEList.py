@@ -26,10 +26,10 @@ class DGEList(object):
         remove_zeroes: To remove genes with zero counts for all samples.
 
     Examples:
-        >>> import gzip
+        >>> from smart_open import smart_open
         >>> from edgePy.io import get_dataset_path
         >>> dataset = 'GSE49712_HTSeq.txt.gz'
-        >>> DGEList.read_handle(gzip.open(get_dataset_path(dataset)))
+        >>> DGEList.read_handle(smart_open(get_dataset_path(dataset), 'r'))
         DGEList(num_samples=10, num_genes=21,717)
 
     """
