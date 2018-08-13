@@ -224,7 +224,7 @@ class DGEList(object):
 
         return cls(counts=counts, samples=samples, genes=genes[1:])
 
-    def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> "DGEList":
+    def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> None:
         """Return the DGEList normalized to read counts per million."""
         self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
         # np.sum(self.counts, axis=0)
