@@ -9,7 +9,7 @@ from edgePy.data_import.mongodb.gene_functions import translate_genes
 from typing import Dict, Hashable, Any, Tuple, List, Optional
 
 
-def parse_arguments(parser: Any=None, ci_values: List[str]=None) -> Any:
+def parse_arguments(parser: Any = None, ci_values: List[str] = None) -> Any:
 
     """
     Standard argparse wrapper for interpreting command line arguments.
@@ -46,17 +46,21 @@ class ImportFromMongodb(object):
         gene_list_file: a list of genes to filter the results on.
     """
 
-    def __init__(self, host: str, port: int,
-                 mongo_key_name: Optional[str],
-                 mongo_key_value: Optional[str],
-                 gene_list_file: Optional[str]) -> None:
+    def __init__(
+        self,
+        host: str,
+        port: int,
+        mongo_key_name: Optional[str],
+        mongo_key_value: Optional[str],
+        gene_list_file: Optional[str],
+    ) -> None:
 
         self.mongo_host = host
         self.mongo_port = port
 
-        self.mongo_reader = MongoWrapper(host=self.mongo_host,
-                                         port=self.mongo_port,
-                                         connect=False)
+        self.mongo_reader = MongoWrapper(
+            host=self.mongo_host, port=self.mongo_port, connect=False
+        )
 
         self.key_name = mongo_key_name
         self.key_value = mongo_key_value
@@ -73,12 +77,14 @@ class ImportFromMongodb(object):
 
         if self.input_gene_file:
             input_genes = get_genelist_from_file(self.input_gene_file)
-            ensg_genes, gene_symbols = \
-                translate_genes(input_genes, self.mongo_reader, database=database)
+            ensg_genes, gene_symbols = translate_genes(
+                input_genes, self.mongo_reader, database=database
+            )
             self.gene_list = ensg_genes
 
-    def get_data_from_mongo(self, database: str='Tenaya') \
-            -> Tuple[List[str], Dict[Hashable, Any], List[str], Dict[Hashable, Any]]:
+    def get_data_from_mongo(
+        self, database: str = "Tenaya"
+    ) -> Tuple[List[str], Dict[Hashable, Any], List[str], Dict[Hashable, Any]]:
         """
         Run the queries to get the samples, from mongo, and then use that data to retrieve
         the counts.
@@ -98,34 +104,39 @@ class ImportFromMongodb(object):
             #     query = {self.key_name: {'$regex': 'myocyte|fibroblast'}}
 
         elif self.key_name and not self.key_value:
-            query[self.key_name] = {'$exists': True}
+            query[self.key_name] = {"$exists": True}
         elif not self.key_name and not self.key_value:
             pass
         else:
-            raise Exception("Invalid input - you can't specify a "
-                            "key_value without specifying a key_name")
+            raise Exception(
+                "Invalid input - you can't specify a "
+                "key_value without specifying a key_name"
+            )
 
-        projection: Dict[Hashable, Any] = {'sample_name': 1, '_id': 0}
+        projection: Dict[Hashable, Any] = {"sample_name": 1, "_id": 0}
         if self.key_name:
             projection[self.key_name] = 1
 
-        cursor = self.mongo_reader.find_as_cursor(database=database, collection='samples',
-                                                  query=query, projection=projection)
+        cursor = self.mongo_reader.find_as_cursor(
+            database=database, collection="samples", query=query, projection=projection
+        )
         sample_names = set()
         sample_category = {}
         for result in cursor:
             print(result)
-            sample_names.add(result['sample_name'])
-            sample_category[result['sample_name']] = \
-                result[self.key_name] if self.key_name else result['sample_name']
+            sample_names.add(result["sample_name"])
+            sample_category[result["sample_name"]] = (
+                result[self.key_name] if self.key_name else result["sample_name"]
+            )
         print(f"get data.... for sample_names {list(sample_names)}")
 
-        query = {'sample_name': {'$in': list(sample_names)}}
+        query = {"sample_name": {"$in": list(sample_names)}}
         if self.gene_list:
             print(self.gene_list)
-            query['gene'] = {'$in': list(self.gene_list)}
-        cursor = self.mongo_reader.find_as_cursor(database=database, collection='RNASeq',
-                                                  query=query, projection={'_id': 0})
+            query["gene"] = {"$in": list(self.gene_list)}
+        cursor = self.mongo_reader.find_as_cursor(
+            database=database, collection="RNASeq", query=query, projection={"_id": 0}
+        )
 
         # make it a list of lists
         print(f"Importing data from mongo ({self.mongo_host})....")
@@ -137,9 +148,9 @@ class ImportFromMongodb(object):
             count += 1
             if count % 100000 == 0:
                 print(f"{count} rows processed")
-            sample = result['sample_name']
+            sample = result["sample_name"]
             rpkm = get_canonical_raw(result)
-            gene = result['gene']
+            gene = result["gene"]
             # print("{}-{}".format(sample, gene))
             if sample not in dataset:
                 dataset[sample] = {}

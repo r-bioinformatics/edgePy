@@ -15,11 +15,15 @@ def parse_arguments(parser=None):
 
     parser.add_argument("--count_file", help="name of the count file")
     parser.add_argument("--groups_file", help="name of the groups file")
-    parser.add_argument("--dge_file", help='import from .dge file;')
-    parser.add_argument("--gene_list", default=None, help='a list of genes to filter the data set')
+    parser.add_argument("--dge_file", help="import from .dge file;")
+    parser.add_argument(
+        "--gene_list", default=None, help="a list of genes to filter the data set"
+    )
 
     # mongo parameters
-    parser.add_argument("--mongo_config", help='a way to import data from a supported mongo database')
+    parser.add_argument(
+        "--mongo_config", help="a way to import data from a supported mongo database"
+    )
     parser.add_argument("--mongo_key_name", default="Project")
     parser.add_argument("--mongo_key_value", default="RNA-Seq1")
 
@@ -29,7 +33,6 @@ def parse_arguments(parser=None):
 
 
 class EdgePy(object):
-
     def __init__(self, args):
 
         self.dge_list = None
@@ -42,15 +45,21 @@ class EdgePy(object):
             config = configparser.ConfigParser()
             config.read(args.mongo_config)
 
-            mongo_importer = ImportFromMongodb(host=config.get("Mongo", "host"),
-                                               port=config.get("Mongo", "port"),
-                                               mongo_key_name=args.mongo_key_name,
-                                               mongo_key_value=args.mongo_key_value,
-                                               gene_list_file=args.gene_list)
-            sample_list, data_set, gene_list, sample_category = mongo_importer.get_data_from_mongo()
-            self.dge_list = create_DGEList(sample_list, data_set, gene_list, sample_category)
+            mongo_importer = ImportFromMongodb(
+                host=config.get("Mongo", "host"),
+                port=config.get("Mongo", "port"),
+                mongo_key_name=args.mongo_key_name,
+                mongo_key_value=args.mongo_key_value,
+                gene_list_file=args.gene_list,
+            )
+            sample_list, data_set, gene_list, sample_category = (
+                mongo_importer.get_data_from_mongo()
+            )
+            self.dge_list = create_DGEList(
+                sample_list, data_set, gene_list, sample_category
+            )
 
-            self.dge_list.write_npz_file('./edgePy/data/example_data.cpe')
+            self.dge_list.write_npz_file("./edgePy/data/example_data.cpe")
 
         else:
             importer = DataImporter(args.count_file)
@@ -72,5 +81,5 @@ def main():
     default_class.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

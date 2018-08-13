@@ -5,14 +5,14 @@ import gzip
 from pathlib import Path
 from typing import Any, List, Tuple, Union, Dict, Hashable
 from edgePy.DGEList import DGEList
-import numpy as np   # type: ignore
+import numpy as np  # type: ignore
 
 __all__ = [
-    'GroupImporter',
-    'DataImporter',
-    'get_dataset_path',
-    'get_open_function',
-    'create_DGEList'
+    "GroupImporter",
+    "DataImporter",
+    "get_dataset_path",
+    "get_open_function",
+    "create_DGEList",
 ]
 
 
@@ -23,7 +23,6 @@ def get_open_function(filename: str) -> Tuple[Any, bool]:
 
 
 class GroupImporter(object):
-
     def __init__(self, filename: Union[str, Path]) -> None:
         self.filename: str = str(filename)
         self.samples: dict = {}
@@ -37,7 +36,7 @@ class GroupImporter(object):
                 if decode_required:
                     # this is needed if we are using gzip, which returns a
                     # binary-string.
-                    line = line.decode('utf-8')
+                    line = line.decode("utf-8")
                 line = line.strip().split(":")
                 if len(line) < 2:
                     continue  # blank line, or does not have any samples.
@@ -51,7 +50,6 @@ class GroupImporter(object):
 
 
 class DataImporter(object):
-
     def __init__(self, filename: Union[str, Path]) -> None:
         self.filename: str = str(filename)
         self.raw_data: List = []
@@ -71,7 +69,7 @@ class DataImporter(object):
                 if decode_required:
                     # this is needed if we are using gzip, which returns a
                     # binary-string.
-                    line = line.decode('utf-8')
+                    line = line.decode("utf-8")
                 line = line.strip().split("\t")
                 if not header_read:
                     _, *self.samples = line
@@ -82,7 +80,7 @@ class DataImporter(object):
 
     @staticmethod
     def clean_headers(samples: List[str]) -> List[str]:
-        return [s.replace("\"", "").strip() for s in samples]
+        return [s.replace('"', "").strip() for s in samples]
 
     def validate(self) -> None:
         columns = len(self.raw_data[1])
@@ -119,14 +117,17 @@ def get_dataset_path(filename: Union[str, Path]) -> Path:
 
     """
     import edgePy
+
     directory = Path(edgePy.__file__).expanduser().resolve().parent
-    return directory / 'data' / filename
+    return directory / "data" / filename
 
 
-def create_DGEList(sample_list: List[str],
-                   data_set: Dict[Hashable, Any],   # {sample: {gene1: x, gene2: y}},
-                   gene_list: List[str],
-                   sample_category: Dict[Hashable, str]) -> 'DGEList':
+def create_DGEList(
+    sample_list: List[str],
+    data_set: Dict[Hashable, Any],  # {sample: {gene1: x, gene2: y}},
+    gene_list: List[str],
+    sample_category: Dict[Hashable, str],
+) -> "DGEList":
     """ sample list and gene list must be pre-sorted
         Use this to create the DGE object for future work."""
 
@@ -141,8 +142,10 @@ def create_DGEList(sample_list: List[str],
                     temp_data_store[idx_g, idx_s] = data_set[sample][gene]
         group.append(sample_category[sample])
 
-    return DGEList(counts=temp_data_store,
-                   genes=np.array(gene_list),
-                   samples=np.array(sample_list),
-                   group=np.array(group),
-                   to_remove_zeroes=False)
+    return DGEList(
+        counts=temp_data_store,
+        genes=np.array(gene_list),
+        samples=np.array(sample_list),
+        group=np.array(group),
+        to_remove_zeroes=False,
+    )

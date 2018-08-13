@@ -3,7 +3,7 @@ A simple library for wrapping around mongo collections and access issues.
 """
 
 import pymongo  # type: ignore
-from pymongo.errors import BulkWriteError   # type: ignore
+from pymongo.errors import BulkWriteError  # type: ignore
 from pymongo import InsertOne, UpdateOne
 from typing import Dict, Hashable, Any, Iterable, List, Union
 
@@ -24,11 +24,18 @@ class MongoWrapper(object):
 
     """
 
-    def __init__(self, host: str, port: Union[str, int]=27017,
-                 connect: bool=True, verbose: bool=False) -> None:
+    def __init__(
+        self,
+        host: str,
+        port: Union[str, int] = 27017,
+        connect: bool = True,
+        verbose: bool = False,
+    ) -> None:
         self.host = host
         self.port = int(port)
-        self.session = pymongo.MongoClient(host=self.host, port=self.port, connect=connect)
+        self.session = pymongo.MongoClient(
+            host=self.host, port=self.port, connect=connect
+        )
         self.verbose = verbose
 
     def get_db(self, database: str, collection: str) -> Any:
@@ -40,13 +47,18 @@ class MongoWrapper(object):
         :return: the collection object ready for use with .find() or similar.
         """
 
-        if database == 'pytest':
+        if database == "pytest":
             return self.session[collection]
         else:
             return self.session[database][collection]
 
-    def find_as_cursor(self, database: str, collection: str, query: Dict[Hashable, Any]=None,
-                       projection: Dict[Hashable, Any]=None) -> Iterable:
+    def find_as_cursor(
+        self,
+        database: str,
+        collection: str,
+        query: Dict[Hashable, Any] = None,
+        projection: Dict[Hashable, Any] = None,
+    ) -> Iterable:
         """
         Do a find operation on a mongo collection and return the data as a cursor,
         the (native MongoClient find return type.)
@@ -65,8 +77,13 @@ class MongoWrapper(object):
 
         return cursor
 
-    def find_as_list(self, database: str, collection: str, query: Dict[Hashable, Any]=None,
-                     projection: Dict[Hashable, Any]=None) -> Iterable:
+    def find_as_list(
+        self,
+        database: str,
+        collection: str,
+        query: Dict[Hashable, Any] = None,
+        projection: Dict[Hashable, Any] = None,
+    ) -> Iterable:
         """
         Do a find operation on a mongo collection, but return the data as a list
         :param database: db name
@@ -75,13 +92,19 @@ class MongoWrapper(object):
         :param projection: a dictionary that gives the projection - the fields to return.
         :return: a list representation of the returned data.
         """
-        cursor = self.find_as_cursor(database=database, collection=collection,
-                                     query=query, projection=projection)
+        cursor = self.find_as_cursor(
+            database=database, collection=collection, query=query, projection=projection
+        )
         return [c for c in cursor]
 
-    def find_as_dict(self, database: str, collection: str,
-                     query: Dict[Hashable, Any]=None, field: str='_id',
-                     projection: Dict[Hashable, Any]=None) -> Iterable:
+    def find_as_dict(
+        self,
+        database: str,
+        collection: str,
+        query: Dict[Hashable, Any] = None,
+        field: str = "_id",
+        projection: Dict[Hashable, Any] = None,
+    ) -> Iterable:
         """
          Do a find operation on a mongo collection, but return the data as a dictionary
         :param database: db name
@@ -91,8 +114,9 @@ class MongoWrapper(object):
         :param field: the field in the projection for which the value will be used as the Hashable key of the dict.
         :return: a dictionary representation of the returned data.
         """
-        cursor = self.find_as_cursor(database=database, collection=collection,
-                                     query=query, projection=projection)
+        cursor = self.find_as_cursor(
+            database=database, collection=collection, query=query, projection=projection
+        )
         return {c[field]: c for c in cursor}
 
     def insert(self, database: str, collection: str, data_list: List[Any]) -> None:
@@ -137,8 +161,10 @@ class MongoInserter(MongoWrapper):
             set to false, if this is being instantiated by a subprocesses.
 
     """
-    def __init__(self, host: str, port: int, database: str,
-                 collection: str, connect: bool=True) -> None:
+
+    def __init__(
+        self, host: str, port: int, database: str, collection: str, connect: bool = True
+    ) -> None:
         MongoWrapper.__init__(self, host, port, connect=connect)
         self.database = database
         self.collection = collection
@@ -202,8 +228,10 @@ class MongoUpdater(MongoWrapper):
                 set to false, if this is being instantiated by a subprocesses.
 
         """
-    def __init__(self, host: str, port: int, database: str,
-                 collection: str, connect: bool=True) -> None:
+
+    def __init__(
+        self, host: str, port: int, database: str, collection: str, connect: bool = True
+    ) -> None:
         MongoWrapper.__init__(self, host, port, connect=connect)
         self.database = database
         self.to_update: List[Any] = []
@@ -224,7 +252,9 @@ class MongoUpdater(MongoWrapper):
                 raise Exception("Mongo bulk write failed.")
         del self.to_update[:]
 
-    def add(self, updatedict: Dict[Hashable, Any], setdict: Dict[Hashable, Any]) -> None:
+    def add(
+        self, updatedict: Dict[Hashable, Any], setdict: Dict[Hashable, Any]
+    ) -> None:
         """
         Add a record to the buffer
         :param updatedict: the criteria for the update query
