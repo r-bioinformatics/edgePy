@@ -130,8 +130,7 @@ class DGEList(object):
                 print(self.genes)
 
                 if (
-                    sample_count != self.samples.shape[0]
-                    or gene_count != self.genes.shape[0]
+                    sample_count != self.samples.shape[0] or gene_count != self.genes.shape[0]
                 ):
 
                     raise ValueError(
@@ -234,13 +233,15 @@ class DGEList(object):
 
         return cls(counts=counts, samples=samples, genes=genes)
 
-    def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> "DGEList":
+    def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> 'DGEList':
         """Return the DGEList normalized to read counts per million."""
-        self.counts = 1e6 * self.counts
-        # np.sum(self.counts, axis=0)
-        if log:
-            self.counts[self.counts == 0] = prior_count
-            self.counts = np.log(self.counts)
+        # self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
+        # if log:
+        #     self.counts[self.counts == 0] = prior_count
+        #     self.counts = np.log(self.counts)
+        # return self
+
+        raise NotImplementedError
 
     def rpkm(
         self, gene_lengths: Mapping, log: bool = False, prior_count: float = PRIOR_COUNT

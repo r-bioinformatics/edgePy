@@ -151,20 +151,9 @@ def test_broken_dge_call():
         DGEList(counts=None)
 
 
-def test_cpm():
-    dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
-    first_pos = dge_list.counts[0][0]
-    print(first_pos)
-    col_sum = np.sum(dge_list.counts, axis=0)
-    print(col_sum[0])
-    print(type(first_pos))
-    assert isinstance(first_pos, np.integer)
-    dge_list.cpm()
-    print(f"{dge_list.counts[0][0]} == {first_pos * 1e6 / col_sum[0]}")
-    assert dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
-
-
 def test_non_implemented():
+    with pytest.raises(NotImplementedError):
+        dge_list().cpm()
     with pytest.raises(NotImplementedError):
         dge_list().rpkm(None)
     with pytest.raises(NotImplementedError):
