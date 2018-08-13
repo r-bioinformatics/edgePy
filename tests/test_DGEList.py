@@ -156,10 +156,8 @@ def test_cpm():
     dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
     first_pos = dge_list.counts[0][0]
     col_sum = np.sum(dge_list.counts, axis=0)
-
     assert isinstance(first_pos, np.integer)
     dge_list.cpm()
-    print(f"{dge_list.counts[0][0]} == {first_pos * 1e6 / col_sum[0]}")
     assert dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
 
 
