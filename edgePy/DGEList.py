@@ -51,9 +51,7 @@ class DGEList(object):
         self.to_remove_zeroes = to_remove_zeroes
         if filename:
             if counts or samples or genes or norm_factors or group:
-                raise Exception(
-                    "if filename is provided, you can't also provide other parameters"
-                )
+                raise Exception("if filename is provided, you can't also provide other parameters")
             self._counts = None
             self.read_npz_file(filename)
 
@@ -66,8 +64,7 @@ class DGEList(object):
                     norm_factors = np.ones(np.size(counts, 1))
                 except IndexError:
                     raise ValueError(
-                        "counts must have more than one sample "
-                        "- eg, have two dimensions"
+                        "counts must have more than one sample " "- eg, have two dimensions"
                     )
 
             self.counts = counts
@@ -122,14 +119,10 @@ class DGEList(object):
             if hasattr(self, "_samples") and self._samples is not None:
                 gene_count, sample_count = counts.shape
                 print(f" sample count: {sample_count}, gene count: {gene_count}")
-                print(
-                    f" samples shape {self.samples.shape[0]}, gene shape {self.genes.shape[0]}"
-                )
+                print(f" samples shape {self.samples.shape[0]}, gene shape {self.genes.shape[0]}")
                 print(self.genes)
 
-                if (
-                    sample_count != self.samples.shape[0] or gene_count != self.genes.shape[0]
-                ):
+                if sample_count != self.samples.shape[0] or gene_count != self.genes.shape[0]:
 
                     raise ValueError(
                         "Attempting to substitute counts data "

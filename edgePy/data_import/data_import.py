@@ -7,13 +7,7 @@ from typing import Any, List, Union, Dict, Hashable
 from edgePy.DGEList import DGEList
 import numpy as np  # type: ignore
 
-__all__ = [
-    "GroupImporter",
-    "DataImporter",
-    "get_dataset_path",
-    "create_DGEList",
-]
-
+__all__ = ["GroupImporter", "DataImporter", "get_dataset_path", "create_DGEList"]
 
 
 class GroupImporter(object):

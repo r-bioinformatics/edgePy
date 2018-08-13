@@ -16,9 +16,7 @@ def parse_arguments(parser=None):
     parser.add_argument("--count_file", help="name of the count file")
     parser.add_argument("--groups_file", help="name of the groups file")
     parser.add_argument("--dge_file", help="import from .dge file;")
-    parser.add_argument(
-        "--gene_list", default=None, help="a list of genes to filter the data set"
-    )
+    parser.add_argument("--gene_list", default=None, help="a list of genes to filter the data set")
 
     # mongo parameters
     parser.add_argument(
@@ -55,9 +53,7 @@ class EdgePy(object):
             sample_list, data_set, gene_list, sample_category = (
                 mongo_importer.get_data_from_mongo()
             )
-            self.dge_list = create_DGEList(
-                sample_list, data_set, gene_list, sample_category
-            )
+            self.dge_list = create_DGEList(sample_list, data_set, gene_list, sample_category)
 
             self.dge_list.write_npz_file("./edgePy/data/example_data.cpe")
 

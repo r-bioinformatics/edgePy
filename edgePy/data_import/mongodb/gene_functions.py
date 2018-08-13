@@ -46,9 +46,7 @@ def translate_genes(
     if ensg_genes or not genes:
         if genes:
             query["_id"] = {"$in": ensg_genes}
-        symbol_gene_list = mongo_reader.find_as_cursor(
-            database, "symbol_by_ensg", query=query
-        )
+        symbol_gene_list = mongo_reader.find_as_cursor(database, "symbol_by_ensg", query=query)
         for symbol_gene in symbol_gene_list:
             for symbol in symbol_gene["symbols"]:
                 gene_symbols[symbol_gene["_id"]] = symbol
@@ -57,9 +55,7 @@ def translate_genes(
                 gene_symbols[ensg] = ensg
     if non_ensg_genes or not genes:
         query = {"_id": {"$in": non_ensg_genes}} if genes else {}
-        translated_gene_list = mongo_reader.find_as_cursor(
-            database, "ensg_by_symbol", query=query
-        )
+        translated_gene_list = mongo_reader.find_as_cursor(database, "ensg_by_symbol", query=query)
         for trans_gene in translated_gene_list:
             symbol = trans_gene["_id"]
             ensgs = trans_gene["ensgs"]

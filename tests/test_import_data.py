@@ -1,30 +1,14 @@
 import pkgutil
-import gzip
 
 import pytest
 import numpy as np
 
-from edgePy.data_import.data_import import get_open_function
 from edgePy.data_import.data_import import get_dataset_path
 from edgePy.data_import.data_import import GroupImporter
 from edgePy.data_import.data_import import DataImporter
 from edgePy.data_import.data_import import create_DGEList
 
-
-# TestCommonFunctions
-def test_get_open_function():
-    file_name = "blah.gz"
-    open_function, decode_required = get_open_function(filename=file_name)
-    assert gzip.open == open_function
-    assert decode_required is True
-
-    file_name = "blah.txt"
-    open_function, decode_required = get_open_function(filename=file_name)
-    assert open == open_function
-    assert decode_required is False
-
-
-# Unit tests for ``edgePy.io.Importer``.
+# Unit tests for ``edgePy.data_import.Importer``.
 def test_init():
     filename = get_dataset_path("GSE49712_HTSeq.txt.gz")
     import_module = DataImporter(filename)
@@ -65,7 +49,7 @@ def test_GroupImporter_failure():
 # Unit tests for packaged (optionally zipped during install) data.
 def test_get_data_stream():
     """Tests finding packaged data with ``pkgutil.get_data()``"""
-    pkgutil.get_data("src", "data/GSE49712_HTSeq.txt.gz")
+    pkgutil.get_data("edgePy", "data/GSE49712_HTSeq.txt.gz")
 
 
 def test_create_DGEList():
@@ -81,10 +65,7 @@ def test_create_DGEList():
     categories = {"AAA": "One", "BBB": "Two", "CCC": "One"}
 
     dge_list = create_DGEList(
-        sample_list=samples,
-        data_set=data_set,
-        gene_list=genes,
-        sample_category=categories,
+        sample_list=samples, data_set=data_set, gene_list=genes, sample_category=categories
     )
 
     assert np.array_equal(dge_list.samples, np.array(samples))
