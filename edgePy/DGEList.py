@@ -130,8 +130,7 @@ class DGEList(object):
                 print(self.genes)
 
                 if (
-                    sample_count != self.samples.shape[0]
-                    or gene_count != self.genes.shape[0]
+                    sample_count != self.samples.shape[0] or gene_count != self.genes.shape[0]
                 ):
 
                     raise ValueError(

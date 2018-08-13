@@ -104,9 +104,6 @@ def test_cycle_dge_npz():
     dge_list_first = dge_list()
     dge_list_first.write_npz_file(filename=file_name)
 
-    # APF: Use this to generate the
-    # dge_list_first.write_npz_file(filename='/tmp/GSE49712_HTSeq.txt')
-
     dge_list_second = DGEList(filename=file_name + ".npz")
     assert np.array_equal(dge_list_first.counts, dge_list_second.counts)
     assert np.array_equal(dge_list_first.genes, dge_list_second.genes)
