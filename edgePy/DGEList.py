@@ -26,10 +26,10 @@ class DGEList(object):
         filename: a shortcut to import NPZ (zipped numpy format) files.
 
     Examples:
-        >>> import gzip
-        >>> from edgePy.data_import.data_import import get_dataset_path
+        >>> from smart_open import smart_open
+        >>> from edgePy.data_import import get_dataset_path
         >>> dataset = 'GSE49712_HTSeq.txt.gz'
-        >>> DGEList.read_handle(gzip.open(get_dataset_path(dataset)))
+        >>> DGEList.read_handle(smart_open(get_dataset_path(dataset), 'r'))
         DGEList(num_samples=10, num_genes=21,717)
 
     """
@@ -77,9 +77,7 @@ class DGEList(object):
             self.group = group
 
     @staticmethod
-    def _format_fields(
-        fields: Iterable[Union[str, bytes]]
-    ) -> Generator[str, None, None]:
+    def _format_fields(fields: Iterable[Union[str, bytes]]) -> Generator[str, None, None]:
         """Clean fields in the header of any read data.
 
         Yields:

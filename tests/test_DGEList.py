@@ -1,4 +1,4 @@
-import gzip
+from smart_open import smart_open
 import numpy as np
 import pytest
 
@@ -12,7 +12,7 @@ TEST_DATASET_NPZ = "GSE49712_HTSeq.npz"
 
 @pytest.fixture
 def dge_list():
-    with gzip.open(get_dataset_path(TEST_DATASET)) as handle:
+    with smart_open(get_dataset_path(TEST_DATASET), 'r') as handle:
         return DGEList.read_handle(handle)
 
 
@@ -149,7 +149,6 @@ def test_broken_dge_call():
         DGEList(filename="fake_filename", counts=np.array([[1, 1, 1], [1, 1, 1]]))
     with pytest.raises(Exception):
         DGEList(counts=None)
-
 
 def test_non_implemented():
     with pytest.raises(NotImplementedError):

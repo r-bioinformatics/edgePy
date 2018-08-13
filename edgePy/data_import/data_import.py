@@ -1,9 +1,9 @@
 """ Skeleton class for importing files """
 
-import gzip
+from smart_open import smart_open  # type: ignore
 
 from pathlib import Path
-from typing import Any, List, Tuple, Union, Dict, Hashable
+from typing import Any, List, Union, Dict, Hashable
 from edgePy.DGEList import DGEList
 import numpy as np  # type: ignore
 
@@ -11,15 +11,9 @@ __all__ = [
     "GroupImporter",
     "DataImporter",
     "get_dataset_path",
-    "get_open_function",
     "create_DGEList",
 ]
 
-
-def get_open_function(filename: str) -> Tuple[Any, bool]:
-    decode_required = filename.endswith("gz")
-    open_function = gzip.open if decode_required else open
-    return open_function, decode_required
 
 
 class GroupImporter(object):
@@ -29,14 +23,9 @@ class GroupImporter(object):
         self.groups: dict = {}
         self.read_file()
 
-    def read_file(self) -> None:
-        open_function, decode_required = get_open_function(filename=self.filename)
-        with open_function(self.filename) as f:
+    def read_file(self, **kwargs) -> None:
+        with smart_open(self.filename, 'r', **kwargs) as f:
             for line in f:
-                if decode_required:
-                    # this is needed if we are using gzip, which returns a
-                    # binary-string.
-                    line = line.decode("utf-8")
                 line = line.strip().split(":")
                 if len(line) < 2:
                     continue  # blank line, or does not have any samples.
@@ -59,17 +48,11 @@ class DataImporter(object):
         self.read_file()
         self.validate()
 
-    def read_file(self) -> None:
-        open_function, decode_required = get_open_function(filename=self.filename)
-
+    def read_file(self, **kwargs) -> None:
         header_read = False
 
-        with open_function(self.filename) as f:
+        with smart_open(self.filename, 'r', **kwargs) as f:
             for line in f:
-                if decode_required:
-                    # this is needed if we are using gzip, which returns a
-                    # binary-string.
-                    line = line.decode("utf-8")
                 line = line.strip().split("\t")
                 if not header_read:
                     _, *self.samples = line
