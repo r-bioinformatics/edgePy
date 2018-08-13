@@ -58,9 +58,7 @@ class ImportFromMongodb(object):
         self.mongo_host = host
         self.mongo_port = port
 
-        self.mongo_reader = MongoWrapper(
-            host=self.mongo_host, port=self.mongo_port, connect=False
-        )
+        self.mongo_reader = MongoWrapper(host=self.mongo_host, port=self.mongo_port, connect=False)
 
         self.key_name = mongo_key_name
         self.key_value = mongo_key_value
@@ -109,8 +107,7 @@ class ImportFromMongodb(object):
             pass
         else:
             raise Exception(
-                "Invalid input - you can't specify a "
-                "key_value without specifying a key_name"
+                "Invalid input - you can't specify a " "key_value without specifying a key_name"
             )
 
         projection: Dict[Hashable, Any] = {"sample_name": 1, "_id": 0}

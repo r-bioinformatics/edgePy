@@ -25,17 +25,11 @@ class MongoWrapper(object):
     """
 
     def __init__(
-        self,
-        host: str,
-        port: Union[str, int] = 27017,
-        connect: bool = True,
-        verbose: bool = False,
+        self, host: str, port: Union[str, int] = 27017, connect: bool = True, verbose: bool = False
     ) -> None:
         self.host = host
         self.port = int(port)
-        self.session = pymongo.MongoClient(
-            host=self.host, port=self.port, connect=connect
-        )
+        self.session = pymongo.MongoClient(host=self.host, port=self.port, connect=connect)
         self.verbose = verbose
 
     def get_db(self, database: str, collection: str) -> Any:
@@ -252,9 +246,7 @@ class MongoUpdater(MongoWrapper):
                 raise Exception("Mongo bulk write failed.")
         del self.to_update[:]
 
-    def add(
-        self, updatedict: Dict[Hashable, Any], setdict: Dict[Hashable, Any]
-    ) -> None:
+    def add(self, updatedict: Dict[Hashable, Any], setdict: Dict[Hashable, Any]) -> None:
         """
         Add a record to the buffer
         :param updatedict: the criteria for the update query

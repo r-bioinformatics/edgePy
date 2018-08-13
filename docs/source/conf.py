@@ -49,9 +49,9 @@ templates_path = ["_templates"]
 #
 
 ### MARKDOWN PARSER
-source_parsers = {".md": "recommonmark.parser.CommonMarkParser"}
+source_parsers = {'.md': 'recommonmark.parser.CommonMarkParser'}
 
-source_suffix = [".rst", ".md"]
+source_suffix = ['.rst', '.md']
 # source_suffix = '.rst'
 
 # The master toctree document.
@@ -129,7 +129,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "EdgePy.tex", "EdgePy Documentation", "R-Bioinformatics", "manual")
+    (master_doc, 'EdgePy.tex', 'EdgePy Documentation', 'R-Bioinformatics', 'manual')
 ]
 
 
@@ -137,7 +137,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "edgepy", "EdgePy Documentation", [author], 1)]
+man_pages = [(master_doc, 'edgepy', 'EdgePy Documentation', [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------------
@@ -148,11 +148,11 @@ man_pages = [(master_doc, "edgepy", "EdgePy Documentation", [author], 1)]
 texinfo_documents = [
     (
         master_doc,
-        "EdgePy",
-        "EdgePy Documentation",
+        'EdgePy',
+        'EdgePy Documentation',
         author,
-        "EdgePy",
-        "One line description of project.",
-        "Miscellaneous",
+        'EdgePy',
+        'One line description of project.',
+        'Miscellaneous',
     )
 ]

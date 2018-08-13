@@ -26,7 +26,7 @@ Always ensure that you have fetched (_via_ `git pull`) the most recent material 
 2. Use [Google Style](http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html) docstrings.
 3. Implement doctests.
 4. Provide accurate type annotations.
-5. Limit line lengths to 99 characters.
+5. Limit line lengths to 120 characters.
 
 An example function showcasing the above requirements:
 
@@ -57,6 +57,15 @@ def get_dataset_path(
     directory = Path(module.__file__).expanduser().resolve().parent
     return directory / 'data' / filename
 ```
+
+### Code Style
+This repository uses [Black](https://github.com/ambv/black) as a code formatter.
+
+It can be ran a few different ways:
+
+1. Manually by running `$ black .` in the repository root
+2. Though [pre-commit](https://pre-commit.com/) a git hook that runs it whenever a commit is made.
+3. It can also be integrated in the of your choice by following the instructions in the [documention](https://github.com/ambv/black#editor-integration).
 
 ## Updating the documentation
 
@@ -106,14 +115,6 @@ To create and activate that environment issue the following:
 # Activate the development environment
 ❯ source venv/bin/activate
 
-```
-
-## Developing on the System Environment (not recommended)
-
-```bash
-❯ cd edgePy
-❯ pip install tox
-❯ pip install --editable .
 ```
 
 ## Running the Test Suite

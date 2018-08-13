@@ -40,26 +40,12 @@ def test_get_data_from_mongo_nofilters(mongodb):
         gene_list_file=None,
     )
     im.mongo_reader.session = mongodb
-    sample_list, dataset, gene_list, sample_category = im.get_data_from_mongo(
-        database="pytest"
-    )
+    sample_list, dataset, gene_list, sample_category = im.get_data_from_mongo(database="pytest")
     assert sample_list == ["SRR5189264", "SRR5189265", "SRR5189266"]
     assert dataset == {
-        "SRR5189264": {
-            "ENSG00000012048": 70,
-            "ENSG00000139618": 105,
-            "ENSG00000141510": 270,
-        },
-        "SRR5189265": {
-            "ENSG00000012048": 76,
-            "ENSG00000139618": 168,
-            "ENSG00000141510": 347,
-        },
-        "SRR5189266": {
-            "ENSG00000012048": 62,
-            "ENSG00000139618": 104,
-            "ENSG00000141510": 191,
-        },
+        "SRR5189264": {"ENSG00000012048": 70, "ENSG00000139618": 105, "ENSG00000141510": 270},
+        "SRR5189265": {"ENSG00000012048": 76, "ENSG00000139618": 168, "ENSG00000141510": 347},
+        "SRR5189266": {"ENSG00000012048": 62, "ENSG00000139618": 104, "ENSG00000141510": 191},
     }
     assert gene_list == ["ENSG00000012048", "ENSG00000139618", "ENSG00000141510"]
     assert sample_category == {
@@ -78,26 +64,12 @@ def test_get_data_from_mongo_filters(mongodb):
         gene_list_file=None,
     )
     im.mongo_reader.session = mongodb
-    sample_list, dataset, gene_list, sample_category = im.get_data_from_mongo(
-        database="pytest"
-    )
+    sample_list, dataset, gene_list, sample_category = im.get_data_from_mongo(database="pytest")
     assert sample_list == ["SRR5189264", "SRR5189265", "SRR5189266"]
     assert dataset == {
-        "SRR5189264": {
-            "ENSG00000012048": 70,
-            "ENSG00000139618": 105,
-            "ENSG00000141510": 270,
-        },
-        "SRR5189265": {
-            "ENSG00000012048": 76,
-            "ENSG00000139618": 168,
-            "ENSG00000141510": 347,
-        },
-        "SRR5189266": {
-            "ENSG00000012048": 62,
-            "ENSG00000139618": 104,
-            "ENSG00000141510": 191,
-        },
+        "SRR5189264": {"ENSG00000012048": 70, "ENSG00000139618": 105, "ENSG00000141510": 270},
+        "SRR5189265": {"ENSG00000012048": 76, "ENSG00000139618": 168, "ENSG00000141510": 347},
+        "SRR5189266": {"ENSG00000012048": 62, "ENSG00000139618": 104, "ENSG00000141510": 191},
     }
     assert gene_list == ["ENSG00000012048", "ENSG00000139618", "ENSG00000141510"]
     assert sample_category == {
@@ -117,26 +89,12 @@ def test_get_data_from_mongo_gene_list(mongodb):
         gene_list_file=filename,
     )
     im.mongo_reader.session = mongodb
-    sample_list, dataset, gene_list, sample_category = im.get_data_from_mongo(
-        database="pytest"
-    )
+    sample_list, dataset, gene_list, sample_category = im.get_data_from_mongo(database="pytest")
     assert sample_list == ["SRR5189264", "SRR5189265", "SRR5189266"]
     assert dataset == {
-        "SRR5189264": {
-            "ENSG00000012048": 70,
-            "ENSG00000139618": 105,
-            "ENSG00000141510": 270,
-        },
-        "SRR5189265": {
-            "ENSG00000012048": 76,
-            "ENSG00000139618": 168,
-            "ENSG00000141510": 347,
-        },
-        "SRR5189266": {
-            "ENSG00000012048": 62,
-            "ENSG00000139618": 104,
-            "ENSG00000141510": 191,
-        },
+        "SRR5189264": {"ENSG00000012048": 70, "ENSG00000139618": 105, "ENSG00000141510": 270},
+        "SRR5189265": {"ENSG00000012048": 76, "ENSG00000139618": 168, "ENSG00000141510": 347},
+        "SRR5189266": {"ENSG00000012048": 62, "ENSG00000139618": 104, "ENSG00000141510": 191},
     }
     assert gene_list == ["ENSG00000012048", "ENSG00000139618", "ENSG00000141510"]
     assert sample_category == {

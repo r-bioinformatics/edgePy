@@ -1,4 +1,4 @@
-import gzip
+from smart_open import smart_open
 import numpy as np
 import pytest
 
@@ -12,7 +12,7 @@ TEST_DATASET_NPZ = "GSE49712_HTSeq.txt.npz"
 
 @pytest.fixture
 def dge_list():
-    with gzip.open(get_dataset_path(TEST_DATASET)) as handle:
+    with smart_open(get_dataset_path(TEST_DATASET), 'r') as handle:
         return DGEList.read_handle(handle)
 
 
@@ -38,18 +38,12 @@ def test_too_much():
 
 def test_too_many_options():
     with pytest.raises(Exception):
-        DGEList(
-            counts=np.zeros(shape=(5, 10)),
-            filename=str(get_dataset_path(TEST_DATASET_NPZ)),
-        )
+        DGEList(counts=np.zeros(shape=(5, 10)), filename=str(get_dataset_path(TEST_DATASET_NPZ)))
 
 
 def test_too_many_options2():
     with pytest.raises(Exception):
-        DGEList(
-            counts=np.ones(shape=(5, 10)),
-            filename=str(get_dataset_path(TEST_DATASET_NPZ)),
-        )
+        DGEList(counts=np.ones(shape=(5, 10)), filename=str(get_dataset_path(TEST_DATASET_NPZ)))
 
 
 def test_library_size():
@@ -128,10 +122,7 @@ def testing_setting_samples_and_counts():
         DGEList(samples=np.array(["1", "2", "3"]), to_remove_zeroes=False)
 
     # Properly formed samples and counts should pass
-    DGEList(
-        samples=np.array(["1", "2", "3"]),
-        counts=np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]]),
-    )
+    DGEList(samples=np.array(["1", "2", "3"]), counts=np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]]))
 
     # Lists with ill-matched samples and counts should fail
     pytest.raises(
