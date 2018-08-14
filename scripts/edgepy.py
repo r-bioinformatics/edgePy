@@ -6,6 +6,9 @@ from edgePy.data_import.data_import import DataImporter
 from edgePy.data_import.data_import import GroupImporter
 from edgePy.data_import.data_import import create_DGEList
 from edgePy.data_import.mongodb.mongo_import import ImportFromMongodb
+
+from edgePy.statistics.ks import kolmogorov_smirnov
+
 import configparser
 
 
@@ -67,7 +70,12 @@ class EdgePy(object):
             # self.dge_list = ???
 
     def run(self):
-        pass
+
+        gene_likelyhood:
+        for gene in self.dge_list.genes:
+
+
+
 
 
 def main():
