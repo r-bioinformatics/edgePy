@@ -12,10 +12,12 @@ def phi(x: float) -> float:
     return (1.0 + erf(x / sqrt(2.0))) / 2.0
 
 
-def kolmogorov_smirnov(m1: float,  # mean of first sample
-                       s1: float,  # standard deviation of first sample
-                       m2: float,  # mean of second sample
-                       s2: float) -> float:  # standard deviation of second sample
+def kolmogorov_smirnov(
+    m1: float,  # mean of first sample
+    s1: float,  # standard deviation of first sample
+    m2: float,  # mean of second sample
+    s2: float,
+) -> float:  # standard deviation of second sample
 
     """This is a test to compare two empirical distributions to see if
      they are from the same original function."""
@@ -49,8 +51,9 @@ def kolmogorov_smirnov(m1: float,  # mean of first sample
     # Calculate the point of max distance between CDFs
     # term = (a4 * (-b2) * log(s2 / s1)) + (a2 * b4 * log(s2 / s1)) +
     # (a2 * b2 * c2) - (2 * a2 * b2 * m1 * m2) + (a2 * b2 * d2)  #original
-    term = (a4 * (-b2) * log(s2 / s1)) + (a2 * b4 * log(s2 / s1)) \
-           + (a2 * b2 * c2) + (a2 * b2 * d2)  # simplified
+    term = (
+        (a4 * (-b2) * log(s2 / s1)) + (a2 * b4 * log(s2 / s1)) + (a2 * b2 * c2) + (a2 * b2 * d2)
+    )  # simplified
 
     # there are two possible solutions for this problem - one will be larger than the other.
     x1 = (a2 * m2 + sqrt(term) - b2 * m1) / (a2 - b2)
