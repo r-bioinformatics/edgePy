@@ -3,10 +3,11 @@
 from smart_open import smart_open  # type: ignore
 
 from pathlib import Path
-from typing import List, Union
+from typing import Any, List, Union, Dict, Hashable
+from edgePy.DGEList import DGEList
+import numpy as np  # type: ignore
 
-
-__all__ = ['GroupImporter', 'DataImporter', 'get_dataset_path']
+__all__ = ["GroupImporter", "DataImporter", "get_dataset_path", "create_DGEList"]
 
 
 class GroupImporter(object):
@@ -56,7 +57,7 @@ class DataImporter(object):
 
     @staticmethod
     def clean_headers(samples: List[str]) -> List[str]:
-        return [s.replace("\"", "").strip() for s in samples]
+        return [s.replace('"', "").strip() for s in samples]
 
     def validate(self) -> None:
         columns = len(self.raw_data[1])
@@ -87,7 +88,7 @@ def get_dataset_path(filename: Union[str, Path]) -> Path:
 
     Examples
     --------
-    >>> from edgePy.io import get_dataset_path
+    >>> from edgePy.data_import.data_import import get_dataset_path
     >>> str(get_dataset_path("GSE49712_HTSeq.txt.gz"))  # doctest:+ELLIPSIS
     '.../edgePy/data/GSE49712_HTSeq.txt.gz'
 
@@ -95,4 +96,33 @@ def get_dataset_path(filename: Union[str, Path]) -> Path:
     import edgePy
 
     directory = Path(edgePy.__file__).expanduser().resolve().parent
-    return directory / 'data' / filename
+    return directory / "data" / filename
+
+
+def create_DGEList(
+    sample_list: List[str],
+    data_set: Dict[Hashable, Any],  # {sample: {gene1: x, gene2: y}},
+    gene_list: List[str],
+    sample_category: Dict[Hashable, str],
+) -> "DGEList":
+    """ sample list and gene list must be pre-sorted
+        Use this to create the DGE object for future work."""
+
+    print("Creating DGE list object...")
+    temp_data_store = np.zeros(shape=(len(gene_list), len(sample_list)))
+    group = []
+
+    for idx_s, sample in enumerate(sample_list):
+        for idx_g, gene in enumerate(gene_list):
+            if sample in data_set and gene in data_set[sample]:
+                if data_set[sample][gene]:
+                    temp_data_store[idx_g, idx_s] = data_set[sample][gene]
+        group.append(sample_category[sample])
+
+    return DGEList(
+        counts=temp_data_store,
+        genes=np.array(gene_list),
+        samples=np.array(sample_list),
+        group=np.array(group),
+        to_remove_zeroes=False,
+    )

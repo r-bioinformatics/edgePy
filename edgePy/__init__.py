@@ -1,3 +1,3 @@
-from edgePy import io
+from edgePy import data_import
 
-from ._DGEList import DGEList
+from edgePy.DGEList import DGEList
