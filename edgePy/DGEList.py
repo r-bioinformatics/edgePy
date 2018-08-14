@@ -232,6 +232,8 @@ class DGEList(object):
             self.counts[self.counts == 0] = prior_count
             self.counts = np.log(self.counts)
 
+        raise NotImplementedError
+
     def rpkm(
         self, gene_lengths: Mapping, log: bool = False, prior_count: float = PRIOR_COUNT
     ) -> None:
