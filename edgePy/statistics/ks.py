@@ -8,7 +8,20 @@ from math import sqrt, log, erf, fabs
 
 
 def phi(x: float) -> float:
-    """phi function"""
+    """The phi function
+
+        Parameters
+        ----------
+        x: input value
+
+        Return
+        ------
+        the value of phi(x)
+
+         Examples
+        --------
+         < No idea what to put here. >
+    """
     return (1.0 + erf(x / sqrt(2.0))) / 2.0
 
 
@@ -20,8 +33,30 @@ def kolmogorov_smirnov(
 ) -> float:  # standard deviation of second sample
 
     """This is a test to compare two empirical distributions to see if
-     they are from the same original function."""
+     they are from the same original function.
 
+        Parameters
+        ----------
+        m1 : float
+            The mean of the first distribution
+        s1 : float
+            The standard deviation of the first distribution
+        m2 : float
+            The mean of the second distribution
+        s2 : float
+            The standard deviation of the second distribution
+
+        Return
+        ------
+            The likelihood that the two distributions are the same.
+            0 = identical
+            1 = not at all the same.
+
+        Examples
+        --------
+         < No idea what to put here. >
+
+        """
     # Check the peaks actually overlap within 4 sigmas...
     start = max(m1 - (4 * s1), m2 - (4 * s2))
     end = min(m1 + (4 * s1), m2 + (4 * s2))
