@@ -7,7 +7,7 @@ from edgePy.data_import.data_import import get_dataset_path
 
 
 TEST_DATASET = "GSE49712_HTSeq.txt.gz"
-TEST_DATASET_NPZ = "GSE49712_HTSeq.npz"
+TEST_DATASET_NPZ = "GSE49712_HTSeq.txt.npz"
 
 
 @pytest.fixture
@@ -33,7 +33,39 @@ def test_too_much():
     #    - Test opening handles, both gzipped or not
     #    - Test samples and genes are set, validated, typed right
     assert len(dge_list().samples) == 10
-    assert len(dge_list().genes) == 21717
+    assert len(dge_list().genes) == 21716
+
+
+def test_too_many_options():
+    with pytest.raises(Exception):
+        DGEList(counts=np.zeros(shape=(5, 10)), filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+
+
+def test_too_many_options2():
+    with pytest.raises(Exception):
+        DGEList(counts=np.ones(shape=(5, 10)), filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+
+
+def test_library_size():
+    dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+
+    assert np.array_equal(
+        dge_list.library_size,
+        np.array(
+            [
+                90895095,
+                82461005,
+                55676791,
+                111027083,
+                65854416,
+                91305546,
+                95585464,
+                96313896,
+                80069980,
+                52772642,
+            ]
+        ),
+    )
 
 
 def test_too_many_options():
@@ -132,7 +164,7 @@ def testing_setting_samples_and_counts():
 
 
 def test_repr():
-    assert dge_list().__repr__() == "DGEList(num_samples=10, num_genes=21,717)"
+    assert dge_list().__repr__() == "DGEList(num_samples=10, num_genes=21,716)"
 
 
 def test_broken_dge_call():
@@ -142,9 +174,16 @@ def test_broken_dge_call():
         DGEList(counts=None)
 
 
+def test_cpm():
+    dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+    first_pos = dge_list.counts[0][0]
+    col_sum = np.sum(dge_list.counts, axis=0)
+    assert isinstance(first_pos, np.integer)
+    dge_list.cpm()
+    assert dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
+
+
 def test_non_implemented():
-    with pytest.raises(NotImplementedError):
-        dge_list().cpm()
     with pytest.raises(NotImplementedError):
         dge_list().rpkm(None)
     with pytest.raises(NotImplementedError):
