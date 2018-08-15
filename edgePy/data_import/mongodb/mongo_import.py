@@ -96,10 +96,11 @@ class ImportFromMongodb(object):
 
         query: Dict[Hashable, Any] = {}
         if self.key_name and self.key_value:
-            query[self.key_name] = self.key_value
 
-            # if self.key_value == 'regex':
-            #     query = {self.key_name: {'$regex': 'myocyte|fibroblast'}}
+            if self.key_value == 'regex':
+                query = {self.key_name: {'$regex': 'myocyte|fibroblast'}}
+            else:
+                query[self.key_name] = self.key_value
 
         elif self.key_name and not self.key_value:
             query[self.key_name] = {"$exists": True}
