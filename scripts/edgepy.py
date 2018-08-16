@@ -31,6 +31,12 @@ def parse_arguments(parser=None):
     )
     parser.add_argument("--mongo_key_name", default="Project")
     parser.add_argument("--mongo_key_value", default="RNA-Seq1")
+    parser.add_argument(
+        "--group1_sample_names", nargs='+', help="L:ist of samples names for first group"
+    )
+    parser.add_argument(
+        "--group2_sample_names", nargs='+', help="L:ist of samples names for second group"
+    )
 
     parser.add_argument("--output", help="optional output file for results")
     parser.add_argument("--cutoff", help="p-value cutoff to accept.", default=0.05)
@@ -56,16 +62,35 @@ class EdgePy(object):
             config = configparser.ConfigParser()
             config.read(args.mongo_config)
 
+            if args.group1_sample_names and args.group2_sample_names:
+                key_name = 'sample_name'
+                key_value = args.group1_sample_names + args.group2_sample_names
+
+            elif args.key_name and args.mongo_key_value:
+                key_name = args.mongo_key_name
+                key_value = args.mongo_key_value
+            else:
+                raise ValueError("Insufficient parameters for use of Mongodb")
+
             mongo_importer = ImportFromMongodb(
                 host=config.get("Mongo", "host"),
                 port=config.get("Mongo", "port"),
-                mongo_key_name=args.mongo_key_name,
-                mongo_key_value=args.mongo_key_value,
+                mongo_key_name=key_name,
+                mongo_key_value=key_value,
                 gene_list_file=args.gene_list,
             )
+
             sample_list, data_set, gene_list, sample_category = (
                 mongo_importer.get_data_from_mongo()
             )
+
+            if key_name == 'sample_name':
+                # Override sample categories if sample name is the source of the categories.
+                sample_category = [
+                    "group1" if sample_name in args.group1_sample_names else "group2"
+                    for sample_name in sample_list
+                ]
+
             self.dge_list = create_DGEList(sample_list, data_set, gene_list, sample_category)
 
             self.dge_list.write_npz_file("./edgePy/data/example_data.cpe")
@@ -174,7 +199,7 @@ def main():
 
     args = parse_arguments()
     default_class = EdgePy(args)
-    default_class.fake_groups()
+    # default_class.fake_groups()
     default_class.run_ks()
 
 

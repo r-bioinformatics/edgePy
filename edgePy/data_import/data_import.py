@@ -117,7 +117,7 @@ def create_DGEList(
             if sample in data_set and gene in data_set[sample]:
                 if data_set[sample][gene]:
                     temp_data_store[idx_g, idx_s] = data_set[sample][gene]
-        group.append(sample_category[sample])
+        group.append(sample_category[idx_s])
 
     return DGEList(
         counts=temp_data_store,

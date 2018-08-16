@@ -100,7 +100,10 @@ class ImportFromMongodb(object):
             if self.key_value == 'regex':
                 query = {self.key_name: {'$regex': 'myocyte|fibroblast'}}
             else:
-                query[self.key_name] = self.key_value
+                if isinstance(self.key_value, list):
+                    query[self.key_name] = {'$in': self.key_value}
+                else:
+                    query[self.key_name] = self.key_value
 
         elif self.key_name and not self.key_value:
             query[self.key_name] = {"$exists": True}
@@ -112,7 +115,7 @@ class ImportFromMongodb(object):
             )
 
         projection: Dict[Hashable, Any] = {"sample_name": 1, "_id": 0}
-        if self.key_name:
+        if self.key_name and not self.key_name == "sample_name":
             projection[self.key_name] = 1
 
         cursor = self.mongo_reader.find_as_cursor(
