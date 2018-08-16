@@ -59,6 +59,9 @@ class EdgePy(object):
             print(self.dge_list)
 
         elif args.mongo_config:
+            # This section is only useful for MongoDB based analyses.  Talk to @apfejes about this section if you have
+            # any questions.
+
             config = configparser.ConfigParser()
             config.read(args.mongo_config)
 
@@ -112,18 +115,24 @@ class EdgePy(object):
         self.p_value_cutoff = args.cutoff
         self.minimum_cpm = args.minimum_cpm
 
-    @staticmethod
-    def group_type(g):
-        if 'fibroblast' in g:
-            return 'fibroblast'
-        elif 'myocyte' in g or 'iCM' in g:
-            return 'cardiomyocte'
-        raise ValueError("don't know what to do with this string.")
-
     def fake_groups(self):
-        self.dge_list.group = [self.group_type(x) for x in self.dge_list.group]
+        """
+        This is used to create fake groups, if you didn't give any at the time the DGEList object was
+         created... this is a bug that needs to be fixed.
+        :return:
+        """
+        self.dge_list.group = [
+            'fibroblast' if 'fibroblast' in g else 'cardiomyocyte' for g in self.dge_list.group
+        ]
 
     def run_ks(self):
+        """
+        First pass implementation of a Kolmogorov-Smirnov test for different groups, using the Scipy KS test two-tailed
+        implementation.
+
+        Args:
+             None.
+        """
 
         gene_likelyhood1: Dict[Hashable, float] = {}
 
@@ -165,6 +174,16 @@ class EdgePy(object):
         group_type1: str,
         group_type2: str,
     ) -> List[str]:
+
+        """
+        This function simply prepares a summary of the results of the analysis for dumping to file or to screen
+
+        Args:
+             gene_details: information about the genes - should contain fields 'mean1' and 'mean2' for display
+             gene_likelyhood1: dictionary of gene names and the p-value associated. used to sort the data
+             group_type1: the name of the first grouping
+             group_type2: the name of the second grouping
+        """
 
         results: List[str] = []
         sorted_likely = [
