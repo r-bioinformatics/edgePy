@@ -124,7 +124,10 @@ class EdgePy(object):
             with smart_open(self.output, 'w') as out:
                 out.write(f"gene_name p-value {group_types[0]} {group_types[1]}\n")
                 for gene, p in sorted_likely:
-                    if p < 0.05 and (gene_details[gene]['mean1'] > 10 or gene_details[gene]['mean2'] > 10):
+                    m1 = gene_details[gene]['mean1']
+                    m2 = gene_details[gene]['mean2']
+
+                    if p < 0.05 and (m1 > 10 or m2 > 10) and m1 < m2:
                         out.write(
                             (f"{self.ensg_to_symbol[gene]['symbols'][0] if gene in self.ensg_to_symbol else gene} "
                              f"{gene_likelyhood1[gene]} "
