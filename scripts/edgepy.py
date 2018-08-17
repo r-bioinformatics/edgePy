@@ -96,7 +96,7 @@ class EdgePy(object):
 
             self.dge_list = create_DGEList(sample_list, data_set, gene_list, sample_category)
 
-            self.dge_list.write_npz_file("./edgePy/data/example_data.cpe")
+            # self.dge_list.write_npz_file("./edgePy/data/example_data.cpe")
 
             self.ensg_to_symbol = mongo_importer.mongo_reader.find_as_dict(
                 'ensembl_90_37', "symbol_by_ensg", query={}
