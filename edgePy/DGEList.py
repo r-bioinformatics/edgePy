@@ -227,10 +227,11 @@ class DGEList(object):
     def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> None:
         """Return the DGEList normalized to read counts per million."""
         self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
-        # np.sum(self.counts, axis=0)
         if log:
             self.counts[self.counts == 0] = prior_count
             self.counts = np.log(self.counts)
+
+        raise NotImplementedError
 
     def rpkm(
         self, gene_lengths: Mapping, log: bool = False, prior_count: float = PRIOR_COUNT
