@@ -134,9 +134,24 @@ class EdgePy(object):
              None.
         """
 
-        gene_likelyhood1: Dict[Hashable, float] = {}
-
         print(self.dge_list.group)
+
+        gene_details, gene_likelyhood1, group_types = self.ks_2_samples()
+
+        results = self.generate_results(
+            gene_details, gene_likelyhood1, group_types[0], group_types[1]
+        )
+
+        if self.output:
+            with smart_open(self.output, 'w') as out:
+                out.writelines(results)
+            print(f"wrote to {self.output}")
+        else:
+            for line in results:
+                print(line)
+
+    def ks_2_samples(self):
+        gene_likelyhood1: Dict[Hashable, float] = {}
         group_types = set(self.dge_list.group)
         group_types = list(group_types)
         group_filters: Dict[Hashable, Any] = {}
@@ -151,21 +166,11 @@ class EdgePy(object):
 
                 group_data2 = gene_row.compress(group_filters[group_types[1]])
                 mean2 = np.mean(group_data2)
+
                 gene_likelyhood1[gene] = ks_2samp(group_data1, group_data2)[1]
 
                 gene_details[gene] = {'mean1': mean1, 'mean2': mean2}
-
-        results = self.generate_results(
-            gene_details, gene_likelyhood1, group_types[0], group_types[1]
-        )
-
-        if self.output:
-            with smart_open(self.output, 'w') as out:
-                out.writelines(results)
-            print(f"wrote to {self.output}")
-        else:
-            for line in results:
-                print(line)
+        return gene_details, gene_likelyhood1, group_types
 
     def generate_results(
         self,
