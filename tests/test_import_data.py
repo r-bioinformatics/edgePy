@@ -1,49 +1,43 @@
 import pkgutil
 
-import pytest
 import numpy as np
 
+from smart_open import smart_open
+
 from edgePy.data_import.data_import import get_dataset_path
-from edgePy.data_import.data_import import GroupImporter
-from edgePy.data_import.data_import import DataImporter
 from edgePy.data_import.data_import import create_DGEList
+from edgePy.data_import.data_import import create_DGEList_handle
 
-# Unit tests for ``edgePy.data_import.Importer``.
+
+TEST_DATASET = "GSE49712_HTSeq.txt.gz"
+TEST_GROUPS = "groups.json"
+
+# Unit tests for ``edgePy.data_import.Importer``.\
 def test_init():
-    filename = get_dataset_path("GSE49712_HTSeq.txt.gz")
-    import_module = DataImporter(filename)
+    dge_list = create_DGEList_handle(
+        data_handle=smart_open(get_dataset_path(TEST_DATASET)),
+        group_file=get_dataset_path(TEST_GROUPS),
+    )
 
-    assert 10 == len(import_module.samples)
-    assert 21716 == len(import_module.raw_data)
-
-    import_module.process_data()
-    assert 10 == len(import_module.samples)
-    assert 21716 == len(import_module.data)
-
-
-def test_failure():
-    with pytest.raises(Exception):
-        DataImporter(None)
+    assert dge_list.__repr__() == "DGEList(num_samples=10, num_genes=21,716)"
 
 
 # TestGroupImporter.
 def test_GroupImporter_init():
-    filename = get_dataset_path("groups.txt")
-    group_importer = GroupImporter(filename)
+    dge_list = create_DGEList_handle(
+        data_handle=smart_open(get_dataset_path(TEST_DATASET)),
+        group_file=get_dataset_path(TEST_GROUPS),
+    )
 
-    assert 2 == len(group_importer.groups)
-    assert 5 == len(group_importer.groups["Group 1"])
-    assert 5 == len(group_importer.groups["Group 2"])
-    assert "Group 1" == group_importer.samples["A_1"]
-    assert "Group 1" == group_importer.samples["A_3"]
-    assert "Group 1" == group_importer.samples["A_5"]
-    assert "Group 2" == group_importer.samples["B_2"]
-    assert "Group 2" == group_importer.samples["B_4"]
-
-
-def test_GroupImporter_failure():
-    with pytest.raises(Exception):
-        GroupImporter(None)
+    print(dge_list.group)
+    assert 2 == len(dge_list.group)
+    assert 5 == len(dge_list.group["Group 1"])
+    assert 5 == len(dge_list.group["Group 2"])
+    assert "Group 1" == dge_list.samples["A_1"]
+    assert "Group 1" == dge_list.samples["A_3"]
+    assert "Group 1" == dge_list.samples["A_5"]
+    assert "Group 2" == dge_list.samples["B_2"]
+    assert "Group 2" == dge_list.samples["B_4"]
 
 
 # Unit tests for packaged (optionally zipped during install) data.
@@ -72,5 +66,6 @@ def test_create_DGEList():
     # 2 rows (genes), 3 columns(samples)
     assert np.array_equal(dge_list.counts, np.array([[10, 15, 20], [20, 40, 80]]))
 
-    assert np.array_equal(dge_list.group, np.array(["One", "Two", "One"]))
+    assert np.array_equal(dge_list.groups_list, np.array(["One", "Two", "One"]))
+    assert dge_list.groups_dict, {"One:"}
     assert np.array_equal(dge_list.genes, np.array(genes))
