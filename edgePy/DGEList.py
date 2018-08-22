@@ -3,7 +3,7 @@ import re
 # TODO: Implement `mypy` stubs for NumPy imports
 import numpy as np  # type: ignore
 
-from typing import Generator, Iterable, Mapping, Optional, Union, Dict
+from typing import Generator, Iterable, Mapping, Optional, Union, Dict, List, Hashable, Any
 
 __all__ = ["DGEList"]
 
@@ -81,18 +81,20 @@ class DGEList(object):
                 self.groups_list = groups_in_list
                 self.groups_dict = self._sample_group_dict(groups_in_list, self.samples)
             else:
-                raise ValueError("You must provide either group by sample or sample by group, "
-                                 "and samples must be present")
+                raise ValueError(
+                    "You must provide either group by sample or sample by group, "
+                    "and samples must be present"
+                )
 
     @staticmethod
-    def _sample_group_dict(groups_list, samples):
+    def _sample_group_dict(groups_list: List[str], samples: np.array):
         """
         Converts data in the form ['group1', 'group1', 'group2', 'group2']
         to the form  {'group1': ['sample1', 'sample2'], 'group2': ['sample3', 'sample4'}
         :param groups_list:
         :return:
         """
-        d = {}
+        d: Dict[Hashable, Any] = {}
         print(samples)
         for idx, group in enumerate(groups_list):
             if group not in d:
@@ -160,14 +162,13 @@ class DGEList(object):
             self._counts = None
             return
 
+        if not isinstance(counts, np.ndarray):
+            raise TypeError("Counts matrix must be of type ``np.ndarray``.")
+
         if hasattr(self, "_counts"):
             # do checks for things here.  You shouldn't modify counts
             # if it has already been set.  Create a new obj.
             if hasattr(self, "_samples") and self._samples is not None:
-                if not hasattr(counts, 'shape'):
-                    raise TypeError(
-                        f"trying to set counts with an invalid object type: {type(counts)} provided, ndarray required."
-                    )
                 gene_count, sample_count = counts.shape
                 print(f" sample count: {sample_count}, gene count: {gene_count}")
                 print(f" samples shape {self.samples.shape[0]}, gene shape {self.genes.shape[0]}")
@@ -181,8 +182,6 @@ class DGEList(object):
                         "dimensions fails."
                     )
 
-        if not isinstance(counts, np.ndarray):
-            raise TypeError("Counts matrix must be of type ``np.ndarray``.")
         if np.isnan(counts).any():
             raise ValueError("Counts matrix must have only real values.")
         if (counts < 0).any():
@@ -301,7 +300,7 @@ class DGEList(object):
             genes=self.genes,
             norm_factors=self.norm_factors,
             counts=self.counts,
-            groups_list=self.groups_list
+            groups_list=self.groups_list,
         )
 
     def read_npz_file(self, filename: str) -> None:
@@ -318,6 +317,6 @@ class DGEList(object):
         self.genes = npzfile["genes"]
         self.samples = npzfile["samples"]
         self.norm_factors = npzfile["norm_factors"]
-        self.groups_list = npzfile["groups_list"]
+        self.groups_list = npzfile["groups_list"].tolist()
 
-        self.groups_dict = self._sample_group_list(self.groups_list, self.samples)
+        self.groups_dict = self._sample_group_dict(self.groups_list, self.samples)

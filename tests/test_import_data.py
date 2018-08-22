@@ -28,16 +28,11 @@ def test_GroupImporter_init():
         data_handle=smart_open(get_dataset_path(TEST_DATASET)),
         group_file=get_dataset_path(TEST_GROUPS),
     )
+    assert 2 == len(dge_list.groups_dict)
+    assert 5 == len(dge_list.groups_dict["Group 1"])
+    assert 5 == len(dge_list.groups_dict["Group 2"])
 
-    print(dge_list.group)
-    assert 2 == len(dge_list.group)
-    assert 5 == len(dge_list.group["Group 1"])
-    assert 5 == len(dge_list.group["Group 2"])
-    assert "Group 1" == dge_list.samples["A_1"]
-    assert "Group 1" == dge_list.samples["A_3"]
-    assert "Group 1" == dge_list.samples["A_5"]
-    assert "Group 2" == dge_list.samples["B_2"]
-    assert "Group 2" == dge_list.samples["B_4"]
+    assert dge_list.samples.shape == dge_list.groups_list.shape
 
 
 # Unit tests for packaged (optionally zipped during install) data.

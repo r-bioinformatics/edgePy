@@ -8,7 +8,7 @@ from edgePy.data_import.data_import import create_DGEList_handle
 
 
 TEST_DATASET = "GSE49712_HTSeq.txt.gz"
-TEST_DATASET_NPZ = "GSE49712_HTSeq.npz"
+TEST_DATASET_NPZ = "GSE49712_HTSeq.txt.npz"
 TEST_GROUPS = "groups.json"
 
 
@@ -67,6 +67,7 @@ def test_too_many_options2():
 
 def test_library_size():
     dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+    print(dge_list.library_size)
     assert np.array_equal(
         dge_list.library_size,
         np.array(
@@ -88,9 +89,11 @@ def test_library_size():
 
 def test_setting_DGElist_counts():
 
-    dge_list = DGEList(counts=np.zeros(shape=(5, 10)),
-                       groups_in_list=['A', 'A', 'B', 'B', 'B'],
-                       samples=['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9'])
+    dge_list = DGEList(
+        counts=np.zeros(shape=(5, 10)),
+        groups_in_list=['A', 'A', 'B', 'B', 'B'],
+        samples=['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9'],
+    )
     assert 5 == dge_list.counts.shape[0]
     assert 10 == dge_list.counts.shape[1]
 
@@ -118,15 +121,12 @@ def test_cycle_dge_npz():
     dge_list_first = dge_list()
     dge_list_first.write_npz_file(filename=file_name)
 
-    # dge_list_first.write_npz_file(filename="/Users/anthony/Development/edgePy/edgePy/data/GSE49712_HTSeq.npz")
-
     dge_list_second = DGEList(filename=file_name + ".npz")
     assert np.array_equal(dge_list_first.counts, dge_list_second.counts)
     assert np.array_equal(dge_list_first.genes, dge_list_second.genes)
     assert np.array_equal(dge_list_first.samples, dge_list_second.samples)
     assert np.array_equal(dge_list_first.norm_factors, dge_list_second.norm_factors)
-    if dge_list_first.group:
-        assert np.array_equal(dge_list_first.group_list, dge_list_second.groups_list)
+    assert np.array_equal(dge_list_first.groups_list, dge_list_second.groups_list)
     os.remove(file_name + ".npz")
     os.rmdir(tempdir)
 
@@ -134,27 +134,36 @@ def test_cycle_dge_npz():
 def testing_setting_samples_and_counts():
     # Empty list should fail
     with pytest.raises(Exception):
-        DGEList(to_remove_zeroes=False,
-                groups_in_list=['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B'])
+        DGEList(
+            to_remove_zeroes=False,
+            groups_in_list=['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B'],
+        )
 
     # Lists with just counts should fail
     with pytest.raises(ValueError):
-        DGEList(counts=np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]]),
-                groups_in_list=['A', 'A', 'B'])
+        DGEList(counts=np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]]), groups_in_list=['A', 'A', 'B'])
 
     # lists sith samples and counts and groups should pass:
-    DGEList(counts=np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]]),
-            groups_in_list=['A', 'A', 'B'],
-            samples=["S1", 'S2', 'S3'])
+    DGEList(
+        counts=np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]]),
+        groups_in_list=['A', 'A', 'B'],
+        samples=["S1", 'S2', 'S3'],
+    )
 
     # Lists with just samples should fail
     with pytest.raises(Exception):
-        DGEList(samples=np.array(["1", "2", "3"]), to_remove_zeroes=False,
-                groups_in_list=['A', 'A', 'B'])
+        DGEList(
+            samples=np.array(["1", "2", "3"]),
+            to_remove_zeroes=False,
+            groups_in_list=['A', 'A', 'B'],
+        )
 
     # Properly formed samples and counts should pass
-    DGEList(samples=np.array(["1", "2", "3"]), counts=np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]]),
-            groups_in_list=['A', 'A', 'B'])
+    DGEList(
+        samples=np.array(["1", "2", "3"]),
+        counts=np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]]),
+        groups_in_list=['A', 'A', 'B'],
+    )
 
     # Lists with ill-matched samples and counts should fail
     pytest.raises(
@@ -164,7 +173,18 @@ def testing_setting_samples_and_counts():
     )
 
 
+# def test_generate_testing_output():
+#     """ Use this function to regenerate the npz file for the GSE49712 test data set.
+#     """
+#
+#     dge_list_first = dge_list()
+#     dge_list_first.write_npz_file(
+#         filename="/Users/anthony/Development/edgePy/edgePy/data/GSE49712_HTSeq.txt.npz"
+#     )
+
+
 def test_repr():
+
     assert dge_list().__repr__() == "DGEList(num_samples=10, num_genes=21,716)"
 
 

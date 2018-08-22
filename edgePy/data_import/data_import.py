@@ -93,11 +93,18 @@ def create_DGEList_handle(data_handle: StringIO, group_file: Path, **kwargs: Map
         replace_space=kwargs.pop("replace_space", "_"),
         case_sensitive=kwargs.pop("case_sensitive", True),
         invalid_raise=kwargs.pop("invalid_raise", True),
+        # skip_header=kwargs.pop("skip_headers", 1),
         **kwargs,
     )
 
+    print(f"First five genes: {genes[:5]}")
+    print(f"Last five genes: {genes[-5:]}")
+    print(f"number of genes: {len(genes)}")
+
     # Delete the first column as it is copied on assignment to `genes`.
     counts = np.delete(frame, 0, axis=1)
+    # Delete the first element in the genes list:
+    genes = genes[1:]
 
     with smart_open(group_file, 'r') as gr:
         group = json.load(gr)
