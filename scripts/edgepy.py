@@ -101,6 +101,9 @@ class EdgePy(object):
                 'ensembl_90_37', "symbol_by_ensg", query={}
             )
 
+        else:
+            raise Exception("Unrecognized data source.")
+
         self.output = args.output if args.output else None
         self.p_value_cutoff = args.cutoff
         self.minimum_cpm = args.minimum_cpm
