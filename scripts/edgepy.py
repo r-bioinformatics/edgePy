@@ -2,9 +2,6 @@ import argparse
 
 from edgePy.DGEList import DGEList
 
-from edgePy.data_import.data_import import DataImporter
-from edgePy.data_import.data_import import GroupImporter
-from edgePy.data_import.data_import import create_DGEList
 from edgePy.data_import.mongodb.mongo_import import ImportFromMongodb
 import numpy as np
 
@@ -94,22 +91,13 @@ class EdgePy(object):
                     for sample_name in sample_list
                 ]
 
-            self.dge_list = create_DGEList(sample_list, data_set, gene_list, sample_category)
+            self.dge_list = DGEList.create_DGEList(sample_list, data_set, gene_list, sample_category)
 
             # self.dge_list.write_npz_file("./edgePy/data/example_data.cpe")
 
             self.ensg_to_symbol = mongo_importer.mongo_reader.find_as_dict(
                 'ensembl_90_37', "symbol_by_ensg", query={}
             )
-
-        else:
-            importer = DataImporter(args.count_file)
-            groups = GroupImporter(args.group_file)
-            print(groups.samples)
-            print(importer.data)  # just a placeholder for the moment.
-
-            # Todo: convert this to a dge_list object.
-            # self.dge_list = ???
 
         self.output = args.output if args.output else None
         self.p_value_cutoff = args.cutoff
@@ -134,7 +122,7 @@ class EdgePy(object):
              None.
         """
 
-        print(self.dge_list.group)
+        print(self.dge_list.groups_list)
 
         gene_details, gene_likelyhood1, group_types = self.ks_2_samples()
 
@@ -152,12 +140,12 @@ class EdgePy(object):
 
     def ks_2_samples(self):
         gene_likelyhood1: Dict[Hashable, float] = {}
-        group_types = set(self.dge_list.group)
+        group_types = set(self.dge_list.groups_list)
         group_types = list(group_types)
         group_filters: Dict[Hashable, Any] = {}
         gene_details: Dict[Hashable, Dict[Hashable, Any]] = {}
         for group in group_types:
-            group_filters[group] = [g == group for g in self.dge_list.group]
+            group_filters[group] = [g == group for g in self.dge_list.groups_list]
         for gene_idx, gene in enumerate(self.dge_list.genes):
             gene_row = self.dge_list.counts[gene_idx]
             if len(group_types) == 2:
