@@ -91,7 +91,9 @@ class EdgePy(object):
                     for sample_name in sample_list
                 ]
 
-            self.dge_list = DGEList.create_DGEList(sample_list, data_set, gene_list, sample_category)
+            self.dge_list = DGEList.create_DGEList(
+                sample_list, data_set, gene_list, sample_category
+            )
 
             # self.dge_list.write_npz_file("./edgePy/data/example_data.cpe")
 
