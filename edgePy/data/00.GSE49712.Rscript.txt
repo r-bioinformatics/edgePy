@@ -1,0 +1,116 @@
+##############################
+x<-c("pheatmap","limma","gplots","edgeR","RColorBrewer")
+require(x)
+lapply(x, require, character.only = TRUE)
+rm(x)
+##############################
+dados<-read.table("GSE49712_gene_FPKM.txt",sep="\t",header=TRUE,row.names=NULL)
+##############################
+group <- as.factor(c(rep("A",5),rep("B",5)))
+##############################
+x<-dados[,2:11]
+rownames(x)<-dados$Geneid
+cpm <- cpm(x)
+lcpm <- cpm(x, log=TRUE)
+table(keep.exprs)
+keep.exprs <- rowSums(cpm>1)>=3
+x <- x[keep.exprs,]
+geneSymbols<-dados[,1][keep.exprs]
+##############################
+png("diagnostic_fig1.png")
+nsamples <- ncol(x)
+col <- brewer.pal(nsamples, "Paired")
+par(mfrow=c(1,2))
+plot(density(lcpm[,1]), col=col[1], lwd=2, ylim=c(0,0.21), las=2, 
+     main="", xlab="")
+title(main="A. Raw data", xlab="Log-cpm")
+abline(v=0, lty=3)
+for (i in 2:nsamples){
+  den <- density(lcpm[,i])
+  lines(den$x, den$y, col=col[i], lwd=2)
+}
+legend("topright", legend=group, text.col=col, bty="n")
+###
+lcpm <- cpm(x, log=TRUE)
+plot(density(lcpm[,1]), col=col[1], lwd=2, ylim=c(0,0.21), las=2, 
+     main="", xlab="")
+title(main="B. Filtered data", xlab="Log-cpm")
+abline(v=0, lty=3)
+for (i in 2:nsamples){
+  den <- density(lcpm[,i])
+  lines(den$x, den$y, col=col[i], lwd=2)
+}
+legend("topright", legend=group, text.col=col, bty="n")
+dev.off()
+##############################
+x<-as.matrix(x)
+rownames(x)<-geneSymbols
+d.cpm.x <- DGEList(counts=x,group=group) 
+d.cpm.x <- calcNormFactors(d.cpm.x, method = "TMM") 
+##############################
+d.cpm.x2 <- d.cpm.x
+d.cpm.x2$samples$norm.factors <- 1
+d.cpm.x2$counts[,1] <- ceiling(d.cpm.x2$counts[,1]*0.05)
+d.cpm.x2$counts[,2] <- d.cpm.x2$counts[,2]*5
+##############################
+png("diagnostic_fig2.png")
+par(mfrow=c(1,2))
+lcpm <- cpm(d.cpm.x2, log=TRUE)
+boxplot(lcpm, las=2, col=col, main="")
+title(main="A. Example: Unnormalised data",ylab="Log-cpm")
+d.cpm.x2 <- calcNormFactors(d.cpm.x2,method = "TMM")
+d.cpm.x2$samples$norm.factors
+lcpm <- cpm(d.cpm.x2, log=TRUE)
+boxplot(lcpm, las=2, col=col, main="")
+title(main="B. Example: Normalised data",ylab="Log-cpm")
+dev.off()
+##############################
+lcpm <- cpm(d.cpm.x, log=TRUE)
+png("mds.png")
+plotMDS(lcpm, labels=group, col=as.numeric(group))
+title(main="MDS - Sample groups")
+dev.off()
+##############################
+png("diagnostic_fig3.png")
+design = model.matrix( ~ 0 + group, data=d.cpm.x$samples)
+colnames(design) <- levels(group)
+d.cpm.x = estimateCommonDisp(d.cpm.x, verbose=TRUE)
+d.cpm.x = estimateTagwiseDisp(d.cpm.x)
+par(mfrow=c(1,2))
+v <- voom(d.cpm.x, design, plot=TRUE)
+##############################
+contr.matrix <- makeContrasts(
+  AvsB = A - B, #1
+  levels = colnames(design))
+##############################
+vfit <- lmFit(v, design)
+vfit <- contrasts.fit(vfit, contrasts=contr.matrix)
+efit <- eBayes(vfit)
+et <- decideTests(vfit)
+plotSA(efit, main="Final model: Mean Variance Trend")
+summary(decideTests(efit))
+tfit <- treat(vfit, lfc=1)
+dt <- decideTests(tfit)
+summary(dt)
+dev.off()
+##############################
+
+##############################
+png("diagnostic_fig4.png")
+vennDiagram(dt[,1], circle.col=c("turquoise", "red","green"))
+dev.off()
+#de.common<-which(dt[,1]!=0 & dt[,2]!=1 & dt[,3]!=1 & dt[,2]!=-1 & dt[,3]!=-1)
+#length(de.common)
+topGenes<-topTreat(tfit, coef=1, n=Inf,adjust.method = "fdr",lfc=2,p.value=0.01)
+##############################
+png("heatmap_fig5.png")
+pheatmap(as.matrix(v$E[which(rownames(v$E) %in% as.character(topGenes$ID)),]), color = colorRampPalette(c("navy", "white","firebrick4"))(255), 
+         cluster_cols = F, cluster_rows=T, show_colnames = TRUE, 
+         show_rownames = FALSE,clustering_distance_rows ="euclidean", scale="row")
+dev.off()
+##############################
+write.table(file="genes+DEGs.tsv",topTreat(tfit, coef=1, n=7001),sep="\t")
+write.table(file="topGenesEdgar.tsv",topGenes,sep="\t")
+##############################
+save.image("analysis.RNAseq.gse49712.Rdata")
+##############################
