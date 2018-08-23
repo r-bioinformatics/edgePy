@@ -222,17 +222,14 @@ class DGEList(object):
         # Delete the first column as it is copied on assignment to `genes`.
         counts = np.delete(frame, 0, axis=1)
 
-        return cls(counts=counts, samples=samples, genes=genes)
+        return cls(counts=counts, samples=samples, genes=genes[1:])
 
-    def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> 'DGEList':
+    def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> None:
         """Return the DGEList normalized to read counts per million."""
-        # self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
-        # if log:
-        #     self.counts[self.counts == 0] = prior_count
-        #     self.counts = np.log(self.counts)
-        # return self
-
-        raise NotImplementedError
+        self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
+        if log:
+            self.counts[self.counts == 0] = prior_count
+            self.counts = np.log(self.counts)
 
     def rpkm(
         self, gene_lengths: Mapping, log: bool = False, prior_count: float = PRIOR_COUNT
