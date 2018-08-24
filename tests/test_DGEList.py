@@ -251,10 +251,10 @@ def test_create_DGEList():
         "BBB": {"ENSG001": 15, "ENSG002": 40},
         "CCC": {"ENSG001": 20, "ENSG002": 80},
     }
-    categories = {"AAA": "One", "BBB": "Two", "CCC": "One"}
+    categories = {"One": ["AAA", "BBB"], "Two": ["CCC"]}
 
     dge_list = DGEList.create_DGEList(
-        sample_list=samples, data_set=data_set, gene_list=genes, sample_category=categories
+        sample_list=samples, data_set=data_set, gene_list=genes, sample_category_dict=categories
     )
 
     assert np.array_equal(dge_list.samples, np.array(samples))

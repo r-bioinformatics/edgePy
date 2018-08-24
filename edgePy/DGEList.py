@@ -328,27 +328,27 @@ class DGEList(object):
         sample_list: List[str],
         data_set: Dict[Hashable, Any],  # {sample: {gene1: x, gene2: y}},
         gene_list: List[str],
-        sample_category: Dict[Hashable, str],
+        sample_category_list: List[str] = None,
+        sample_category_dict: Dict[Hashable, List[str]] = None,
     ) -> "DGEList":
         """ sample list and gene list must be pre-sorted
             Use this to create the DGE object for future work."""
 
         print("Creating DGE list object...")
         temp_data_store = np.zeros(shape=(len(gene_list), len(sample_list)))
-        group = []
 
         for idx_s, sample in enumerate(sample_list):
             for idx_g, gene in enumerate(gene_list):
                 if sample in data_set and gene in data_set[sample]:
                     if data_set[sample][gene]:
                         temp_data_store[idx_g, idx_s] = data_set[sample][gene]
-            group.append(sample_category[sample])
 
         return cls(
             counts=temp_data_store,
             genes=np.array(gene_list),
             samples=np.array(sample_list),
-            groups_in_list=group,
+            groups_in_list=sample_category_list if sample_category_list else None,
+            groups_in_dict=sample_category_dict if sample_category_dict else None,
             to_remove_zeroes=False,
         )
 

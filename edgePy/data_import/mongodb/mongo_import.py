@@ -1,6 +1,7 @@
 import argparse
 
 from edgePy.data_import.mongodb.mongo_wrapper import MongoWrapper
+from edgePy.data_import.mongodb.gene_functions import get_canonical_rpkm
 from edgePy.data_import.mongodb.gene_functions import get_canonical_raw
 from edgePy.data_import.mongodb.gene_functions import get_genelist_from_file
 from edgePy.data_import.mongodb.gene_functions import translate_genes
@@ -81,12 +82,15 @@ class ImportFromMongodb(object):
             self.gene_list = ensg_genes
 
     def get_data_from_mongo(
-        self, database: str = "Tenaya"
+        self, database: str = "Tenaya", rpkm_flag: bool = False
     ) -> Tuple[List[str], Dict[Hashable, Any], List[str], Dict[Hashable, Any]]:
         """
         Run the queries to get the samples, from mongo, and then use that data to retrieve
         the counts.
-        :param database: name of the database to retrieve data from.
+
+        Args
+            database: name of the database to retrieve data from.
+            rpkm: You can use the rpkm values from the mongodb.
         :return: the list of samples, the data itself,
             the gene list and the categories of the samples.
         """
@@ -150,7 +154,7 @@ class ImportFromMongodb(object):
             if count % 100000 == 0:
                 print(f"{count} rows processed")
             sample = result["sample_name"]
-            rpkm = get_canonical_raw(result)
+            rpkm = get_canonical_rpkm(result) if rpkm_flag else get_canonical_raw(result)
             gene = result["gene"]
             # print("{}-{}".format(sample, gene))
             if sample not in dataset:

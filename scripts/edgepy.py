@@ -34,11 +34,14 @@ def parse_arguments(parser=None):
     parser.add_argument(
         "--group2_sample_names", nargs='+', help="L:ist of samples names for second group"
     )
+    parser.add_argument(
+        "--groups_json", help="A Json file with the group names, and list of samples. see example."
+    )
 
     parser.add_argument("--output", help="optional output file for results")
     parser.add_argument("--cutoff", help="p-value cutoff to accept.", default=0.05)
     parser.add_argument(
-        "--minimum_cpm", help="discard results for which no group has this many counts", default=10
+        "--minimum_cpm", help="discard results for which no group has this many counts", default=1
     )
 
     args = parser.parse_args()
@@ -86,13 +89,22 @@ class EdgePy(object):
 
             if key_name == 'sample_name':
                 # Override sample categories if sample name is the source of the categories.
-                sample_category = [
+                sample_category_list = [
                     "group1" if sample_name in args.group1_sample_names else "group2"
                     for sample_name in sample_list
                 ]
+                sample_category_dict = None
+            else:
+                # TODO: read from file
+                sample_category_dict = args.groups_json
+                sample_category_list = None
 
             self.dge_list = DGEList.create_DGEList(
-                sample_list, data_set, gene_list, sample_category
+                sample_list,
+                data_set,
+                gene_list,
+                sample_category_list=sample_category_list,
+                sample_category_dict=sample_category_dict,
             )
 
             # self.dge_list.write_npz_file("./edgePy/data/example_data.cpe")
@@ -188,7 +200,7 @@ class EdgePy(object):
             (gene, gene_likelyhood1[gene])
             for gene in sorted(gene_likelyhood1, key=gene_likelyhood1.get)
         ]
-        results.append(f"gene_name p-value {group_type1} {group_type2}")
+        results.append(f"gene_name\tp-value\t{group_type1}\t{group_type2}\n")
         for gene, p in sorted_likely:
             m1 = gene_details[gene]['mean1']
             m2 = gene_details[gene]['mean2']
@@ -202,10 +214,10 @@ class EdgePy(object):
                 and m1 < m2
             ):
                 results.append(
-                    f"{gene} "
-                    f"{symbol} "
-                    f"{gene_likelyhood1[gene]} "
-                    f"{gene_details[gene]['mean1']:.2f} "
+                    f"{gene}\t"
+                    f"{symbol}\t"
+                    f"{gene_likelyhood1[gene]}\t"
+                    f"{gene_details[gene]['mean1']:.2f}\t"
                     f"{gene_details[gene]['mean2']:.2f}\n"
                 )
 
