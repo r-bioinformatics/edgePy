@@ -40,7 +40,9 @@ class DGEList(object):
     _field_strip_re = re.compile(r'[\s"]+')
 
     # Metatags used in older HTSeq datasets without underscore prefixes.
-    _old_metatags = np.array(['no_feature', 'ambiguous', 'too_low_aQual', 'not_aligned', 'alignment_not_unique'])
+    _old_metatags = np.array(
+        ['no_feature', 'ambiguous', 'too_low_aQual', 'not_aligned', 'alignment_not_unique']
+    )
 
     def __init__(
         self,
@@ -237,7 +239,9 @@ class DGEList(object):
         if genes is not None:
             genes = np.array(list(self._format_fields(genes)))
             # Creates boolean mask and filters out metatag rows from samples and counts
-            metatag_mask = ~(np.isin(genes, self._old_metatags) | np.core.defchararray.startswith(genes, '__'))
+            metatag_mask = ~(
+                np.isin(genes, self._old_metatags) | np.core.defchararray.startswith(genes, '__')
+            )
             genes = genes[metatag_mask].copy()
             self._counts = self.counts[metatag_mask].copy()
         self._genes = genes
