@@ -1,13 +1,10 @@
 import pytest
-
-from edgePy.DGEList import DGEList
-
 import pkgutil
-
 import numpy as np
 
 from smart_open import smart_open
 
+from edgePy.DGEList import DGEList
 from edgePy.data_import.data_import import get_dataset_path
 
 TEST_DATASET = "GSE49712_HTSeq.txt.gz"
@@ -70,7 +67,6 @@ def test_too_many_options2():
 
 def test_library_size():
     dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
-    print(dge_list.library_size)
     assert np.array_equal(
         dge_list.library_size,
         np.array(
@@ -187,7 +183,6 @@ def testing_setting_samples_and_counts():
 
 
 def test_repr():
-
     assert dge_list().__repr__() == "DGEList(num_samples=10, num_genes=21,716)"
 
 
@@ -198,9 +193,16 @@ def test_broken_dge_call():
         DGEList(counts=None)
 
 
+def test_cpm():
+    dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+    first_pos = dge_list.counts[0][0]
+    col_sum = np.sum(dge_list.counts, axis=0)
+    assert isinstance(first_pos, np.integer)
+    dge_list.cpm()
+    assert dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
+
+
 def test_non_implemented():
-    with pytest.raises(NotImplementedError):
-        dge_list().cpm()
     with pytest.raises(NotImplementedError):
         dge_list().rpkm(None)
     with pytest.raises(NotImplementedError):
@@ -218,7 +220,7 @@ def test_init():
 
 
 # TestGroupImporter.
-def test_GroupImporter_init():
+def test_create_DGEList_handle_init():
     dge_list = DGEList.create_DGEList_handle(
         data_handle=smart_open(get_dataset_path(TEST_DATASET)),
         group_file=get_dataset_path(TEST_GROUPS),
