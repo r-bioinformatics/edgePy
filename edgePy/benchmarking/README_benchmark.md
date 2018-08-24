@@ -66,5 +66,16 @@ heatmap_fig5.png
     Graphics: Gallium 0.4 on AMD RS880 (DRM 2.50.0 / 4.15.0-32-generic, LLVM **3.8.0)
 
 ```
+### Computing
+
+```
+Running the script from cero, including packages loading time:
+   user  system elapsed 
+  1.213   0.136 167.807 
+   user  system elapsed 
+ 12.951   0.366 180.962 
+ RAM used: 850mB
+ Cores used: 1
+```
 
 
