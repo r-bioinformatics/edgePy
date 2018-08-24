@@ -42,20 +42,29 @@ heatmap_fig5.png
 **TODO: show file 08.topDEGs.tsv**
 
 ### Versions 
-R version 3.2.3 (2015-12-10)
-Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 16.04.2 LTS
+    *R version 3.2.3 (2015-12-10)
+    *Platform: x86_64-pc-linux-gnu (64-bit) Running under: Ubuntu 16.04.2 LTS
 
-### Packages 
-[1] ggplot2_2.2.1   pheatmap_1.0.10 edgeR_3.12.1    limma_3.26.9   
-loaded via a namespace (and not attached):
- [1] colorspace_1.3-2   scales_0.5.0       lazyeval_0.2.1     plyr_1.8.4        
- [5] pillar_1.2.1       gtable_0.2.0       RColorBrewer_1.1-2 tibble_1.4.2      
- [9] Rcpp_0.12.15       grid_3.2.3         rlang_0.2.0        munsell_0.4.3  
+### Packages
 
+```
+    [1] ggplot2_2.2.1   pheatmap_1.0.10 edgeR_3.12.1    limma_3.26.9   
+    loaded via a namespace (and not attached):
+    [1] colorspace_1.3-2   scales_0.5.0       lazyeval_0.2.1     plyr_1.8.4
+    [5] pillar_1.2.1       gtable_0.2.0       RColorBrewer_1.1-2 tibble_1.4.2
+    [9] Rcpp_0.12.15       grid_3.2.3         rlang_0.2.0        munsell_0.4.3 
+```
+ 
+ 
+ 
 ### Compute resources 
-Cores 4; 8GB RAM; 500GB HD.
-Processor: AMD Phenom(tm) II X4 B97 Processor × 4 
-Graphics: Gallium 0.4 on AMD RS880 (DRM 2.50.0 / 4.15.0-32-generic, LLVM **3.8.0)**
+
+```
+
+    Cores 4; 8GB RAM; 500GB HD
+    Processor: AMD Phenom(tm) II X4 B97 Processor × 4 
+    Graphics: Gallium 0.4 on AMD RS880 (DRM 2.50.0 / 4.15.0-32-generic, LLVM **3.8.0)
+
+```
 
 
