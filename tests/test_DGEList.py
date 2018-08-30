@@ -217,7 +217,7 @@ def test_init():
         data_file=get_dataset_path(TEST_DATASET), group_file=get_dataset_path(TEST_GROUPS)
     )
 
-    assert dge_list.__repr__() == "DGEList(num_samples=10, num_genes=21,716)"
+    assert dge_list.__repr__() == "DGEList(num_samples=10, num_genes=21,711)"
 
     dge_list = DGEList.create_DGEList_handle(
         data_handle=smart_open(get_dataset_path(TEST_DATASET)),
