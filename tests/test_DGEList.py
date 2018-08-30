@@ -261,6 +261,6 @@ def test_create_DGEList():
     # 2 rows (genes), 3 columns(samples)
     assert np.array_equal(dge_list.counts, np.array([[10, 15, 20], [20, 40, 80]]))
 
-    assert np.array_equal(dge_list.groups_list, np.array(["One", "Two", "One"]))
+    assert np.array_equal(dge_list.groups_list, np.array(["One", "One", "Two"]))
     assert dge_list.groups_dict, {"One:"}
     assert np.array_equal(dge_list.genes, np.array(genes))
