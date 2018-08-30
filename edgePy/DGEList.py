@@ -31,7 +31,7 @@ class DGEList(object):
 
         >>> from edgePy.data_import import get_dataset_path
         >>> dataset = 'GSE49712_HTSeq.txt.gz'
-        >>> group_file = 'gruops.json'
+        >>> group_file = 'groups.json'
         >>> DGEList.create_DGEList_data_file(get_dataset_path(dataset), get_dataset_path(group_file))
         DGEList(num_samples=10, num_genes=21,711)
 
