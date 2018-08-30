@@ -54,7 +54,7 @@ def test_too_much():
     #    - Test opening handles, both gzipped or not
     #    - Test samples and genes are set, validated, typed right
     assert len(dge_list().samples) == 10
-    assert len(dge_list().genes) == 21716
+    assert len(dge_list().genes) == 21711
 
 
 def test_too_many_options():
@@ -73,16 +73,16 @@ def test_library_size():
         dge_list.library_size,
         np.array(
             [
-                90895095,
-                82461005,
-                55676791,
-                111027083,
-                65854416,
-                91305546,
-                95585464,
-                96313896,
-                80069980,
-                52772642,
+                63579607,
+                58531933,
+                39138521,
+                78565885,
+                48667119,
+                62799917,
+                66032107,
+                66194776,
+                55085875,
+                37760315,
             ]
         ),
     )
@@ -185,7 +185,7 @@ def testing_setting_samples_and_counts():
 
 
 def test_repr():
-    assert dge_list().__repr__() == "DGEList(num_samples=10, num_genes=21,716)"
+    assert dge_list().__repr__() == "DGEList(num_samples=10, num_genes=21,711)"
 
 
 def test_broken_dge_call():
@@ -224,7 +224,7 @@ def test_init():
         group_handle=smart_open(get_dataset_path(TEST_GROUPS)),
     )
 
-    assert dge_list.__repr__() == "DGEList(num_samples=10, num_genes=21,716)"
+    assert dge_list.__repr__() == "DGEList(num_samples=10, num_genes=21,711)"
 
 
 # TestGroupImporter.
