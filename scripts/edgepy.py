@@ -107,14 +107,14 @@ class EdgePy(object):
                 sample_category_dict=sample_category_dict,
             )
 
-            # self.dge_list.write_npz_file("./edgePy/data/example_data.cpe")
-
             self.ensg_to_symbol = mongo_importer.mongo_reader.find_as_dict(
                 'ensembl_90_37', "symbol_by_ensg", query={}
             )
 
         else:
-            raise Exception("Unrecognized data source.")
+            self.dge_list = DGEList.create_DGEList_data_file(
+                data_file=args.counts_file, group_file=args.groups_file
+            )
 
         self.output = args.output if args.output else None
         self.p_value_cutoff = args.cutoff

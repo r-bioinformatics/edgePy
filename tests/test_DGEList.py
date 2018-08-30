@@ -1,13 +1,10 @@
 import pytest
-
-from edgePy.DGEList import DGEList
-
 import pkgutil
-
 import numpy as np
 
 from smart_open import smart_open
 
+from edgePy.DGEList import DGEList
 from edgePy.data_import.data_import import get_dataset_path
 
 TEST_DATASET = "GSE49712_HTSeq.txt.gz"
@@ -17,8 +14,10 @@ TEST_GROUPS = "groups.json"
 
 @pytest.fixture
 def dge_list():
-    with smart_open(get_dataset_path(TEST_DATASET), 'r') as handle:
-        return DGEList.create_DGEList_handle(handle, get_dataset_path(TEST_GROUPS))
+    with smart_open(get_dataset_path(TEST_DATASET), 'r') as data_handle, smart_open(
+        get_dataset_path(TEST_GROUPS), 'r'
+    ) as group_handle:
+        return DGEList.create_DGEList_handle(data_handle, group_handle)
 
 
 def test_sample_by_group():
@@ -55,7 +54,7 @@ def test_too_much():
     #    - Test opening handles, both gzipped or not
     #    - Test samples and genes are set, validated, typed right
     assert len(dge_list().samples) == 10
-    assert len(dge_list().genes) == 21716
+    assert len(dge_list().genes) == 21711
 
 
 def test_too_many_options():
@@ -74,16 +73,16 @@ def test_library_size():
         dge_list.library_size,
         np.array(
             [
-                90895095,
-                82461005,
-                55676791,
-                111027083,
-                65854416,
-                91305546,
-                95585464,
-                96313896,
-                80069980,
-                52772642,
+                63579607,
+                58531933,
+                39138521,
+                78565885,
+                48667119,
+                62799917,
+                66032107,
+                66194776,
+                55085875,
+                37760315,
             ]
         ),
     )
@@ -186,7 +185,7 @@ def testing_setting_samples_and_counts():
 
 
 def test_repr():
-    assert dge_list().__repr__() == "DGEList(num_samples=10, num_genes=21,716)"
+    assert dge_list().__repr__() == "DGEList(num_samples=10, num_genes=21,711)"
 
 
 def test_broken_dge_call():
@@ -214,19 +213,25 @@ def test_non_implemented():
 
 # Unit tests for ``edgePy.data_import.Importer``.\
 def test_init():
-    dge_list = DGEList.create_DGEList_handle(
-        data_handle=smart_open(get_dataset_path(TEST_DATASET)),
-        group_file=get_dataset_path(TEST_GROUPS),
+    dge_list = DGEList.create_DGEList_data_file(
+        data_file=get_dataset_path(TEST_DATASET), group_file=get_dataset_path(TEST_GROUPS)
     )
 
-    assert dge_list.__repr__() == "DGEList(num_samples=10, num_genes=21,716)"
+    assert dge_list.__repr__() == "DGEList(num_samples=10, num_genes=21,711)"
+
+    dge_list = DGEList.create_DGEList_handle(
+        data_handle=smart_open(get_dataset_path(TEST_DATASET)),
+        group_handle=smart_open(get_dataset_path(TEST_GROUPS)),
+    )
+
+    assert dge_list.__repr__() == "DGEList(num_samples=10, num_genes=21,711)"
 
 
 # TestGroupImporter.
-def test_GroupImporter_init():
+def test_create_DGEList_handle_init():
     dge_list = DGEList.create_DGEList_handle(
         data_handle=smart_open(get_dataset_path(TEST_DATASET)),
-        group_file=get_dataset_path(TEST_GROUPS),
+        group_handle=smart_open(get_dataset_path(TEST_GROUPS)),
     )
     assert 2 == len(dge_list.groups_dict)
     assert 5 == len(dge_list.groups_dict["Group 1"])

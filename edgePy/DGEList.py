@@ -28,16 +28,22 @@ class DGEList(object):
         filename: a shortcut to import NPZ (zipped numpy format) files.
 
     Examples:
-        >>> from smart_open import smart_open
+
         >>> from edgePy.data_import import get_dataset_path
         >>> dataset = 'GSE49712_HTSeq.txt.gz'
-        >>> DGEList.read_handle(smart_open(get_dataset_path(dataset), 'r'))
-        DGEList(num_samples=10, num_genes=21,716)
+        >>> group_file = 'groups.json'
+        >>> DGEList.create_DGEList_data_file(get_dataset_path(dataset), get_dataset_path(group_file))
+        DGEList(num_samples=10, num_genes=21,711)
 
     """
 
     # Pattern to delete from field names anytime they are assigned.
     _field_strip_re = re.compile(r'[\s"]+')
+
+    # Metatags used in older HTSeq datasets without underscore prefixes.
+    _old_metatags = np.array(
+        ['no_feature', 'ambiguous', 'too_low_aQual', 'not_aligned', 'alignment_not_unique']
+    )
 
     def __init__(
         self,
@@ -233,6 +239,12 @@ class DGEList(object):
         # - Genes same length as nrow(self.counts) if defined
         if genes is not None:
             genes = np.array(list(self._format_fields(genes)))
+            # Creates boolean mask and filters out metatag rows from samples and counts
+            metatag_mask = ~(
+                np.isin(genes, self._old_metatags) | np.core.defchararray.startswith(genes, '__')
+            )
+            genes = genes[metatag_mask].copy()
+            self._counts = self.counts[metatag_mask].copy()
         self._genes = genes
 
     @property
@@ -353,13 +365,13 @@ class DGEList(object):
         )
 
     @classmethod
-    def create_DGEList_handle(
-        cls, data_handle: StringIO, group_file: Path, **kwargs: Mapping
+    def create_DGEList_data_file(
+        cls, data_file: Path, group_file: Path, **kwargs: Mapping
     ) -> "DGEList":
         """Read in a file-like object of delimited data for instantiation.
 
         Args:
-            data_handle: Any handle supporting text streaming io.
+            data_file: Text File defining the data set.
             group_file: the json file defining the groups
             kwargs: Additional arguments supported by ``np.genfromtxt``.
 
@@ -367,8 +379,26 @@ class DGEList(object):
             DGEList: Container for storing read counts for samples.
 
         """
-        # First column is the header for the the gene names.
-        # Remaining columns are sample names.
+        with smart_open(data_file, 'r') as data_handle, smart_open(
+            group_file, 'r'
+        ) as group_handle:
+            return cls.create_DGEList_handle(data_handle, group_handle, **kwargs)
+
+    @classmethod
+    def create_DGEList_handle(
+        cls, data_handle: StringIO, group_handle: StringIO, **kwargs: Mapping
+    ) -> "DGEList":
+        """Read in a file-like object of delimited data for instantiation.
+
+        Args:
+            data_handle: Text File defining the data set.
+            group_handle: the json file defining the groups
+            kwargs: Additional arguments supported by ``np.genfromtxt``.
+
+        Returns:
+            DGEList: Container for storing read counts for samples.
+
+        """
         _, *samples = next(data_handle).strip().split()
 
         genes = []
@@ -390,8 +420,7 @@ class DGEList(object):
         # duplicate gene name, due to a putative bug in genfromtxt
         genes = genes[1:]
 
-        with smart_open(group_file, 'r') as gr:
-            group = json.load(gr)
+        group = json.load(group_handle)
 
         return cls(
             counts=counts,
