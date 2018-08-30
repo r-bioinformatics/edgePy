@@ -28,10 +28,11 @@ class DGEList(object):
         filename: a shortcut to import NPZ (zipped numpy format) files.
 
     Examples:
-        >>> from smart_open import smart_open
+
         >>> from edgePy.data_import import get_dataset_path
         >>> dataset = 'GSE49712_HTSeq.txt.gz'
-        >>> DGEList.read_handle(smart_open(get_dataset_path(dataset), 'r'))
+        >>> group_file = 'gruops.json'
+        >>> DGEList.create_DGEList_data_file(get_dataset_path(dataset), get_dataset_path(group_file))
         DGEList(num_samples=10, num_genes=21,716)
 
     """
@@ -353,13 +354,13 @@ class DGEList(object):
         )
 
     @classmethod
-    def create_DGEList_handle(
-        cls, data_handle: StringIO, group_file: Path, **kwargs: Mapping
+    def create_DGEList_data_file(
+        cls, data_file: Path, group_file: Path, **kwargs: Mapping
     ) -> "DGEList":
         """Read in a file-like object of delimited data for instantiation.
 
         Args:
-            data_handle: Any handle supporting text streaming io.
+            data_file: Text File defining the data set.
             group_file: the json file defining the groups
             kwargs: Additional arguments supported by ``np.genfromtxt``.
 
@@ -367,8 +368,26 @@ class DGEList(object):
             DGEList: Container for storing read counts for samples.
 
         """
-        # First column is the header for the the gene names.
-        # Remaining columns are sample names.
+        with smart_open(data_file, 'r') as data_handle, smart_open(
+            group_file, 'r'
+        ) as group_handle:
+            return cls.create_DGEList_handle(data_handle, group_handle, **kwargs)
+
+    @classmethod
+    def create_DGEList_handle(
+        cls, data_handle: StringIO, group_handle: StringIO, **kwargs: Mapping
+    ) -> "DGEList":
+        """Read in a file-like object of delimited data for instantiation.
+
+        Args:
+            data_handle: Text File defining the data set.
+            group_handle: the json file defining the groups
+            kwargs: Additional arguments supported by ``np.genfromtxt``.
+
+        Returns:
+            DGEList: Container for storing read counts for samples.
+
+        """
         _, *samples = next(data_handle).strip().split()
 
         genes = []
@@ -390,8 +409,7 @@ class DGEList(object):
         # duplicate gene name, due to a putative bug in genfromtxt
         genes = genes[1:]
 
-        with smart_open(group_file, 'r') as gr:
-            group = json.load(gr)
+        group = json.load(group_handle)
 
         return cls(
             counts=counts,

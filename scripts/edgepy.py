@@ -56,6 +56,11 @@ class EdgePy(object):
 
             self.dge_list.write_npz_file("./edgePy/data/example_data.cpe")
 
+        else:
+            self.dge_list = DGEList.create_DGEList_data_file(
+                data_file=args.counts_file, group_file=args.groups_file
+            )
+
     def run(self):
         pass
 

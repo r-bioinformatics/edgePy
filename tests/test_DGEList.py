@@ -14,8 +14,10 @@ TEST_GROUPS = "groups.json"
 
 @pytest.fixture
 def dge_list():
-    with smart_open(get_dataset_path(TEST_DATASET), 'r') as handle:
-        return DGEList.create_DGEList_handle(handle, get_dataset_path(TEST_GROUPS))
+    with smart_open(get_dataset_path(TEST_DATASET), 'r') as data_handle, smart_open(
+        get_dataset_path(TEST_GROUPS), 'r'
+    ) as group_handle:
+        return DGEList.create_DGEList_handle(data_handle, group_handle)
 
 
 def test_sample_by_group():
@@ -211,9 +213,15 @@ def test_non_implemented():
 
 # Unit tests for ``edgePy.data_import.Importer``.\
 def test_init():
+    dge_list = DGEList.create_DGEList_data_file(
+        data_file=get_dataset_path(TEST_DATASET), group_file=get_dataset_path(TEST_GROUPS)
+    )
+
+    assert dge_list.__repr__() == "DGEList(num_samples=10, num_genes=21,716)"
+
     dge_list = DGEList.create_DGEList_handle(
         data_handle=smart_open(get_dataset_path(TEST_DATASET)),
-        group_file=get_dataset_path(TEST_GROUPS),
+        group_handle=smart_open(get_dataset_path(TEST_GROUPS)),
     )
 
     assert dge_list.__repr__() == "DGEList(num_samples=10, num_genes=21,716)"
@@ -223,7 +231,7 @@ def test_init():
 def test_create_DGEList_handle_init():
     dge_list = DGEList.create_DGEList_handle(
         data_handle=smart_open(get_dataset_path(TEST_DATASET)),
-        group_file=get_dataset_path(TEST_GROUPS),
+        group_handle=smart_open(get_dataset_path(TEST_GROUPS)),
     )
     assert 2 == len(dge_list.groups_dict)
     assert 5 == len(dge_list.groups_dict["Group 1"])
