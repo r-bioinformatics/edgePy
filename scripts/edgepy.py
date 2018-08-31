@@ -35,7 +35,7 @@ def parse_arguments(parser=None):
         "--group2_sample_names", nargs='+', help="L:ist of samples names for second group"
     )
     parser.add_argument(
-        "--groups_json", help="A Json file with the group names, and list of samples. see example."
+        "--groups_json", help="A JSON file with the group names, and list of samples. see example."
     )
 
     parser.add_argument("--output", help="optional output file for results")
