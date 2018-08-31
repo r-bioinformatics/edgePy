@@ -256,16 +256,16 @@ def test_create_DGEList():
         "BBB": {"ENSG001": 15, "ENSG002": 40},
         "CCC": {"ENSG001": 20, "ENSG002": 80},
     }
-    categories = {"AAA": "One", "BBB": "Two", "CCC": "One"}
+    categories = {"One": ["AAA", "BBB"], "Two": ["CCC"]}
 
     dge_list = DGEList.create_DGEList(
-        sample_list=samples, data_set=data_set, gene_list=genes, sample_category=categories
+        sample_list=samples, data_set=data_set, gene_list=genes, category_to_samples=categories
     )
 
     assert np.array_equal(dge_list.samples, np.array(samples))
     # 2 rows (genes), 3 columns(samples)
     assert np.array_equal(dge_list.counts, np.array([[10, 15, 20], [20, 40, 80]]))
 
-    assert np.array_equal(dge_list.groups_list, np.array(["One", "Two", "One"]))
+    assert np.array_equal(dge_list.groups_list, np.array(["One", "One", "Two"]))
     assert dge_list.groups_dict, {"One:"}
     assert np.array_equal(dge_list.genes, np.array(genes))

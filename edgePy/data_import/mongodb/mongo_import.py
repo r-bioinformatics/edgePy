@@ -1,6 +1,7 @@
 import argparse
 
 from edgePy.data_import.mongodb.mongo_wrapper import MongoWrapper
+from edgePy.data_import.mongodb.gene_functions import get_canonical_rpkm
 from edgePy.data_import.mongodb.gene_functions import get_canonical_raw
 from edgePy.data_import.mongodb.gene_functions import get_genelist_from_file
 from edgePy.data_import.mongodb.gene_functions import translate_genes
@@ -41,8 +42,8 @@ class ImportFromMongodb(object):
     Args:
         host: the name of the machine hosting the database
         port: the port number (usually 27017)
-        mongo_key_name: a key in the samples collection to filter on
-        mongo_key_value: accepted values in the samples collection to
+        mongo_key: a key in the samples collection to filter on
+        mongo_value: accepted values in the samples collection to
         gene_list_file: a list of genes to filter the results on.
     """
 
@@ -50,8 +51,8 @@ class ImportFromMongodb(object):
         self,
         host: str,
         port: int,
-        mongo_key_name: Optional[str],
-        mongo_key_value: Optional[str],
+        mongo_key: Optional[str],
+        mongo_value: Optional[str],
         gene_list_file: Optional[str],
     ) -> None:
 
@@ -60,8 +61,8 @@ class ImportFromMongodb(object):
 
         self.mongo_reader = MongoWrapper(host=self.mongo_host, port=self.mongo_port, connect=False)
 
-        self.key_name = mongo_key_name
-        self.key_value = mongo_key_value
+        self.search_key = mongo_key
+        self.search_value = mongo_value
 
         self.input_gene_file = gene_list_file
         self.gene_list: Optional[List[str]] = None
@@ -81,12 +82,15 @@ class ImportFromMongodb(object):
             self.gene_list = ensg_genes
 
     def get_data_from_mongo(
-        self, database: str = "Tenaya"
+        self, database: str, rpkm_flag: bool = False
     ) -> Tuple[List[str], Dict[Hashable, Any], List[str], Dict[Hashable, Any]]:
         """
         Run the queries to get the samples, from mongo, and then use that data to retrieve
         the counts.
-        :param database: name of the database to retrieve data from.
+
+        Args
+            database: name of the database to retrieve data from.
+            rpkm: takes the rpkm values from the mongodb, instead of the raw counts
         :return: the list of samples, the data itself,
             the gene list and the categories of the samples.
         """
@@ -95,15 +99,19 @@ class ImportFromMongodb(object):
             self.translate_gene_list(database)
 
         query: Dict[Hashable, Any] = {}
-        if self.key_name and self.key_value:
-            query[self.key_name] = self.key_value
+        if self.search_key and self.search_value:
 
-            # if self.key_value == 'regex':
-            #     query = {self.key_name: {'$regex': 'myocyte|fibroblast'}}
+            if self.search_value == 'regex':
+                query = {self.search_key: {'$regex': 'myocyte|fibroblast'}}
+            else:
+                if isinstance(self.search_value, list):
+                    query[self.search_key] = {'$in': self.search_value}
+                else:
+                    query[self.search_key] = self.search_value
 
-        elif self.key_name and not self.key_value:
-            query[self.key_name] = {"$exists": True}
-        elif not self.key_name and not self.key_value:
+        elif self.search_key and not self.search_value:
+            query[self.search_key] = {"$exists": True}
+        elif not self.search_key and not self.search_value:
             pass
         else:
             raise Exception(
@@ -111,8 +119,8 @@ class ImportFromMongodb(object):
             )
 
         projection: Dict[Hashable, Any] = {"sample_name": 1, "_id": 0}
-        if self.key_name:
-            projection[self.key_name] = 1
+        if self.search_key and not self.search_key == "sample_name":
+            projection[self.search_key] = 1
 
         cursor = self.mongo_reader.find_as_cursor(
             database=database, collection="samples", query=query, projection=projection
@@ -123,7 +131,7 @@ class ImportFromMongodb(object):
             print(result)
             sample_names.add(result["sample_name"])
             sample_category[result["sample_name"]] = (
-                result[self.key_name] if self.key_name else result["sample_name"]
+                result[self.search_key] if self.search_key else result["sample_name"]
             )
         print(f"get data.... for sample_names {list(sample_names)}")
 
@@ -146,7 +154,7 @@ class ImportFromMongodb(object):
             if count % 100000 == 0:
                 print(f"{count} rows processed")
             sample = result["sample_name"]
-            rpkm = get_canonical_raw(result)
+            rpkm = get_canonical_rpkm(result) if rpkm_flag else get_canonical_raw(result)
             gene = result["gene"]
             # print("{}-{}".format(sample, gene))
             if sample not in dataset:

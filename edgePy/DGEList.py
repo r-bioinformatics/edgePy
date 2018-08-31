@@ -340,27 +340,27 @@ class DGEList(object):
         sample_list: List[str],
         data_set: Dict[Hashable, Any],  # {sample: {gene1: x, gene2: y}},
         gene_list: List[str],
-        sample_category: Dict[Hashable, str],
+        sample_to_category: Optional[List[str]] = None,
+        category_to_samples: Optional[Dict[Hashable, List[str]]] = None,
     ) -> "DGEList":
         """ sample list and gene list must be pre-sorted
             Use this to create the DGE object for future work."""
 
         print("Creating DGE list object...")
         temp_data_store = np.zeros(shape=(len(gene_list), len(sample_list)))
-        group = []
 
         for idx_s, sample in enumerate(sample_list):
             for idx_g, gene in enumerate(gene_list):
                 if sample in data_set and gene in data_set[sample]:
                     if data_set[sample][gene]:
                         temp_data_store[idx_g, idx_s] = data_set[sample][gene]
-            group.append(sample_category[sample])
 
         return cls(
             counts=temp_data_store,
             genes=np.array(gene_list),
             samples=np.array(sample_list),
-            groups_in_list=group,
+            groups_in_list=sample_to_category if sample_to_category else None,
+            groups_in_dict=category_to_samples if category_to_samples else None,
             to_remove_zeroes=False,
         )
 
@@ -368,11 +368,12 @@ class DGEList(object):
     def create_DGEList_data_file(
         cls, data_file: Path, group_file: Path, **kwargs: Mapping
     ) -> "DGEList":
-        """Read in a file-like object of delimited data for instantiation.
+        """Wrapper for creating DGEList objects from file locations.  Performs open and passes
+        the file handles to the method for creating a DGEList object.
 
         Args:
-            data_file: Text File defining the data set.
-            group_file: the json file defining the groups
+            data_file: Text file defining the data set.
+            group_file: The JSON file defining the groups.
             kwargs: Additional arguments supported by ``np.genfromtxt``.
 
         Returns:
@@ -391,8 +392,8 @@ class DGEList(object):
         """Read in a file-like object of delimited data for instantiation.
 
         Args:
-            data_handle: Text File defining the data set.
-            group_handle: the json file defining the groups
+            data_handle: Text file defining the data set.
+            group_handle: The JSON file defining the groups.
             kwargs: Additional arguments supported by ``np.genfromtxt``.
 
         Returns:
