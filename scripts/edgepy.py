@@ -12,6 +12,8 @@ from typing import List, Dict, Hashable, Any
 
 import configparser
 
+from edgePy.util import log
+
 
 def parse_arguments(parser=None):
     if not parser:
@@ -57,7 +59,7 @@ class EdgePy(object):
 
         if args.dge_file:
             self.dge_list = DGEList(filename=args.dge_file)
-            print(self.dge_list)
+            log.info(self.dge_list)
 
         elif args.mongo_config:
             # This section is only useful for MongoDB based analyses.  Talk to @apfejes about this section if you have
@@ -130,7 +132,7 @@ class EdgePy(object):
              None.
         """
 
-        print(self.dge_list.groups_list)
+        log.info(self.dge_list.groups_list)
 
         gene_details, gene_likelyhood1, group_types = self.ks_2_samples()
 
@@ -141,10 +143,10 @@ class EdgePy(object):
         if self.output:
             with smart_open(self.output, 'w') as out:
                 out.writelines(results)
-            print(f"wrote to {self.output}")
+            log.info(f"wrote to {self.output}")
         else:
             for line in results:
-                print(line)
+                log.info(line)
 
     def ks_2_samples(self):
         """

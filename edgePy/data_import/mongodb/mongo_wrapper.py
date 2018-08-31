@@ -66,7 +66,7 @@ class MongoWrapper(object):
         try:
             cursor = self.get_db(database, collection).find(query, projection)
         except Exception as exception:
-            print(exception)
+            log.exception(exception)
             raise Exception("Mongo find failed")
 
         return cursor
@@ -125,7 +125,7 @@ class MongoWrapper(object):
         try:
             self.get_db(database, collection).test.insert_many(data_list, ordered=False)
         except BulkWriteError as bwe:
-            print(bwe.details)
+            log.exception(bwe.details)
 
     def create_index(self, database: str, collection: str, key: str) -> None:
 
@@ -174,9 +174,9 @@ class MongoInserter(MongoWrapper):
             try:
                 result = self.mongo_col.bulk_write(self.to_insert, ordered=False)
                 if result and self.verbose:
-                    print(result.bulk_api_result)
+                    log.info(result.bulk_api_result)
             except BulkWriteError as bwe:
-                print(bwe.details)
+                log.exception(bwe.details)
                 raise Exception("Mongo bulk write failed.")
         del self.to_insert[:]
 
@@ -240,9 +240,9 @@ class MongoUpdater(MongoWrapper):
             try:
                 result = self.mongo_col.bulk_write(self.to_update, ordered=False)
                 if result and self.verbose:
-                    print(result.bulk_api_result)
+                    log.info(result.bulk_api_result)
             except BulkWriteError as bwe:
-                print(bwe.details)
+                log.exception(bwe.details)
                 raise Exception("Mongo bulk write failed.")
         del self.to_update[:]
 

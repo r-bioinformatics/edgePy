@@ -9,6 +9,8 @@ from smart_open import smart_open  # type: ignore
 
 from typing import Generator, Iterable, Mapping, Optional, Union, Dict, List, Hashable, Any
 
+from edgePy.util import log
+
 __all__ = ["DGEList"]
 
 PRIOR_COUNT: float = 0.25
@@ -105,7 +107,7 @@ class DGEList(object):
         :return:
         """
         d: Dict[Hashable, Any] = {}
-        print(samples)
+        log.info(samples)
         for idx, group in enumerate(groups_list):
             if group not in d:
                 d[group] = []
@@ -180,9 +182,9 @@ class DGEList(object):
             # if it has already been set.  Create a new obj.
             if hasattr(self, "_samples") and self._samples is not None:
                 gene_count, sample_count = counts.shape
-                print(f" sample count: {sample_count}, gene count: {gene_count}")
-                print(f" samples shape {self.samples.shape[0]}, gene shape {self.genes.shape[0]}")
-                print(self.genes)
+                log.info(f" sample count: {sample_count}, gene count: {gene_count}")
+                log.info(f" samples shape {self.samples.shape[0]}, gene shape {self.genes.shape[0]}")
+                log.info(self.genes)
 
                 if sample_count != self.samples.shape[0] or gene_count != self.genes.shape[0]:
 
@@ -305,7 +307,7 @@ class DGEList(object):
 
         # TODO: validate file name
 
-        print(f"Exporting data to compressed .dge file ({filename}.npz)....")
+        log.info(f"Exporting data to compressed .dge file ({filename}.npz)....")
 
         np.savez_compressed(
             filename,
@@ -323,7 +325,7 @@ class DGEList(object):
         :return:
         """
 
-        print(f"Importing data from .dge file ({filename})....")
+        log.info(f"Importing data from .dge file ({filename})....")
 
         npzfile = np.load(filename)
         self.counts = npzfile["counts"]
@@ -346,7 +348,7 @@ class DGEList(object):
         """ sample list and gene list must be pre-sorted
             Use this to create the DGE object for future work."""
 
-        print("Creating DGE list object...")
+        log.info("Creating DGE list object...")
         temp_data_store = np.zeros(shape=(len(gene_list), len(sample_list)))
 
         for idx_s, sample in enumerate(sample_list):
