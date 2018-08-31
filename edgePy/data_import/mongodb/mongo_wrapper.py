@@ -6,7 +6,7 @@ import pymongo  # type: ignore
 from pymongo.errors import BulkWriteError  # type: ignore
 from pymongo import InsertOne, UpdateOne
 from typing import Dict, Hashable, Any, Iterable, List, Union
-
+from edgePy.util import log
 
 class MongoWrapper(object):
     """This class is for use as a thin layer for interactinvg with the Mongo Database
