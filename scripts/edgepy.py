@@ -121,16 +121,6 @@ class EdgePy(object):
         self.p_value_cutoff = args.cutoff
         self.minimum_cpm = args.minimum_cpm
 
-    def fake_groups(self):
-        """
-        This is used to create fake groups, if you didn't give any at the time the DGEList object was
-         created... this is a bug that needs to be fixed.
-        :return:
-        """
-        self.dge_list.group = [
-            'fibroblast' if 'fibroblast' in g else 'cardiomyocyte' for g in self.dge_list.group
-        ]
-
     def run_ks(self):
         """
         First pass implementation of a Kolmogorov-Smirnov test for different groups, using the Scipy KS test two-tailed
@@ -229,7 +219,6 @@ def main():
 
     args = parse_arguments()
     default_class = EdgePy(args)
-    # default_class.fake_groups()
     default_class.run_ks()
 
 
