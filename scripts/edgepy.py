@@ -147,6 +147,17 @@ class EdgePy(object):
                 print(line)
 
     def ks_2_samples(self):
+        """
+        This function runs a 2-tailed Kolmogorov-Smirnov test on the DGEList object.
+
+        Args:
+            None.
+
+        Returns:
+            gene_details: a dictionary of dictionary (key, gene), holding mean1 and mean2 for the two groups
+            gene_likelihood: a dictionary (key, gene), holding the p-value of the separation of the two groups
+            group_types: list of the groups in order.
+        """
         gene_likelihood1: Dict[Hashable, float] = {}
         group_types = set(self.dge_list.groups_list)
         group_types = list(group_types)
