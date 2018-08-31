@@ -340,8 +340,8 @@ class DGEList(object):
         sample_list: List[str],
         data_set: Dict[Hashable, Any],  # {sample: {gene1: x, gene2: y}},
         gene_list: List[str],
-        sample_category_list: List[str] = None,
-        sample_category_dict: Dict[Hashable, List[str]] = None,
+        sample_category_list: Optional[List[str]] = None,
+        sample_category_dict: Optional[Dict[Hashable, List[str]]] = None,
     ) -> "DGEList":
         """ sample list and gene list must be pre-sorted
             Use this to create the DGE object for future work."""
