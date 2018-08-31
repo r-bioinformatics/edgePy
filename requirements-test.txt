@@ -8,4 +8,3 @@ pytest-parallel==0.0.2
 pymongo==3.7.1
 pytest-mongodb==2.1.2
 black==18.6b3
-scipy==1.1.0

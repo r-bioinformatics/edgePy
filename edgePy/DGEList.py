@@ -371,8 +371,8 @@ class DGEList(object):
         """Read in a file-like object of delimited data for instantiation.
 
         Args:
-            data_file: Text File defining the data set.
-            group_file: the json file defining the groups
+            data_file: Text file defining the data set.
+            group_file: The json file defining the groups.
             kwargs: Additional arguments supported by ``np.genfromtxt``.
 
         Returns:
@@ -391,8 +391,8 @@ class DGEList(object):
         """Read in a file-like object of delimited data for instantiation.
 
         Args:
-            data_handle: Text File defining the data set.
-            group_handle: the json file defining the groups
+            data_handle: Text file defining the data set.
+            group_handle: The json file defining the groups.
             kwargs: Additional arguments supported by ``np.genfromtxt``.
 
         Returns:
