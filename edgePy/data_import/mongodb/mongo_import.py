@@ -10,6 +10,7 @@ from typing import Dict, Hashable, Any, Tuple, List, Optional
 
 from edgePy.util import log
 
+
 def parse_arguments(parser: Any = None, ci_values: List[str] = None) -> Any:
 
     """

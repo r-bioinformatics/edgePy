@@ -183,7 +183,9 @@ class DGEList(object):
             if hasattr(self, "_samples") and self._samples is not None:
                 gene_count, sample_count = counts.shape
                 log.info(f" sample count: {sample_count}, gene count: {gene_count}")
-                log.info(f" samples shape {self.samples.shape[0]}, gene shape {self.genes.shape[0]}")
+                log.info(
+                    f" samples shape {self.samples.shape[0]}, gene shape {self.genes.shape[0]}"
+                )
                 log.info(self.genes)
 
                 if sample_count != self.samples.shape[0] or gene_count != self.genes.shape[0]:
