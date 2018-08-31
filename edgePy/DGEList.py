@@ -340,8 +340,8 @@ class DGEList(object):
         sample_list: List[str],
         data_set: Dict[Hashable, Any],  # {sample: {gene1: x, gene2: y}},
         gene_list: List[str],
-        sample_category_list: Optional[List[str]] = None,
-        sample_category_dict: Optional[Dict[Hashable, List[str]]] = None,
+        sample_to_category: Optional[List[str]] = None,
+        category_to_samples: Optional[Dict[Hashable, List[str]]] = None,
     ) -> "DGEList":
         """ sample list and gene list must be pre-sorted
             Use this to create the DGE object for future work."""
@@ -359,8 +359,8 @@ class DGEList(object):
             counts=temp_data_store,
             genes=np.array(gene_list),
             samples=np.array(sample_list),
-            groups_in_list=sample_category_list if sample_category_list else None,
-            groups_in_dict=sample_category_dict if sample_category_dict else None,
+            groups_in_list=sample_to_category if sample_to_category else None,
+            groups_in_dict=category_to_samples if category_to_samples else None,
             to_remove_zeroes=False,
         )
 
@@ -368,7 +368,8 @@ class DGEList(object):
     def create_DGEList_data_file(
         cls, data_file: Path, group_file: Path, **kwargs: Mapping
     ) -> "DGEList":
-        """Read in a file-like object of delimited data for instantiation.
+        """Wrapper for creating DGEList objects from file locations.  Performs open and passes
+        the file handles to the method for creating a DGEList object.
 
         Args:
             data_file: Text file defining the data set.

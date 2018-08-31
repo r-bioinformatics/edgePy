@@ -28,11 +28,12 @@ def parse_arguments(parser=None):
     )
     parser.add_argument("--mongo_key_name", default="Project")
     parser.add_argument("--mongo_key_value", default="RNA-Seq1")
+    parser.add_argument("--database_name")
     parser.add_argument(
-        "--group1_sample_names", nargs='+', help="L:ist of samples names for first group"
+        "--group1_sample_names", nargs='+', help="List of samples names for first group"
     )
     parser.add_argument(
-        "--group2_sample_names", nargs='+', help="L:ist of samples names for second group"
+        "--group2_sample_names", nargs='+', help="List of samples names for second group"
     )
     parser.add_argument(
         "--groups_json", help="A JSON file with the group names, and list of samples. see example."
@@ -66,28 +67,28 @@ class EdgePy(object):
             config.read(args.mongo_config)
 
             if args.group1_sample_names and args.group2_sample_names:
-                key_name = 'sample_name'
-                key_value = args.group1_sample_names + args.group2_sample_names
+                key = 'sample_name'
+                value = args.group1_sample_names + args.group2_sample_names
 
             elif args.key_name and args.mongo_key_value:
-                key_name = args.mongo_key_name
-                key_value = args.mongo_key_value
+                key = args.mongo_key_name
+                value = args.mongo_key_value
             else:
                 raise ValueError("Insufficient parameters for use of Mongodb")
 
             mongo_importer = ImportFromMongodb(
                 host=config.get("Mongo", "host"),
                 port=config.get("Mongo", "port"),
-                mongo_key_name=key_name,
-                mongo_key_value=key_value,
+                mongo_key=key,
+                mongo_value=value,
                 gene_list_file=args.gene_list,
             )
 
-            sample_list, data_set, gene_list, sample_category = (
-                mongo_importer.get_data_from_mongo()
+            sample_list, data_set, gene_list, sample_category = mongo_importer.get_data_from_mongo(
+                database=args.database_name
             )
 
-            if key_name == 'sample_name':
+            if key == 'sample_name':
                 # Override sample categories if sample name is the source of the categories.
                 sample_category_list = [
                     "group1" if sample_name in args.group1_sample_names else "group2"
@@ -103,8 +104,8 @@ class EdgePy(object):
                 sample_list,
                 data_set,
                 gene_list,
-                sample_category_list=sample_category_list,
-                sample_category_dict=sample_category_dict,
+                sample_to_category=sample_category_list,
+                category_to_samples=sample_category_dict,
             )
 
             self.ensg_to_symbol = mongo_importer.mongo_reader.find_as_dict(
@@ -156,7 +157,7 @@ class EdgePy(object):
                 print(line)
 
     def ks_2_samples(self):
-        gene_likelyhood1: Dict[Hashable, float] = {}
+        gene_likelihood1: Dict[Hashable, float] = {}
         group_types = set(self.dge_list.groups_list)
         group_types = list(group_types)
         group_filters: Dict[Hashable, Any] = {}
@@ -172,15 +173,15 @@ class EdgePy(object):
                 group_data2 = gene_row.compress(group_filters[group_types[1]])
                 mean2 = np.mean(group_data2)
 
-                gene_likelyhood1[gene] = ks_2samp(group_data1, group_data2)[1]
+                gene_likelihood1[gene] = ks_2samp(group_data1, group_data2)[1]
 
                 gene_details[gene] = {'mean1': mean1, 'mean2': mean2}
-        return gene_details, gene_likelyhood1, group_types
+        return gene_details, gene_likelihood1, group_types
 
     def generate_results(
         self,
         gene_details: Dict[Hashable, Dict[Hashable, Any]],
-        gene_likelyhood1: Dict[Hashable, float],
+        gene_likelihood1: Dict[Hashable, float],
         group_type1: str,
         group_type2: str,
     ) -> List[str]:
@@ -190,15 +191,15 @@ class EdgePy(object):
 
         Args:
              gene_details: information about the genes - should contain fields 'mean1' and 'mean2' for display
-             gene_likelyhood1: dictionary of gene names and the p-value associated. used to sort the data
+             gene_likelihood1: dictionary of gene names and the p-value associated. used to sort the data
              group_type1: the name of the first grouping
              group_type2: the name of the second grouping
         """
 
         results: List[str] = []
         sorted_likely = [
-            (gene, gene_likelyhood1[gene])
-            for gene in sorted(gene_likelyhood1, key=gene_likelyhood1.get)
+            (gene, gene_likelihood1[gene])
+            for gene in sorted(gene_likelihood1, key=gene_likelihood1.get)
         ]
         results.append(f"gene_name\tp-value\t{group_type1}\t{group_type2}\n")
         for gene, p in sorted_likely:
@@ -216,7 +217,7 @@ class EdgePy(object):
                 results.append(
                     f"{gene}\t"
                     f"{symbol}\t"
-                    f"{gene_likelyhood1[gene]}\t"
+                    f"{gene_likelihood1[gene]}\t"
                     f"{gene_details[gene]['mean1']:.2f}\t"
                     f"{gene_details[gene]['mean2']:.2f}\n"
                 )

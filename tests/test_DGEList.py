@@ -259,7 +259,7 @@ def test_create_DGEList():
     categories = {"One": ["AAA", "BBB"], "Two": ["CCC"]}
 
     dge_list = DGEList.create_DGEList(
-        sample_list=samples, data_set=data_set, gene_list=genes, sample_category_dict=categories
+        sample_list=samples, data_set=data_set, gene_list=genes, category_to_samples=categories
     )
 
     assert np.array_equal(dge_list.samples, np.array(samples))

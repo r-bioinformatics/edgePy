@@ -82,7 +82,7 @@ def get_gene_list(mongo_reader: Any, database: str = "ensembl_90_37") -> Dict[st
 
 
 def get_sample_details(
-    group_by: str, mongo_reader: Any, database: str = "Tenaya"
+    group_by: str, mongo_reader: Any, database: str
 ) -> Dict[Any, Dict[str, Any]]:
     """
     Get details from the samples collection.  Use this to decide which samples to query data for.

@@ -33,11 +33,7 @@ def test_parse_arguments():
 
 def test_get_data_from_mongo_nofilters(mongodb):
     im = ImportFromMongodb(
-        host="localhost",
-        port=27017,
-        mongo_key_name=None,
-        mongo_key_value=None,
-        gene_list_file=None,
+        host="localhost", port=27017, mongo_key=None, mongo_value=None, gene_list_file=None
     )
     im.mongo_reader.session = mongodb
     sample_list, dataset, gene_list, sample_category = im.get_data_from_mongo(database="pytest")
@@ -59,8 +55,8 @@ def test_get_data_from_mongo_filters(mongodb):
     im = ImportFromMongodb(
         host="localhost",
         port=27017,
-        mongo_key_name="Project",
-        mongo_key_value="Public Data",
+        mongo_key="Project",
+        mongo_value="Public Data",
         gene_list_file=None,
     )
     im.mongo_reader.session = mongodb
@@ -84,8 +80,8 @@ def test_get_data_from_mongo_gene_list(mongodb):
     im = ImportFromMongodb(
         host="localhost",
         port=27017,
-        mongo_key_name="Project",
-        mongo_key_value="Public Data",
+        mongo_key="Project",
+        mongo_value="Public Data",
         gene_list_file=filename,
     )
     im.mongo_reader.session = mongodb
