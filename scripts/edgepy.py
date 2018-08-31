@@ -2,9 +2,6 @@ import argparse
 
 from edgePy.DGEList import DGEList
 
-from edgePy.data_import.data_import import DataImporter
-from edgePy.data_import.data_import import GroupImporter
-from edgePy.data_import.data_import import create_DGEList
 from edgePy.data_import.mongodb.mongo_import import ImportFromMongodb
 import configparser
 
@@ -53,18 +50,16 @@ class EdgePy(object):
             sample_list, data_set, gene_list, sample_category = (
                 mongo_importer.get_data_from_mongo()
             )
-            self.dge_list = create_DGEList(sample_list, data_set, gene_list, sample_category)
+            self.dge_list = DGEList.create_DGEList(
+                sample_list, data_set, gene_list, sample_category
+            )
 
             self.dge_list.write_npz_file("./edgePy/data/example_data.cpe")
 
         else:
-            importer = DataImporter(args.count_file)
-            groups = GroupImporter(args.group_file)
-            print(groups.samples)
-            print(importer.data)  # just a placeholder for the moment.
-
-            # Todo: convert this to a dge_list object.
-            # self.dge_list = ???
+            self.dge_list = DGEList.create_DGEList_data_file(
+                data_file=args.counts_file, group_file=args.groups_file
+            )
 
     def run(self):
         pass

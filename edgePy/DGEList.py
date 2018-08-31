@@ -1,11 +1,13 @@
 import re
-
+import json
 from io import StringIO
+from pathlib import Path
 
 # TODO: Implement `mypy` stubs for NumPy imports
 import numpy as np  # type: ignore
+from smart_open import smart_open  # type: ignore
 
-from typing import Generator, Iterable, Mapping, Optional, Union
+from typing import Generator, Iterable, Mapping, Optional, Union, Dict, List, Hashable, Any
 
 __all__ = ["DGEList"]
 
@@ -26,16 +28,22 @@ class DGEList(object):
         filename: a shortcut to import NPZ (zipped numpy format) files.
 
     Examples:
-        >>> from smart_open import smart_open
+
         >>> from edgePy.data_import import get_dataset_path
         >>> dataset = 'GSE49712_HTSeq.txt.gz'
-        >>> DGEList.read_handle(smart_open(get_dataset_path(dataset), 'r'))
-        DGEList(num_samples=10, num_genes=21,717)
+        >>> group_file = 'groups.json'
+        >>> DGEList.create_DGEList_data_file(get_dataset_path(dataset), get_dataset_path(group_file))
+        DGEList(num_samples=10, num_genes=21,711)
 
     """
 
     # Pattern to delete from field names anytime they are assigned.
     _field_strip_re = re.compile(r'[\s"]+')
+
+    # Metatags used in older HTSeq datasets without underscore prefixes.
+    _old_metatags = np.array(
+        ['no_feature', 'ambiguous', 'too_low_aQual', 'not_aligned', 'alignment_not_unique']
+    )
 
     def __init__(
         self,
@@ -43,14 +51,15 @@ class DGEList(object):
         samples: Optional[np.array] = None,
         genes: Optional[np.array] = None,
         norm_factors: Optional[np.array] = None,
-        group: Optional[np.array] = None,
+        groups_in_list: Optional[np.array] = None,
+        groups_in_dict: Optional[Dict] = None,
         to_remove_zeroes: Optional[bool] = False,
         filename: Optional[str] = None,
     ) -> None:
 
         self.to_remove_zeroes = to_remove_zeroes
         if filename:
-            if counts or samples or genes or norm_factors or group:
+            if counts or samples or genes or norm_factors or groups_in_list or groups_in_dict:
                 raise Exception("if filename is provided, you can't also provide other parameters")
             self._counts = None
             self.read_npz_file(filename)
@@ -71,7 +80,57 @@ class DGEList(object):
             self.samples = samples
             self.genes = genes
             self.norm_factors = norm_factors
-            self.group = group
+
+            if groups_in_dict and groups_in_list:
+                self.groups_dict = groups_in_dict
+                self.groups_list = groups_in_list
+            elif groups_in_dict and self.samples is not None:
+                self.groups_dict = groups_in_dict
+                self.groups_list = self._sample_group_list(groups_in_dict, self.samples)
+            elif groups_in_list is not None and self.samples is not None:
+                self.groups_list = groups_in_list
+                self.groups_dict = self._sample_group_dict(groups_in_list, self.samples)
+            else:
+                raise ValueError(
+                    "You must provide either group by sample or sample by group, "
+                    "and samples must be present"
+                )
+
+    @staticmethod
+    def _sample_group_dict(groups_list: List[str], samples: np.array):
+        """
+        Converts data in the form ['group1', 'group1', 'group2', 'group2']
+        to the form  {'group1': ['sample1', 'sample2'], 'group2': ['sample3', 'sample4'}
+        :param groups_list:
+        :return:
+        """
+        d: Dict[Hashable, Any] = {}
+        print(samples)
+        for idx, group in enumerate(groups_list):
+            if group not in d:
+                d[group] = []
+            d[group].append(samples[idx])
+        return d
+
+    @staticmethod
+    def _sample_group_list(groups_dict, samples):
+        """
+        Converts data in the form {'group1': ['sample1', 'sample2'], 'group2': ['sample3', 'sample4'}
+        to the form ['group1', 'group1', 'group2', 'group2']
+        :param groups_dict:
+        :param samples:
+        :return:
+        """
+        d = []
+        temp_d = {}
+        for group in groups_dict:
+            for sample in groups_dict[group]:
+                temp_d[sample] = group
+
+        for sample in samples:
+            d.append(temp_d[sample])
+
+        return np.array(d)
 
     @staticmethod
     def _format_fields(fields: Iterable[Union[str, bytes]]) -> Generator[str, None, None]:
@@ -113,6 +172,9 @@ class DGEList(object):
             self._counts = None
             return
 
+        if not isinstance(counts, np.ndarray):
+            raise TypeError("Counts matrix must be of type ``np.ndarray``.")
+
         if hasattr(self, "_counts"):
             # do checks for things here.  You shouldn't modify counts
             # if it has already been set.  Create a new obj.
@@ -130,8 +192,6 @@ class DGEList(object):
                         "dimensions fails."
                     )
 
-        if not isinstance(counts, np.ndarray):
-            raise TypeError("Counts matrix must be of type ``np.ndarray``.")
         if np.isnan(counts).any():
             raise ValueError("Counts matrix must have only real values.")
         if (counts < 0).any():
@@ -179,6 +239,12 @@ class DGEList(object):
         # - Genes same length as nrow(self.counts) if defined
         if genes is not None:
             genes = np.array(list(self._format_fields(genes)))
+            # Creates boolean mask and filters out metatag rows from samples and counts
+            metatag_mask = ~(
+                np.isin(genes, self._old_metatags) | np.core.defchararray.startswith(genes, '__')
+            )
+            genes = genes[metatag_mask].copy()
+            self._counts = self.counts[metatag_mask].copy()
         self._genes = genes
 
     @property
@@ -190,39 +256,6 @@ class DGEList(object):
 
         """
         return np.sum(self.counts, 0)
-
-    @classmethod
-    def read_handle(cls, handle: StringIO, **kwargs: Mapping) -> "DGEList":
-        """Read in a file-like object of delimited data for instantiation.
-
-        Args:
-            handle: Any handle supporting text streaming io.
-            kwargs: Additional arguments supported by ``np.genfromtxt``.
-
-        Returns:
-            DGEList: Container for storing read counts for samples.
-
-        """
-        # First column is the header for the the gene names.
-        # Remaining columns are sample names.
-        _, *samples = next(handle).strip().split()
-
-        genes = []
-        frame = np.genfromtxt(
-            fname=handle,
-            dtype=np.int,
-            converters={0: lambda _: genes.append(_) or 0},  # type: ignore
-            autostrip=kwargs.pop("autostrip", True),
-            replace_space=kwargs.pop("replace_space", "_"),
-            case_sensitive=kwargs.pop("case_sensitive", True),
-            invalid_raise=kwargs.pop("invalid_raise", True),
-            **kwargs,
-        )
-
-        # Delete the first column as it is copied on assignment to `genes`.
-        counts = np.delete(frame, 0, axis=1)
-
-        return cls(counts=counts, samples=samples, genes=genes[1:])
 
     def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> None:
         """Return the DGEList normalized to read counts per million."""
@@ -280,7 +313,7 @@ class DGEList(object):
             genes=self.genes,
             norm_factors=self.norm_factors,
             counts=self.counts,
-            group=self.group,
+            groups_list=self.groups_list,
         )
 
     def read_npz_file(self, filename: str) -> None:
@@ -297,4 +330,102 @@ class DGEList(object):
         self.genes = npzfile["genes"]
         self.samples = npzfile["samples"]
         self.norm_factors = npzfile["norm_factors"]
-        self.group = npzfile["group"]
+        self.groups_list = npzfile["groups_list"].tolist()
+
+        self.groups_dict = self._sample_group_dict(self.groups_list, self.samples)
+
+    @classmethod
+    def create_DGEList(
+        cls,
+        sample_list: List[str],
+        data_set: Dict[Hashable, Any],  # {sample: {gene1: x, gene2: y}},
+        gene_list: List[str],
+        sample_category: Dict[Hashable, str],
+    ) -> "DGEList":
+        """ sample list and gene list must be pre-sorted
+            Use this to create the DGE object for future work."""
+
+        print("Creating DGE list object...")
+        temp_data_store = np.zeros(shape=(len(gene_list), len(sample_list)))
+        group = []
+
+        for idx_s, sample in enumerate(sample_list):
+            for idx_g, gene in enumerate(gene_list):
+                if sample in data_set and gene in data_set[sample]:
+                    if data_set[sample][gene]:
+                        temp_data_store[idx_g, idx_s] = data_set[sample][gene]
+            group.append(sample_category[sample])
+
+        return cls(
+            counts=temp_data_store,
+            genes=np.array(gene_list),
+            samples=np.array(sample_list),
+            groups_in_list=group,
+            to_remove_zeroes=False,
+        )
+
+    @classmethod
+    def create_DGEList_data_file(
+        cls, data_file: Path, group_file: Path, **kwargs: Mapping
+    ) -> "DGEList":
+        """Read in a file-like object of delimited data for instantiation.
+
+        Args:
+            data_file: Text File defining the data set.
+            group_file: the json file defining the groups
+            kwargs: Additional arguments supported by ``np.genfromtxt``.
+
+        Returns:
+            DGEList: Container for storing read counts for samples.
+
+        """
+        with smart_open(data_file, 'r') as data_handle, smart_open(
+            group_file, 'r'
+        ) as group_handle:
+            return cls.create_DGEList_handle(data_handle, group_handle, **kwargs)
+
+    @classmethod
+    def create_DGEList_handle(
+        cls, data_handle: StringIO, group_handle: StringIO, **kwargs: Mapping
+    ) -> "DGEList":
+        """Read in a file-like object of delimited data for instantiation.
+
+        Args:
+            data_handle: Text File defining the data set.
+            group_handle: the json file defining the groups
+            kwargs: Additional arguments supported by ``np.genfromtxt``.
+
+        Returns:
+            DGEList: Container for storing read counts for samples.
+
+        """
+        _, *samples = next(data_handle).strip().split()
+
+        genes = []
+        frame = np.genfromtxt(
+            fname=data_handle,
+            dtype=np.int,
+            converters={0: lambda _: genes.append(_.decode("utf-8")) or 0},  # type: ignore
+            autostrip=kwargs.pop("autostrip", True),
+            replace_space=kwargs.pop("replace_space", "_"),
+            case_sensitive=kwargs.pop("case_sensitive", True),
+            invalid_raise=kwargs.pop("invalid_raise", True),
+            # skip_header=kwargs.pop("skip_headers", 1),
+            **kwargs,
+        )
+
+        # Delete the first column as it is copied on assignment to `genes`.
+        counts = np.delete(frame, 0, axis=1)
+        # Delete the first element in the genes list: (should be 'genes' but was a
+        # duplicate gene name, due to a putative bug in genfromtxt
+        genes = genes[1:]
+
+        group = json.load(group_handle)
+
+        return cls(
+            counts=counts,
+            genes=genes,
+            samples=samples,
+            groups_in_dict=group,
+            to_remove_zeroes=False,
+        )
