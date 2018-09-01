@@ -6,7 +6,7 @@ from edgePy.data_import.mongodb.gene_functions import get_canonical_rpkm
 from edgePy.data_import.mongodb.gene_functions import get_canonical_raw
 from edgePy.data_import.mongodb.gene_functions import get_genelist_from_file
 from edgePy.data_import.mongodb.gene_functions import translate_genes
-from edgePy.util import LOG as log  # type: ignore
+from edgePy.util import LOG as log
 
 
 def parse_arguments(parser: Any = None, ci_values: List[str] = None) -> Any:

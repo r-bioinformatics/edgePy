@@ -7,7 +7,7 @@ import pymongo  # type: ignore
 from pymongo.errors import BulkWriteError  # type: ignore
 from pymongo import InsertOne, UpdateOne
 
-from edgePy.util import LOG as log  # type: ignore
+from edgePy.util import LOG as log
 
 
 class MongoWrapper(object):
