@@ -2,14 +2,13 @@ import re
 import json
 from io import StringIO
 from pathlib import Path
+from typing import Generator, Iterable, Mapping, Optional, Union, Dict, List, Hashable, Any
 
 # TODO: Implement `mypy` stubs for NumPy imports
 import numpy as np  # type: ignore
 from smart_open import smart_open  # type: ignore
 
-from typing import Generator, Iterable, Mapping, Optional, Union, Dict, List, Hashable, Any
-
-from edgePy.util import log
+from edgePy.util import LOG as log  # type: ignore
 
 __all__ = ["DGEList"]
 

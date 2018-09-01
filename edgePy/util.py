@@ -1,6 +1,5 @@
 """ Utilities to support functions and classes """
-
-from logzero import setup_logger, LogFormatter, logging
+import logzero  # type: ignore
 
 
 def _setup_log():
@@ -13,11 +12,12 @@ def _setup_log():
         "%(color)s[%(levelname)s] [%(asctime)s | "
         "%(module)s - line %(lineno)d]:%(end_color)s %(message)s"
     )
-    _formatter = LogFormatter(fmt=_log_format)
+    _formatter = logzero.LogFormatter(fmt=_log_format)
 
-    logger = setup_logger(logfile=None, level=logging.INFO, formatter=_formatter)
+    logger = logzero.setup_logger(logfile=None, level=logzero.logging.INFO, formatter=_formatter)
 
     return logger
 
 
-log = _setup_log()
+# Logger instance constant
+LOG = _setup_log()

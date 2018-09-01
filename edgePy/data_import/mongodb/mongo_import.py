@@ -1,14 +1,12 @@
 import argparse
+from typing import Dict, Hashable, Any, Tuple, List, Optional
 
 from edgePy.data_import.mongodb.mongo_wrapper import MongoWrapper
 from edgePy.data_import.mongodb.gene_functions import get_canonical_rpkm
 from edgePy.data_import.mongodb.gene_functions import get_canonical_raw
 from edgePy.data_import.mongodb.gene_functions import get_genelist_from_file
 from edgePy.data_import.mongodb.gene_functions import translate_genes
-
-from typing import Dict, Hashable, Any, Tuple, List, Optional
-
-from edgePy.util import log
+from edgePy.util import LOG as log  # type: ignore
 
 
 def parse_arguments(parser: Any = None, ci_values: List[str] = None) -> Any:

@@ -1,18 +1,15 @@
 import argparse
+from typing import List, Dict, Hashable, Any
+import configparser
 
-from edgePy.DGEList import DGEList
-
-from edgePy.data_import.mongodb.mongo_import import ImportFromMongodb
 import numpy as np
-
 from scipy.stats import ks_2samp
 from smart_open import smart_open
 
-from typing import List, Dict, Hashable, Any
 
-import configparser
-
-from edgePy.util import log
+from edgePy.DGEList import DGEList
+from edgePy.data_import.mongodb.mongo_import import ImportFromMongodb
+from edgePy.util import LOG as log  # type: ignore
 
 
 def parse_arguments(parser=None):
