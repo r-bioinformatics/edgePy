@@ -29,7 +29,7 @@ def getLogger(
     Examples:
         >>> from edgePy.util import getLogger
         >>> log = getLogger(name="script")
-        >>> log.info('This is the your DGElist.")
+        >>> log.info('This is the your DGElist.')
         [INFO | [180904 14:07:30 | script | DGEList | line 1]: This is the your DGElist.
 
     Notes:
