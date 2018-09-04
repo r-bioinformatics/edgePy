@@ -58,7 +58,7 @@ class EdgePy(object):
 
         if args.dge_file:
             self.dge_list = DGEList(filename=args.dge_file)
-            log.info("The DGE list is %s", self.dge_list)
+            log.info(f"The DGE list is {self.dge_list}")
 
         elif args.mongo_config:
             # This section is only useful for MongoDB based analyses.  Talk to @apfejes about this section if you have
@@ -143,7 +143,7 @@ class EdgePy(object):
         if self.output:
             with smart_open(self.output, 'w') as out:
                 out.writelines(results)
-            log.info("Wrote to %s", self.output)
+            log.info(f"Wrote to {self.output}")
         else:
             for line in results:
                 log.info(line)
