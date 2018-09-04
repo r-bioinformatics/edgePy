@@ -37,7 +37,9 @@ def getLogger(
 
     """
     log_formatter = (
-        logzero.LogFormatter(fmt=logzero.LogFormatter.DEFAULT_FORMAT) if formatter is None else formatter
+        logzero.LogFormatter(fmt=logzero.LogFormatter.DEFAULT_FORMAT)
+        if formatter is None
+        else formatter
     )
     logger = logzero.setup_logger(name=name, level=level, formatter=log_formatter)
 
