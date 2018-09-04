@@ -134,7 +134,7 @@ class ImportFromMongodb(object):
             sample_category[result["sample_name"]] = (
                 result[self.search_key] if self.search_key else result["sample_name"]
             )
-        log.info("Get data.... for sample_names %s" % list(sample_names))
+        log.info("Get data.... for sample_names %s", list(sample_names))
 
         query = {"sample_name": {"$in": list(sample_names)}}
         if self.gene_list:
@@ -145,13 +145,13 @@ class ImportFromMongodb(object):
         )
 
         # make it a list of lists
-        log.info("Importing data from mongo %s...." % self.mongo_host)
+        log.info("Importing data from mongo %s....", self.mongo_host)
         dataset: Dict[Hashable, Dict[Hashable, Optional[int]]] = {}
         gene_list = set()
         sample_list = set()
         for count, result in enumerate(cursor):
             if count % 100000 == 0:
-                log.info("%s rows processed." % count)
+                log.info("%s rows processed.", count)
             sample = result["sample_name"]
             rpkm = get_canonical_rpkm(result) if rpkm_flag else get_canonical_raw(result)
             gene = result["gene"]

@@ -183,10 +183,9 @@ class DGEList(object):
             # if it has already been set.  Create a new obj.
             if hasattr(self, "_samples") and self._samples is not None:
                 gene_count, sample_count = counts.shape
-                log.info("sample count: %s, gene count: %s" % (sample_count, gene_count))
+                log.info("sample count: %s, gene count: %s", sample_count, gene_count)
                 log.info(
-                    "samples shape %s, gene shape %s"
-                    % (self.samples.shape[0], self.genes.shape[0])
+                    "samples shape %s, gene shape %s", self.samples.shape[0], self.genes.shape[0]
                 )
                 log.info(self.genes)
 
@@ -311,7 +310,7 @@ class DGEList(object):
 
         # TODO: validate file name
 
-        log.info("Exporting data to compressed .dge file (%s.npz)..." % filename)
+        log.info("Exporting data to compressed .dge file (%s.npz)...", filename)
 
         np.savez_compressed(
             filename,
@@ -329,7 +328,7 @@ class DGEList(object):
         :return:
         """
 
-        log.info("Importing data from .dge file (%s)..." % filename)
+        log.info("Importing data from .dge file (%s)...", filename)
 
         npzfile = np.load(filename)
         self.counts = npzfile["counts"]
