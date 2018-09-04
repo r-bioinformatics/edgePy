@@ -14,7 +14,7 @@ __all__ = ["DGEList"]
 
 PRIOR_COUNT: float = 0.25
 
-log = getLogger(name="__name__")
+log = getLogger(name=__name__)
 
 
 class DGEList(object):
