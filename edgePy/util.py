@@ -15,7 +15,7 @@ def getLogger(
     name: str,
     level: int = logzero.logging.INFO,
     formatter: Optional[logzero.LogFormatter] = logzero.LogFormatter(fmt=LOG_FORMAT),
-) -> logger:
+) -> logzero.logger:
     """Formats and sets up the logger instance.
 
     Args:
