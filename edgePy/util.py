@@ -6,7 +6,7 @@ import logzero  # type: ignore
 __all__ = ["getLogger"]
 
 LOG_FORMAT = (
-    "%(color)s[%(levelname)s | [%(asctime)s | "
+    "%(color)s[%(levelname)s | %(asctime)s | "
     "%(name)s | %(module)s | line %(lineno)d]:%(end_color)s %(message)s"
 )
 
@@ -29,8 +29,8 @@ def getLogger(
     Examples:
         >>> from edgePy.util import getLogger
         >>> log = getLogger(name="script")
-        >>> log.info('This is the your DGElist.')
-        [INFO | [180904 14:07:30 | script | DGEList | line 1]: This is the your DGElist.
+        >>> log.info('This is your DGElist.')
+        ...
 
     Notes:
         1. See https://docs.python.org/3/library/logging.html#levels for more information about logging levels.
