@@ -8,11 +8,13 @@ from typing import Generator, Iterable, Mapping, Optional, Union, Dict, List, Ha
 import numpy as np  # type: ignore
 from smart_open import smart_open  # type: ignore
 
-from edgePy.util import LOG as log
+from edgePy.util import getLogger
 
 __all__ = ["DGEList"]
 
 PRIOR_COUNT: float = 0.25
+
+log = getLogger(name="__name__")
 
 
 class DGEList(object):
@@ -181,9 +183,10 @@ class DGEList(object):
             # if it has already been set.  Create a new obj.
             if hasattr(self, "_samples") and self._samples is not None:
                 gene_count, sample_count = counts.shape
-                log.info(f" sample count: {sample_count}, gene count: {gene_count}")
+                log.info("sample count: %s, gene count: %s" % (sample_count, gene_count))
                 log.info(
-                    f" samples shape {self.samples.shape[0]}, gene shape {self.genes.shape[0]}"
+                    "samples shape %s, gene shape %s"
+                    % (self.samples.shape[0], self.genes.shape[0])
                 )
                 log.info(self.genes)
 
@@ -304,11 +307,11 @@ class DGEList(object):
         )
 
     def write_npz_file(self, filename: str) -> None:
-        """ Convert the object to a byte representation, which can be stored or imported."""
+        """Convert the object to a byte representation, which can be stored or imported."""
 
         # TODO: validate file name
 
-        log.info(f"Exporting data to compressed .dge file ({filename}.npz)....")
+        log.info("Exporting data to compressed .dge file (%s.npz)..." % filename)
 
         np.savez_compressed(
             filename,
@@ -320,8 +323,8 @@ class DGEList(object):
         )
 
     def read_npz_file(self, filename: str) -> None:
-        """
-        Import a file name stored in the dge export format.
+        """Import a file name stored in the dge export format.
+
         :param filename:
         :return:
         """

@@ -2,7 +2,6 @@ import pytest
 from edgePy.data_import.mongodb.mongo_wrapper import MongoWrapper
 from edgePy.data_import.mongodb.mongo_wrapper import MongoInserter
 from edgePy.data_import.mongodb.mongo_wrapper import MongoUpdater
-from edgePy.util import LOG as log  # type: ignore
 
 
 def test_mongo_wrapper_find_as_cursor(mongodb):
@@ -13,7 +12,6 @@ def test_mongo_wrapper_find_as_cursor(mongodb):
 
     count = 0
     for i in cursor:
-        log.info(i)
         count += 1
 
     assert 3 == count

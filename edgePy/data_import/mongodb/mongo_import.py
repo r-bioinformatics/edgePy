@@ -6,7 +6,9 @@ from edgePy.data_import.mongodb.gene_functions import get_canonical_rpkm
 from edgePy.data_import.mongodb.gene_functions import get_canonical_raw
 from edgePy.data_import.mongodb.gene_functions import get_genelist_from_file
 from edgePy.data_import.mongodb.gene_functions import translate_genes
-from edgePy.util import LOG as log
+from edgePy.util import getLogger
+
+log = getLogger(name=__name__)
 
 
 def parse_arguments(parser: Any = None, ci_values: List[str] = None) -> Any:
@@ -132,7 +134,7 @@ class ImportFromMongodb(object):
             sample_category[result["sample_name"]] = (
                 result[self.search_key] if self.search_key else result["sample_name"]
             )
-        log.info(f"get data.... for sample_names {list(sample_names)}")
+        log.info("Get data.... for sample_names %s" % list(sample_names))
 
         query = {"sample_name": {"$in": list(sample_names)}}
         if self.gene_list:
@@ -143,19 +145,16 @@ class ImportFromMongodb(object):
         )
 
         # make it a list of lists
-        log.info(f"Importing data from mongo ({self.mongo_host})....")
+        log.info("Importing data from mongo %s...." % self.mongo_host)
         dataset: Dict[Hashable, Dict[Hashable, Optional[int]]] = {}
         gene_list = set()
         sample_list = set()
-        count = 0
-        for result in cursor:
-            count += 1
+        for count, result in enumerate(cursor):
             if count % 100000 == 0:
-                log.info(f"{count} rows processed")
+                log.info("%s rows processed." % count)
             sample = result["sample_name"]
             rpkm = get_canonical_rpkm(result) if rpkm_flag else get_canonical_raw(result)
             gene = result["gene"]
-            # log.info("{}-{}".format(sample, gene))
             if sample not in dataset:
                 dataset[sample] = {}
             dataset[sample][gene] = rpkm
