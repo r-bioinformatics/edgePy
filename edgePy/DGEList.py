@@ -329,7 +329,7 @@ class DGEList(object):
         :return:
         """
 
-        log.info(f"Importing data from .dge file ({filename})....")
+        log.info("Importing data from .dge file (%s)..." % filename)
 
         npzfile = np.load(filename)
         self.counts = npzfile["counts"]
