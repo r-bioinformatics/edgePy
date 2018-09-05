@@ -1,7 +1,6 @@
 import pytest
 import pkgutil
 import numpy as np
-
 from smart_open import smart_open
 
 from edgePy.DGEList import DGEList

@@ -1,4 +1,3 @@
-
 import pytest
 from edgePy.data_import.mongodb.mongo_wrapper import MongoWrapper
 from edgePy.data_import.mongodb.mongo_wrapper import MongoInserter
@@ -13,7 +12,6 @@ def test_mongo_wrapper_find_as_cursor(mongodb):
 
     count = 0
     for i in cursor:
-        print(i)
         count += 1
 
     assert 3 == count

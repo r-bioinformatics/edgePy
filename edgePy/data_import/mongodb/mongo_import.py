@@ -1,13 +1,14 @@
 import argparse
+from typing import Dict, Hashable, Any, Tuple, List, Optional
 
 from edgePy.data_import.mongodb.mongo_wrapper import MongoWrapper
 from edgePy.data_import.mongodb.gene_functions import get_canonical_rpkm
 from edgePy.data_import.mongodb.gene_functions import get_canonical_raw
 from edgePy.data_import.mongodb.gene_functions import get_genelist_from_file
 from edgePy.data_import.mongodb.gene_functions import translate_genes
+from edgePy.util import getLogger
 
-
-from typing import Dict, Hashable, Any, Tuple, List, Optional
+log = getLogger(name=__name__)
 
 
 def parse_arguments(parser: Any = None, ci_values: List[str] = None) -> Any:
@@ -129,35 +130,32 @@ class ImportFromMongodb(object):
         sample_names = set()
         sample_category = {}
         for result in cursor:
-            print(result)
+            log.info(result)
             sample_names.add(result["sample_name"])
             sample_category[result["sample_name"]] = (
                 result[self.search_key] if self.search_key else result["sample_name"]
             )
-        print(f"get data.... for sample_names {list(sample_names)}")
+        log.info(f"Get data for sample_names {list(sample_names)}")
 
         query = {"sample_name": {"$in": list(sample_names)}}
         if self.gene_list:
-            print(self.gene_list)
+            log.info(self.gene_list)
             query["gene"] = {"$in": list(self.gene_list)}
         cursor = self.mongo_reader.find_as_cursor(
             database=database, collection="RNASeq", query=query, projection={"_id": 0}
         )
 
         # make it a list of lists
-        print(f"Importing data from mongo ({self.mongo_host})....")
+        log.info(f"Importing data from mongo ({self.mongo_host})...")
         dataset: Dict[Hashable, Dict[Hashable, Optional[int]]] = {}
         gene_list = set()
         sample_list = set()
-        count = 0
-        for result in cursor:
-            count += 1
+        for count, result in enumerate(cursor):
             if count % 100000 == 0:
-                print(f"{count} rows processed")
+                log.info(f"{count} rows processed.")
             sample = result["sample_name"]
             rpkm = get_canonical_rpkm(result) if rpkm_flag else get_canonical_raw(result)
             gene = result["gene"]
-            # print("{}-{}".format(sample, gene))
             if sample not in dataset:
                 dataset[sample] = {}
             dataset[sample][gene] = rpkm
