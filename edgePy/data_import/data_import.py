@@ -13,7 +13,7 @@ def get_dataset_path(filename: Union[str, Path]) -> Path:
     Args:
         filename (str, pathlib.Path) : The full name of the packaged data file.
 
-    Return:
+    Returns:
         path (pathlib.Path) : The filesystem path to the packaged data file.
 
     Examples

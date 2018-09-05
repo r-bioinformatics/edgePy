@@ -45,7 +45,7 @@ class MongoWrapper(object):
             database:  database name
             collection:  collection name
 
-        Return:
+        Returns:
             the collection object ready for use with .find() or similar.
         """
 
@@ -71,7 +71,7 @@ class MongoWrapper(object):
             query: a dictionary providing the criteria for the find command
             projection: a dictionary that gives the projection - the fields to return.
 
-        Return:
+        Returns:
             a cursor object, to be used as an iterator.
         """
 
@@ -99,7 +99,7 @@ class MongoWrapper(object):
             query: a dictionary providing the criteria for the find command
             projection: a dictionary that gives the projection - the fields to return.
 
-        Return:
+        Returns:
             a list representation of the returned data.
         """
         cursor = self.find_as_cursor(
@@ -125,7 +125,7 @@ class MongoWrapper(object):
             projection: a dictionary that gives the projection - the fields to return.
             field: the field in the projection for which the value will be used as the Hashable key of the dict.
 
-        Return:
+        Returns:
             a dictionary representation of the returned data.
         """
         cursor = self.find_as_cursor(
@@ -142,7 +142,7 @@ class MongoWrapper(object):
             collection: collection name
             data_list: a list of documents to insert into mongodb.
 
-        Return:
+        Returns:
             None
         """
 
@@ -161,7 +161,7 @@ class MongoWrapper(object):
             collection: collection name
             key: the field name to create the index on.
 
-        Return:
+        Returns:
             None
         """
         self.get_db(database, collection).create_index(key)
@@ -200,7 +200,7 @@ class MongoInserter(MongoWrapper):
         Args:
             None
 
-        Return:
+        Returns:
             None
         """
         if self.to_insert:
@@ -220,7 +220,7 @@ class MongoInserter(MongoWrapper):
         Args:
             record: the record to add to the mongo inserter buffer
 
-        Return:
+        Returns:
             None
         """
         self.to_insert.append(InsertOne(record))
@@ -231,7 +231,7 @@ class MongoInserter(MongoWrapper):
         """
         Close the MongoInserter - flush the buffer.
 
-        Return:
+        Returns:
             None
         """
 
@@ -273,7 +273,7 @@ class MongoUpdater(MongoWrapper):
         """
         Flush out the buffer and write to mongo db.
 
-        Return:
+        Returns:
             None
         """
         if self.to_update:
@@ -295,7 +295,7 @@ class MongoUpdater(MongoWrapper):
             setdict: the dictionary describing the new record - OR use {$set: {}} to update a
                 particular key without replacing the existing record.
 
-        Return:
+        Returns:
             None
         """
 
@@ -307,7 +307,7 @@ class MongoUpdater(MongoWrapper):
         """
         Close the MongoInserter - flush the buffer.
 
-        Return:
+        Returns:
             None
         """
         self.flush()
