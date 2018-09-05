@@ -110,6 +110,7 @@ class DGEList(object):
 
         Returns:
             dictionary containing the sample types, each with a list of samples.
+
         """
         d: Dict[Hashable, Any] = {}
         log.info(samples)
@@ -332,7 +333,6 @@ class DGEList(object):
 
     def read_npz_file(self, filename: str) -> None:
         """Import a file name stored in the dge export format.
-
 
         Args:
             filename: the name of the file to read from.

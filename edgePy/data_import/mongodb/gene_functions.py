@@ -76,6 +76,7 @@ def get_gene_list(mongo_reader: Any, database: str = "ensembl_90_37") -> Dict[st
     Args:
         mongo_reader: the mongo wrapper
         database: database name to use.
+
     """
 
     genes = mongo_reader.find_as_cursor(database, "symbol_by_ensg", query={})
@@ -99,6 +100,7 @@ def get_sample_details(
 
     Returns:
         details required for each sample available.
+
     """
 
     sample_details = {}
@@ -130,6 +132,7 @@ def get_canonical_rpkm(result: Dict[str, Any]) -> Optional[int]:
 
     Returns:
         the rpkm value
+
     """
     transcript_list = result["transcripts"]
     for trans in transcript_list.values():
@@ -147,6 +150,7 @@ def get_canonical_raw(result: Dict[str, Any]) -> Optional[int]:
 
     Returns:
         the raw count (as an integer)
+
     """
 
     transcript_list = result["transcripts"]
