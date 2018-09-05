@@ -15,6 +15,5 @@ Welcome to EdgePy's documentation!
    planned_statistical_tests
    CONTRIBUTING
    Links
-
-
+   edgePy
 
