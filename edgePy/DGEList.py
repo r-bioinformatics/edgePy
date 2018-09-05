@@ -104,8 +104,12 @@ class DGEList(object):
         """
         Converts data in the form ['group1', 'group1', 'group2', 'group2']
         to the form  {'group1': ['sample1', 'sample2'], 'group2': ['sample3', 'sample4'}
-        :param groups_list:
-        :return:
+
+        Args:
+            groups_list: group names in a list, in the same order as samples.
+
+        Returns:
+            dictionary containing the sample types, each with a list of samples.
         """
         d: Dict[Hashable, Any] = {}
         log.info(samples)
@@ -120,9 +124,13 @@ class DGEList(object):
         """
         Converts data in the form {'group1': ['sample1', 'sample2'], 'group2': ['sample3', 'sample4'}
         to the form ['group1', 'group1', 'group2', 'group2']
-        :param groups_dict:
-        :param samples:
-        :return:
+        Args:
+            groups_dict: dictionary containing the sample types, each with a list of samples.
+            samples: order of samples in the DGEList
+
+        Returns:
+            data in a list, in the same order as samples.
+
         """
         d = []
         temp_d = {}
@@ -324,8 +332,10 @@ class DGEList(object):
     def read_npz_file(self, filename: str) -> None:
         """Import a file name stored in the dge export format.
 
-        :param filename:
-        :return:
+
+        Args:
+            filename: the name of the file to read from.
+
         """
 
         log.info(f"Importing data from .dge file ({filename})...")
