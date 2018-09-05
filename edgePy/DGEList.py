@@ -124,6 +124,7 @@ class DGEList(object):
         """
         Converts data in the form {'group1': ['sample1', 'sample2'], 'group2': ['sample3', 'sample4'}
         to the form ['group1', 'group1', 'group2', 'group2']
+
         Args:
             groups_dict: dictionary containing the sample types, each with a list of samples.
             samples: order of samples in the DGEList
