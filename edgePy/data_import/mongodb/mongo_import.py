@@ -15,10 +15,11 @@ def parse_arguments(parser: Any = None, ci_values: List[str] = None) -> Any:
 
     """
     Standard argparse wrapper for interpreting command line arguments.
-    :param parser: if there's an existing parser, provide it, else, this will
-    create a new one.
-    :param ci_values: use for testing purposes only.
-    :return:
+
+    Args:
+        parser: if there's an existing parser, provide it, else, this will
+        create a new one.
+        ci_values: use for testing purposes only.
     """
     if not parser:
         parser = argparse.ArgumentParser()
@@ -71,8 +72,9 @@ class ImportFromMongodb(object):
     def translate_gene_list(self, database: str) -> None:
         """
         If there was a list of genes provided, convert them to ENSG symbols.
-        :param database:
-        :return: None
+
+        Args:
+            database: name of the database
         """
 
         if self.input_gene_file:
@@ -89,10 +91,11 @@ class ImportFromMongodb(object):
         Run the queries to get the samples, from mongo, and then use that data to retrieve
         the counts.
 
-        Args
+        Args:
             database: name of the database to retrieve data from.
             rpkm: takes the rpkm values from the mongodb, instead of the raw counts
-        Return
+
+        Returns:
             the list of samples, the data itself,
             the gene list and the categories of the samples.
         """
