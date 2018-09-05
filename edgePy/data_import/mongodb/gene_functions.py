@@ -6,8 +6,8 @@ from typing import Dict, Optional, List, Tuple, Any, Hashable
 def get_genelist_from_file(filename: str) -> Optional[List]:
     """
     Converts a genelist file into a list of genes.   Simple function, but can be expanded if needed.
-    :param filename: gene list file name.
-    :return:
+    Args:
+        filename: gene list file name.
     """
 
     # TODO: should be expanded to handle gzip genelists too.
@@ -26,10 +26,14 @@ def translate_genes(
 ) -> Tuple[List[str], Dict[str, str]]:
     """
     Functions to translate a list of genes in to ENGS symbols and vice versa.
-    :param genes: list of genes to filter on.
-    :param mongo_reader: the mongo connector
-    :param database: the name of the database to use.  "pytest" for unit testimg (mocking)
-    :return:a list of ensg symbols, a list of gene symbols
+
+    Args:
+        genes: list of genes to filter on.
+        mongo_reader: the mongo connector
+        database: the name of the database to use.  "pytest" for unit testimg (mocking)
+
+    Returns:
+        a list of ensg symbols, a list of gene symbols
     """
 
     ensg_genes = []
@@ -68,9 +72,11 @@ def translate_genes(
 def get_gene_list(mongo_reader: Any, database: str = "ensembl_90_37") -> Dict[str, str]:
     """
     get the list of genes from the mongo database, to translated ensg ids to symbols.
-    :param mongo_reader: the mongo wrapper
-    :param database: database name to use.
-    :return: None
+
+    Args:
+        mongo_reader: the mongo wrapper
+        database: database name to use.
+
     """
 
     genes = mongo_reader.find_as_cursor(database, "symbol_by_ensg", query={})
@@ -86,10 +92,15 @@ def get_sample_details(
 ) -> Dict[Any, Dict[str, Any]]:
     """
     Get details from the samples collection.  Use this to decide which samples to query data for.
-    :param group_by: the name of the key to group samples by (Category-based key)
-    :param mongo_reader: the mongo wrapper
-    :param database: the database to use
-    :return: details required for each sample available.
+
+    Args:
+        group_by: the name of the key to group samples by (Category-based key)
+        mongo_reader: the mongo wrapper
+        database: the database to use
+
+    Returns:
+        details required for each sample available.
+
     """
 
     sample_details = {}
@@ -115,8 +126,13 @@ def get_sample_details(
 def get_canonical_rpkm(result: Dict[str, Any]) -> Optional[int]:
     """
     Get the rpkm from the database for a given entry in the data collection.
-    :param result: the entry in the data collection
-    :return: the rpkm value
+
+    Args:
+        result: the entry in the data collection
+
+    Returns:
+        the rpkm value
+
     """
     transcript_list = result["transcripts"]
     for trans in transcript_list.values():
@@ -128,8 +144,13 @@ def get_canonical_rpkm(result: Dict[str, Any]) -> Optional[int]:
 def get_canonical_raw(result: Dict[str, Any]) -> Optional[int]:
     """
     An approximation of the raw count of reads.
-    :param result: the entry from the data collection
-    :return: the raw count (as an integer)
+
+    Args:
+        result: the entry from the data collection
+
+    Returns:
+        the raw count (as an integer)
+
     """
 
     transcript_list = result["transcripts"]

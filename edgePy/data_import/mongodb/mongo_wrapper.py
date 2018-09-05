@@ -47,6 +47,7 @@ class MongoWrapper(object):
 
         Returns:
             the collection object ready for use with .find() or similar.
+
         """
 
         if database == "pytest":
@@ -73,6 +74,7 @@ class MongoWrapper(object):
 
         Returns:
             a cursor object, to be used as an iterator.
+
         """
 
         try:
@@ -101,6 +103,7 @@ class MongoWrapper(object):
 
         Returns:
             a list representation of the returned data.
+
         """
         cursor = self.find_as_cursor(
             database=database, collection=collection, query=query, projection=projection
@@ -127,6 +130,7 @@ class MongoWrapper(object):
 
         Returns:
             a dictionary representation of the returned data.
+
         """
         cursor = self.find_as_cursor(
             database=database, collection=collection, query=query, projection=projection
@@ -142,8 +146,6 @@ class MongoWrapper(object):
             collection: collection name
             data_list: a list of documents to insert into mongodb.
 
-        Returns:
-            None
         """
 
         try:
@@ -161,8 +163,6 @@ class MongoWrapper(object):
             collection: collection name
             key: the field name to create the index on.
 
-        Returns:
-            None
         """
         self.get_db(database, collection).create_index(key)
 
@@ -197,11 +197,6 @@ class MongoInserter(MongoWrapper):
         """
         Flush out the buffer and write to mongo db.
 
-        Args:
-            None
-
-        Returns:
-            None
         """
         if self.to_insert:
             try:
@@ -220,8 +215,6 @@ class MongoInserter(MongoWrapper):
         Args:
             record: the record to add to the mongo inserter buffer
 
-        Returns:
-            None
         """
         self.to_insert.append(InsertOne(record))
         if len(self.to_insert) > 1000:
@@ -231,8 +224,6 @@ class MongoInserter(MongoWrapper):
         """
         Close the MongoInserter - flush the buffer.
 
-        Returns:
-            None
         """
 
         self.flush()
@@ -273,8 +264,6 @@ class MongoUpdater(MongoWrapper):
         """
         Flush out the buffer and write to mongo db.
 
-        Returns:
-            None
         """
         if self.to_update:
             try:
@@ -295,8 +284,6 @@ class MongoUpdater(MongoWrapper):
             setdict: the dictionary describing the new record - OR use {$set: {}} to update a
                 particular key without replacing the existing record.
 
-        Returns:
-            None
         """
 
         self.to_update.append(UpdateOne(updatedict, setdict))
@@ -307,7 +294,5 @@ class MongoUpdater(MongoWrapper):
         """
         Close the MongoInserter - flush the buffer.
 
-        Returns:
-            None
         """
         self.flush()

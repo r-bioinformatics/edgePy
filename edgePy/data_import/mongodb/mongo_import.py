@@ -47,6 +47,7 @@ class ImportFromMongodb(object):
         mongo_key: a key in the samples collection to filter on
         mongo_value: accepted values in the samples collection to
         gene_list_file: a list of genes to filter the results on.
+
     """
 
     def __init__(
@@ -75,6 +76,7 @@ class ImportFromMongodb(object):
 
         Args:
             database: name of the database
+
         """
 
         if self.input_gene_file:
@@ -98,6 +100,7 @@ class ImportFromMongodb(object):
         Returns:
             the list of samples, the data itself,
             the gene list and the categories of the samples.
+
         """
 
         if self.input_gene_file and not self.gene_list:
