@@ -1,16 +1,17 @@
 import argparse
+from typing import List, Dict, Hashable, Any
+import configparser
 
-from edgePy.DGEList import DGEList
-
-from edgePy.data_import.mongodb.mongo_import import ImportFromMongodb
 import numpy as np
-
 from scipy.stats import ks_2samp
 from smart_open import smart_open
 
-from typing import List, Dict, Hashable, Any
 
-import configparser
+from edgePy.DGEList import DGEList
+from edgePy.data_import.mongodb.mongo_import import ImportFromMongodb
+from edgePy.util import getLogger
+
+log = getLogger(name="script")
 
 
 def parse_arguments(parser=None):
@@ -57,7 +58,7 @@ class EdgePy(object):
 
         if args.dge_file:
             self.dge_list = DGEList(filename=args.dge_file)
-            print(self.dge_list)
+            log.info(f"The DGE list is {self.dge_list}")
 
         elif args.mongo_config:
             # This section is only useful for MongoDB based analyses.  Talk to @apfejes about this section if you have
@@ -128,9 +129,10 @@ class EdgePy(object):
 
         Args:
              None.
+
         """
 
-        print(self.dge_list.groups_list)
+        log.info(self.dge_list.groups_list)
 
         gene_details, gene_likelyhood1, group_types = self.ks_2_samples()
 
@@ -141,14 +143,13 @@ class EdgePy(object):
         if self.output:
             with smart_open(self.output, 'w') as out:
                 out.writelines(results)
-            print(f"wrote to {self.output}")
+            log.info(f"Wrote to {self.output}")
         else:
             for line in results:
-                print(line)
+                log.info(line)
 
     def ks_2_samples(self):
-        """
-        This function runs a 2-tailed Kolmogorov-Smirnov test on the DGEList object.
+        """Run a 2-tailed Kolmogorov-Smirnov test on the DGEList object.
 
         Args:
             None.
@@ -157,6 +158,7 @@ class EdgePy(object):
             gene_details: a dictionary of dictionary (key, gene), holding mean1 and mean2 for the two groups
             gene_likelihood: a dictionary (key, gene), holding the p-value of the separation of the two groups
             group_types: list of the groups in order.
+
         """
         gene_likelihood1: Dict[Hashable, float] = {}
         group_types = set(self.dge_list.groups_list)
@@ -195,6 +197,7 @@ class EdgePy(object):
              gene_likelihood1: dictionary of gene names and the p-value associated. used to sort the data
              group_type1: the name of the first grouping
              group_type2: the name of the second grouping
+
         """
 
         results: List[str] = []

@@ -1,8 +1,5 @@
-
-
 from edgePy.data_import.mongodb.mongo_import import ImportFromMongodb
 from edgePy.data_import.mongodb.mongo_import import parse_arguments
-
 from edgePy.data_import.data_import import get_dataset_path
 
 
