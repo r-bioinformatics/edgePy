@@ -40,9 +40,13 @@ class MongoWrapper(object):
         """
         This function simply hides the db name when using pytest-mongodb, when the database name
         should always be 'pytest'
-        :param database:  database name
-        :param collection:  collection name
-        :return: the collection object ready for use with .find() or similar.
+
+        Args:
+            database:  database name
+            collection:  collection name
+
+        Returns:
+            the collection object ready for use with .find() or similar.
         """
 
         if database == "pytest":
@@ -60,11 +64,15 @@ class MongoWrapper(object):
         """
         Do a find operation on a mongo collection and return the data as a cursor,
         the (native MongoClient find return type.)
-        :param database: db name
-        :param collection: collection name
-        :param query: a dictionary providing the criteria for the find command
-        :param projection: a dictionary that gives the projection - the fields to return.
-        :return: a cursor object, to be used as an iterator.
+
+        Args:
+            database: db name
+            collection: collection name
+            query: a dictionary providing the criteria for the find command
+            projection: a dictionary that gives the projection - the fields to return.
+
+        Returns:
+            a cursor object, to be used as an iterator.
         """
 
         try:
@@ -84,11 +92,15 @@ class MongoWrapper(object):
     ) -> Iterable:
         """
         Do a find operation on a mongo collection, but return the data as a list
-        :param database: db name
-        :param collection: collection name
-        :param query: a dictionary providing the criteria for the find command
-        :param projection: a dictionary that gives the projection - the fields to return.
-        :return: a list representation of the returned data.
+
+        Args:
+            database: db name
+            collection: collection name
+            query: a dictionary providing the criteria for the find command
+            projection: a dictionary that gives the projection - the fields to return.
+
+        Returns:
+            a list representation of the returned data.
         """
         cursor = self.find_as_cursor(
             database=database, collection=collection, query=query, projection=projection
@@ -105,12 +117,16 @@ class MongoWrapper(object):
     ) -> Iterable:
         """
          Do a find operation on a mongo collection, but return the data as a dictionary
-        :param database: db name
-        :param collection: collection name
-        :param query: a dictionary providing the criteria for the find command
-        :param projection: a dictionary that gives the projection - the fields to return.
-        :param field: the field in the projection for which the value will be used as the Hashable key of the dict.
-        :return: a dictionary representation of the returned data.
+
+        Args:
+            database: db name
+            collection: collection name
+            query: a dictionary providing the criteria for the find command
+            projection: a dictionary that gives the projection - the fields to return.
+            field: the field in the projection for which the value will be used as the Hashable key of the dict.
+
+        Returns:
+            a dictionary representation of the returned data.
         """
         cursor = self.find_as_cursor(
             database=database, collection=collection, query=query, projection=projection
@@ -120,10 +136,14 @@ class MongoWrapper(object):
     def insert(self, database: str, collection: str, data_list: List[Any]) -> None:
         """
         bulk insert of items into a mongodb collection.
-        :param database: db name
-        :param collection: collection name
-        :param data_list: a list of documents to insert into mongodb.
-        :return: None
+
+        Args:
+            database: db name
+            collection: collection name
+            data_list: a list of documents to insert into mongodb.
+
+        Returns:
+            None
         """
 
         try:
@@ -135,10 +155,14 @@ class MongoWrapper(object):
 
         """
         A tool for creating indexes on a given collection.
-        :param database: db name
-        :param collection: collection name
-        :param key: the field name to create the index on.
-        :return: None
+
+        Args:
+            database: db name
+            collection: collection name
+            key: the field name to create the index on.
+
+        Returns:
+            None
         """
         self.get_db(database, collection).create_index(key)
 
@@ -155,8 +179,8 @@ class MongoInserter(MongoWrapper):
         port: the port number (usually 27017)
         database: db name
         collection: collection name
-        connect: whether to create the new session, or to attach to an existing session,
-            set to false, if this is being instantiated by a subprocesses.
+        connect: whether to create the new session, or to attach to an existing session, set to false,
+        if this is being instantiated by a subprocesses.
 
     """
 
@@ -172,7 +196,12 @@ class MongoInserter(MongoWrapper):
     def flush(self) -> None:
         """
         Flush out the buffer and write to mongo db.
-        :return: None
+
+        Args:
+            None
+
+        Returns:
+            None
         """
         if self.to_insert:
             try:
@@ -187,8 +216,12 @@ class MongoInserter(MongoWrapper):
     def add(self, record: Union[List[Any], Dict[Hashable, Any]]) -> None:
         """
         Add a record to the buffer
-        :param record:
-        :return: None
+
+        Args:
+            record: the record to add to the mongo inserter buffer
+
+        Returns:
+            None
         """
         self.to_insert.append(InsertOne(record))
         if len(self.to_insert) > 1000:
@@ -197,7 +230,9 @@ class MongoInserter(MongoWrapper):
     def close(self) -> None:
         """
         Close the MongoInserter - flush the buffer.
-        :return: None
+
+        Returns:
+            None
         """
 
         self.flush()
@@ -205,7 +240,6 @@ class MongoInserter(MongoWrapper):
     def create_index_key(self, key: str) -> None:
         """
         A tool for creating indexes on the collection.
-        :return:
         """
         self.create_index(self.database, self.collection, key)
 
@@ -238,7 +272,9 @@ class MongoUpdater(MongoWrapper):
     def flush(self) -> None:
         """
         Flush out the buffer and write to mongo db.
-        :return: None
+
+        Returns:
+            None
         """
         if self.to_update:
             try:
@@ -253,10 +289,14 @@ class MongoUpdater(MongoWrapper):
     def add(self, updatedict: Dict[Hashable, Any], setdict: Dict[Hashable, Any]) -> None:
         """
         Add a record to the buffer
-        :param updatedict: the criteria for the update query
-        :param setdict: the dictionary describing the new record - OR use {$set: {}} to update a
-            particular key without replacing the existing record.
-        :return: None
+
+        Args:
+            updatedict: the criteria for the update query
+            setdict: the dictionary describing the new record - OR use {$set: {}} to update a
+                particular key without replacing the existing record.
+
+        Returns:
+            None
         """
 
         self.to_update.append(UpdateOne(updatedict, setdict))
@@ -266,6 +306,8 @@ class MongoUpdater(MongoWrapper):
     def close(self) -> None:
         """
         Close the MongoInserter - flush the buffer.
-        :return: None
+
+        Returns:
+            None
         """
         self.flush()
