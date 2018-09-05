@@ -91,7 +91,8 @@ class ImportFromMongodb(object):
         Args
             database: name of the database to retrieve data from.
             rpkm: takes the rpkm values from the mongodb, instead of the raw counts
-        :return: the list of samples, the data itself,
+        Return
+            the list of samples, the data itself,
             the gene list and the categories of the samples.
         """
 

@@ -1,20 +1,13 @@
-edgePy package
-==============
-
-Subpackages
------------
-
-.. toctree::
-
-    edgePy.data_import
+scripts package
+===============
 
 Submodules
 ----------
 
-edgePy.DGEList module
+scripts.edgepy module
 ---------------------
 
-.. automodule:: edgePy.DGEList
+.. automodule:: scripts.edgepy
     :members:
     :undoc-members:
     :show-inheritance:
@@ -23,7 +16,7 @@ edgePy.DGEList module
 Module contents
 ---------------
 
-.. automodule:: edgePy
+.. automodule:: scripts
     :members:
     :undoc-members:
     :show-inheritance:

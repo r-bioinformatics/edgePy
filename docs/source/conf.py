@@ -15,6 +15,7 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('../../..'))
 sys.path.insert(0, os.path.abspath('../..'))
 sys.path.insert(0, os.path.abspath('../'))
@@ -74,9 +75,6 @@ templates_path = ['_templates']
 source_suffix = ['.rst', '.md']
 source_parsers = {'.md': 'recommonmark.parser.CommonMarkParser'}
 
-source_suffix = ['.rst', '.md']
-# source_suffix = '.rst'
-
 # The master toctree document.
 master_doc = 'index'
 
@@ -121,6 +119,8 @@ html_theme_options = {
     'includehidden': True,
     'titles_only': False,
 }
+
+autodoc_mock_imports = ['pymongo']
 
 # html_theme_path = ["_themes/sphinx_rtd_theme", ]
 
