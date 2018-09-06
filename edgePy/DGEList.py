@@ -387,6 +387,10 @@ class DGEList(object):
         """Wrapper for creating DGEList objects from file locations.  Performs open and passes
         the file handles to the method for creating a DGEList object.
 
+        This function uses smart_open, which provides a broad list of data sources that can be
+        opened.  For a full list of data sources, see smart_open's documentation at
+        https://github.com/RaRe-Technologies/smart_open/blob/master/README.rst
+
         Args:
             data_file: Text file defining the data set.
             group_file: The JSON file defining the groups.
