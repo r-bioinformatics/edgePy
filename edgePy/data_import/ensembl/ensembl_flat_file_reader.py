@@ -1,0 +1,2 @@
+import smart_open
+
