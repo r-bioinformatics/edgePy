@@ -2,7 +2,7 @@ import re
 import json
 from io import StringIO
 from pathlib import Path
-from typing import Generator, Iterable, Mapping, Optional, Union, Dict, List, Hashable, Any
+from typing import Generator, Iterable, Mapping, Optional, Union, Dict, List, Hashable, Any, Sequence
 
 # TODO: Implement `mypy` stubs for NumPy imports
 import numpy as np  # type: ignore
@@ -292,17 +292,23 @@ class DGEList(object):
         # self = self.cpm(log=log, prior_count=prior_count)
 
     def tpm(
-        self, transcripts: Mapping, log: bool = False, prior_count: float = PRIOR_COUNT
-    ) -> None:
-        """Return the DGEList normalized to reads per kilobase of transcript
-        length.
+        self, gene_lengths: Sequence[int], log: bool = False, prior_count: float = PRIOR_COUNT
+    ) -> np.ndarray:
+        """Return the DGEList normalized to transcripts per million
+
+        Args:
+            gene_lengths: length for each gene in counts table
+
+        Returns:
+            normalized counts matrix
 
         """
-        raise NotImplementedError
+        # based on https://haroldpimentel.wordpress.com/2014/05/08/what-the-fpkm-a-review-rna-seq-expression-units/
+        # how many counts per base
+        base_counts = self.counts / gene_lengths[:, None]
 
-        # TODO: Implement here
-
-        # self = self.cpm(log=log, prior_count=prior_count)
+        tpm = 10**6 * (self.counts / gene_lengths[:, None]) / np.sum(base_counts, axis=0)[None, :]
+        return tpm
 
     def __repr__(self) -> str:
         """Give a pretty non-executeable representation of this object."""
