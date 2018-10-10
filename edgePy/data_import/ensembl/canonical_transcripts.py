@@ -29,11 +29,7 @@ def parse_arguments(parser=None):
         default="homo_sapiens_core_75_37",
     )
 
-    parser.add_argument(
-        "--output",
-        help="database to use for the query",
-        default="blank"
-    )
+    parser.add_argument("--output", help="database to use for the query", default="blank")
     args = parser.parse_args()
     if args.output == "blank":
         args.output = f"../../data/transcripts_{args.database}.tsv"

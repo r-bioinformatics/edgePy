@@ -4,8 +4,9 @@ SQLAlchemy, but for the moment, it's probalby easiest just to make a simple libr
 
 """
 
-import pymysql  # type: ignore
+import pymysql
 from typing import List
+from pymysql.cursors import DictCursor
 
 
 class MySQLWrapper(object):
@@ -28,7 +29,7 @@ class MySQLWrapper(object):
             password=self.password,
             db=self.database,
             charset="utf8mb4",
-            cursorclass=pymysql.cursors.DictCursor,
+            cursorclass=DictCursor,
         )
 
     def find_one(self, sql: str) -> object:

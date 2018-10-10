@@ -1,5 +1,5 @@
-from smart_open import smart_open
-from typing import Optional, Union
+from smart_open import smart_open  # type: ignore
+from typing import Optional, Union, Dict, Hashable, Any
 from pathlib import Path
 
 
@@ -12,13 +12,10 @@ class ImportCanonicalData(object):
 
     """
 
-    def __init__(
-        self,
-        filename: Union[str, Path]
-    ) -> None:
+    def __init__(self, filename: Union[str, Path]) -> None:
 
-        self.by_transcript = {}
-        self.canonical_transcript = {}
+        self.by_transcript: Dict[Hashable, Dict[Hashable, Any]] = {}
+        self.canonical_transcript: Dict[Hashable, str] = {}
 
         with smart_open(filename, 'r') as data:
             for line in data:
@@ -28,8 +25,7 @@ class ImportCanonicalData(object):
                 length = int(gene_info[2])
                 canonical = True if gene_info[3] == "True" else False
 
-                self.by_transcript[transcript] = {'len': length,
-                                                  'can': canonical}
+                self.by_transcript[transcript] = {'len': length, 'can': canonical}
 
                 if canonical:
                     self.canonical_transcript[gene] = transcript
@@ -41,6 +37,7 @@ class ImportCanonicalData(object):
         Args:
             transcript_id: an Ensembl transcript ID, starting with ENST
         """
+
         if transcript_id not in self.by_transcript:
             return False
         else:
@@ -53,6 +50,7 @@ class ImportCanonicalData(object):
         Args:
             gene_id: An Ensembl gene ID, starting with ENSG
         """
+
         if gene_id in self.canonical_transcript:
             return self.canonical_transcript[gene_id]
         else:
@@ -73,7 +71,7 @@ class ImportCanonicalData(object):
     def get_length_of_canonical_transcript(self, gene_id: str) -> int:
         """
         Return the length of a transcript, given an ensembl gene ID.
-        
+
         Args:
              gene_id: An Ensembl gene ID, starting with ENSG
         """

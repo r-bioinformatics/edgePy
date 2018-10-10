@@ -2,12 +2,12 @@ import pytest
 import unittest
 
 from edgePy.data_import.data_import import get_dataset_path
+
 TEST_DATASET = "transcripts_homo_sapiens_core_75_37.tsv"
 from edgePy.data_import.ensembl.ensembl_flat_file_reader import ImportCanonicalData
 
 
 class TestCanonicalTranscripts(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.canonicaldata = ImportCanonicalData(get_dataset_path(TEST_DATASET))
