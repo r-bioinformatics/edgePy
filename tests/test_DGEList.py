@@ -1,7 +1,7 @@
 import pytest
 import pkgutil
 import numpy as np
-from smart_open import smart_open
+from smart_open import smart_open  # type: ignore
 
 from edgePy.DGEList import DGEList
 from edgePy.data_import.data_import import get_dataset_path

@@ -4,7 +4,7 @@ import configparser
 
 import numpy as np
 from scipy.stats import ks_2samp
-from smart_open import smart_open
+from smart_open import smart_open # type: ignore
 
 
 from edgePy.DGEList import DGEList
