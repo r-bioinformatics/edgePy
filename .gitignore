@@ -4,7 +4,8 @@ edgePy/data/*.tsv
 edgePy/data/*.txt
 !edgePy/data/groups.txt
 !edgePy/data/example_gene_list.txt
-
+!edgePy/data/example_gene_list.txt
+!edgePy/data/transcripts_homo_sapiens_core_75_37.tsv
 
 # Intellij project files
 .idea

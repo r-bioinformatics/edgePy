@@ -32,10 +32,11 @@ def parse_arguments(parser=None):
     parser.add_argument(
         "--output",
         help="database to use for the query",
-        default="edgePy/data/canonical_transcripts_75.tsv",
+        default="blank"
     )
-
     args = parser.parse_args()
+    if args.output == "blank":
+        args.output = f"../../data/transcripts_{args.database}.tsv"
 
     return args
 
