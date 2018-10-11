@@ -273,7 +273,7 @@ class DGEList(object):
         return np.sum(self.counts, 0)
 
     def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> None:
-        """Return the DGEList normalized to read counts per million."""
+        """Normalize the DGEList to read counts per million."""
         self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
         if log:
             self.counts[self.counts == 0] = prior_count
@@ -292,23 +292,37 @@ class DGEList(object):
         # self = self.cpm(log=log, prior_count=prior_count)
 
     def tpm(
-        self, gene_lengths: Sequence[int], log: bool = False, prior_count: float = PRIOR_COUNT
+            self, gene_lengths: Sequence[int], log: bool = False, prior_count: float = PRIOR_COUNT,
+            mean_fragment_lengths: Sequence[int] = None
     ) -> np.ndarray:
-        """Return the DGEList normalized to transcripts per million
+        """Normalize the DGEList to transcripts per million
 
         Args:
             gene_lengths: length for each gene in counts table
+            log: store log outputs
+            prior_count: 
+            mean_fragment_lengths: mean fragment length for each sample in counts table (optional)
 
         Returns:
             normalized counts matrix
 
         """
-        # based on https://haroldpimentel.wordpress.com/2014/05/08/what-the-fpkm-a-review-rna-seq-expression-units/
+        # based on https://haroldpimentel.wordpress.com/2014/05/08/what-the-fpkm-a-review-rna-seq-expression-units/ and
+        # https://gist.github.com/slowkow/c6ab0348747f86e2748b
         # how many counts per base
-        base_counts = self.counts / gene_lengths[:, None]
 
-        tpm = 10**6 * (self.counts / gene_lengths[:, None]) / np.sum(base_counts, axis=0)[None, :]
-        return tpm
+        # compute effective length not allowing negative lengths
+        if mean_fragment_lengths:
+            effective_lengths = (gene_lengths[:, None] - mean_fragment_lengths[None, :]).clip(min=1)
+        else:
+            effective_lengths = gene_lengths[:, None]
+
+        base_counts = self.counts / effective_lengths
+
+        self.counts = 10**6 * base_counts / np.sum(base_counts, axis=0)[None, :]
+        if log:
+            self.counts[self.counts == 0] = prior_count
+            self.counts = np.log(self.counts)
 
     def __repr__(self) -> str:
         """Give a pretty non-executeable representation of this object."""
