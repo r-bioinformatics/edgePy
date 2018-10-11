@@ -1,6 +1,10 @@
 language: python
 python:
   - 3.6
+# Corrupt `boto.cfg` on TravisCI images
+# https://github.com/travis-ci/travis-ci/issues/7940
+before_install:
+  - sudo rm -f /etc/boto.cfg
 install:
   - pip install codecov tox-travis
 script:
