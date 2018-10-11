@@ -72,16 +72,16 @@ def test_library_size():
         dge_list.library_size,
         np.array(
             [
-                63579607,
-                58531933,
-                39138521,
-                78565885,
-                48667119,
-                62799917,
-                66032107,
-                66194776,
-                55085875,
-                37760315,
+                63_579_607,
+                58_531_933,
+                39_138_521,
+                78_565_885,
+                48_667_119,
+                62_799_917,
+                66_032_107,
+                66_194_776,
+                55_085_875,
+                37_760_315,
             ]
         ),
     )
@@ -203,11 +203,24 @@ def test_cpm():
     assert dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
 
 
+def test_tpm():
+    dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+    first_pos = dge_list.counts[0][0]
+    gene_lengths = np.random.randint(10, 1000, size=dge_list.genes.shape)
+    desired = (
+        1e6
+        * (first_pos / gene_lengths[0])
+        / np.sum(dge_list.counts / gene_lengths[:, None], axis=0)[0]
+    )
+    assert isinstance(first_pos, np.integer)
+    dge_list.tpm(gene_lengths)
+
+    assert dge_list.counts[0][0] == desired
+
+
 def test_non_implemented():
     with pytest.raises(NotImplementedError):
         dge_list().rpkm(None)
-    with pytest.raises(NotImplementedError):
-        dge_list().tpm(None)
 
 
 # Unit tests for ``edgePy.data_import.Importer``.\

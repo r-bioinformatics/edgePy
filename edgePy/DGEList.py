@@ -2,7 +2,7 @@ import re
 import json
 from io import StringIO
 from pathlib import Path
-from typing import Generator, Iterable, Mapping, Optional, Union, Dict, List, Hashable, Any, Sequence
+from typing import Generator, Iterable, Mapping, Optional, Union, Dict, List, Hashable, Any
 
 # TODO: Implement `mypy` stubs for NumPy imports
 import numpy as np  # type: ignore
@@ -292,34 +292,37 @@ class DGEList(object):
         # self = self.cpm(log=log, prior_count=prior_count)
 
     def tpm(
-            self, gene_lengths: Sequence[int], log: bool = False, prior_count: float = PRIOR_COUNT,
-            mean_fragment_lengths: Sequence[int] = None
+        self,
+        gene_lengths: np.ndarray,
+        log: bool = False,
+        prior_count: float = PRIOR_COUNT,
+        mean_fragment_lengths: np.ndarray = None,
     ) -> np.ndarray:
         """Normalize the DGEList to transcripts per million
 
         Args:
-            gene_lengths: length for each gene in counts table
+            gene_lengths: vector of length for each gene in counts table
             log: store log outputs
-            prior_count: 
-            mean_fragment_lengths: mean fragment length for each sample in counts table (optional)
-
-        Returns:
-            normalized counts matrix
+            prior_count:
+            mean_fragment_lengths: vector of mean fragment length for each sample in counts table (optional)
 
         """
+
         # based on https://haroldpimentel.wordpress.com/2014/05/08/what-the-fpkm-a-review-rna-seq-expression-units/ and
         # https://gist.github.com/slowkow/c6ab0348747f86e2748b
         # how many counts per base
 
         # compute effective length not allowing negative lengths
         if mean_fragment_lengths:
-            effective_lengths = (gene_lengths[:, None] - mean_fragment_lengths[None, :]).clip(min=1)
+            effective_lengths = (gene_lengths[:, None] - mean_fragment_lengths[None, :]).clip(
+                min=1
+            )
         else:
             effective_lengths = gene_lengths[:, None]
 
         base_counts = self.counts / effective_lengths
 
-        self.counts = 10**6 * base_counts / np.sum(base_counts, axis=0)[None, :]
+        self.counts = 10 ** 6 * base_counts / np.sum(base_counts, axis=0)[None, :]
         if log:
             self.counts[self.counts == 0] = prior_count
             self.counts = np.log(self.counts)
