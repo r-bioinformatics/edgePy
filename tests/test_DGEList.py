@@ -198,24 +198,21 @@ def test_cpm():
     dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
     first_pos = dge_list.counts[0][0]
     col_sum = np.sum(dge_list.counts, axis=0)
-    assert isinstance(first_pos, np.integer)
+    assert isinstance(first_pos, int)
     dge_list.cpm()
     assert dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
 
 
 def test_tpm():
-    dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
-    first_pos = dge_list.counts[0][0]
-    gene_lengths = np.random.randint(10, 1000, size=dge_list.genes.shape)
-    desired = (
-        1e6
-        * (first_pos / gene_lengths[0])
-        / np.sum(dge_list.counts / gene_lengths[:, None], axis=0)[0]
-    )
-    assert isinstance(first_pos, np.integer)
+    # simple dataset with two genes and 2 samples
+    counts = np.array([[2, 3], [3, 4]])
+    gene_lengths = [8, 11]
+
+    dge_list = DGEList(counts=counts)
+    assert isinstance(dge_list.counts[0][0], int)
     dge_list.tpm(gene_lengths)
 
-    assert dge_list.counts[0][0] == desired
+    assert dge_list.counts[0][0] == 1e6 * (counts[0][0] / gene_lengths[0]) / np.sum(counts[:,0] / gene_lengths)
 
 
 def test_non_implemented():

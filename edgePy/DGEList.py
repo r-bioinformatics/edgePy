@@ -272,15 +272,19 @@ class DGEList(object):
         """
         return np.sum(self.counts, 0)
 
-    def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> None:
+    def log_transform(self, prior_count):
+        """Compute the log of the counts"""
+        self.counts[self.counts == 0] = prior_count
+        self.counts = np.log(self.counts)
+
+    def cpm(self, tranform_to_log: bool = False, prior_count: float = PRIOR_COUNT) -> None:
         """Normalize the DGEList to read counts per million."""
         self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
-        if log:
-            self.counts[self.counts == 0] = prior_count
-            self.counts = np.log(self.counts)
+        if transform_to_log:
+            self.log_transform(prior_count)
 
     def rpkm(
-        self, gene_lengths: Mapping, log: bool = False, prior_count: float = PRIOR_COUNT
+            self, gene_lengths: Mapping, transform_to_log: bool = False, prior_count: float = PRIOR_COUNT
     ) -> None:
         """Return the DGEList normalized to reads per kilobase of gene length
         per million reads.
@@ -289,43 +293,43 @@ class DGEList(object):
         raise NotImplementedError
 
         # TODO: Implement here
-        # self = self.cpm(log=log, prior_count=prior_count)
+        # self = self.cpm(transform_to_log=tranform_to_log, prior_count=prior_count)
 
     def tpm(
         self,
         gene_lengths: np.ndarray,
-        log: bool = False,
+        transform_to_log: bool = False,
         prior_count: float = PRIOR_COUNT,
         mean_fragment_lengths: np.ndarray = None,
     ) -> np.ndarray:
         """Normalize the DGEList to transcripts per million
 
         Args:
-            gene_lengths: vector of length for each gene in counts table
-            log: store log outputs
+            gene_lengths: 1D array of gene lengths for each gene in the rows of `DGEList.counts`.
+            transform_to_log: store log outputs
             prior_count:
-            mean_fragment_lengths: vector of mean fragment length for each sample in counts table (optional)
+            mean_fragment_lengths: 1D array of mean fragment lengths for each sample in the columns of `DGEList.counts`
+                (optional)
 
         """
 
-        # based on https://haroldpimentel.wordpress.com/2014/05/08/what-the-fpkm-a-review-rna-seq-expression-units/ and
-        # https://gist.github.com/slowkow/c6ab0348747f86e2748b
-        # how many counts per base
+        # adapted from Wagner, et al. 'Measurement of mRNA abundance using RNA-seq data:
+        # RPKM measure is inconsistent among samples.' doi:10.1007/s12064-012-0162-3
 
         # compute effective length not allowing negative lengths
         if mean_fragment_lengths:
-            effective_lengths = (gene_lengths[:, None] - mean_fragment_lengths[None, :]).clip(
+            effective_lengths = (gene_lengths[:, np.newaxis] - mean_fragment_lengths[np.newaxis, :]).clip(
                 min=1
             )
         else:
-            effective_lengths = gene_lengths[:, None]
+            effective_lengths = gene_lengths[:, np.newaxis]
 
+        # how many counts per base
         base_counts = self.counts / effective_lengths
 
-        self.counts = 10 ** 6 * base_counts / np.sum(base_counts, axis=0)[None, :]
-        if log:
-            self.counts[self.counts == 0] = prior_count
-            self.counts = np.log(self.counts)
+        self.counts = 10 ** 6 * base_counts / np.sum(base_counts, axis=0)[np.newaxis, :]
+        if transform_to_log:
+            self.log_transform(prior_count)
 
     def __repr__(self) -> str:
         """Give a pretty non-executeable representation of this object."""
