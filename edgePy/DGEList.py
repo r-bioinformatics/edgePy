@@ -302,9 +302,17 @@ class DGEList(object):
             self.log = False
 
         for gene in self.genes:
-            if gene_data.has_gene(gene):
-                temp_gene_len.append(gene_data.get_length_of_canonical_transcript(gene) * 1e3)
-                temp_genes.append(gene)
+
+
+            gene_name = (
+                gene_data.pick_gene_id(gene_data.get_genes_from_symbol(gene))
+                if not gene.startswith("ENSG")
+                else gene
+            )
+
+            if gene_data.has_gene(gene_name):
+                temp_gene_len.append(gene_data.get_length_of_canonical_transcript(gene_name) * 1e3)
+                temp_genes.append(gene_name)
 
         gene_len = np.array(temp_gene_len)
         for idx, gene in enumerate(self.genes):

@@ -19,6 +19,13 @@ where xref.xref_id = gene.display_xref_id
       and xref.external_db_id = 1100;
 """
 
+GENE_SYNONYM_SQL = """select g.stable_id as gene_id, es.synonym as synonym
+from gene g
+join xref x on (g.display_xref_id = x.xref_id)
+left join external_synonym es using (xref_id)
+join external_db ed using (external_db_id)
+where synonym is not NULL and ed.db_name='HGNC';"""
+
 
 def parse_arguments(parser=None):
     if not parser:
@@ -66,8 +73,11 @@ class CanonicalTranscript(object):
         print("retrieving canonical transcript data.")
         self.canonical_transcripts = self.mysql_wrapper.run_sql_query(CANONICAL_TRANSCRIPT_SQL)
 
-        print("retrieving gene synonym data.")
+        print("retrieving gene symbol data.")
         self.gene_symbols = self.mysql_wrapper.run_sql_query(GENE_SYMBOL_SQL)
+
+        print("retrieving gene synonym data.")
+        self.synonyms = self.mysql_wrapper.run_sql_query(GENE_SYNONYM_SQL)
 
         print("completed")
         self.mysql_wrapper.close()
@@ -77,6 +87,9 @@ class CanonicalTranscript(object):
 
     def get_gene_symbols(self) -> List:
         return self.gene_symbols
+
+    def get_gene_synonyms(self) -> List:
+        return self.synonyms
 
 
 def main():
@@ -94,10 +107,17 @@ def main():
             )
 
     symbols = default_class.get_gene_symbols()
+    synonyms = default_class.get_gene_synonyms()
 
     with smart_open(args.output_symbols, 'w') as output:
+        """ The order here is important - symbols contain duplicates, so make sure the symbols
+        are procesesed before synonyms.  The matching script (ensembl_flat_file_reader.py) will ignore new symbols
+        for translating to gene, if there's already one accepted."""
+
         for symbol in symbols:
             output.write(f"{symbol['symbol']}\t{symbol['gene']}\n")
+        for synonym in synonyms:
+            output.write(f"{synonym['synonym']}\t{synonym['gene_id']}\n")
 
 
 if __name__ == "__main__":

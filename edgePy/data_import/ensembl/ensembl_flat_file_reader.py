@@ -1,5 +1,5 @@
 from smart_open import smart_open  # type: ignore
-from typing import Optional, Union, Dict, Hashable, Any
+from typing import Optional, Union, Dict, Hashable, Any, List
 from pathlib import Path
 
 
@@ -21,7 +21,7 @@ class ImportCanonicalData(object):
         self.canonical_transcript: Dict[Hashable, str] = {}
 
         self.gene_to_symbol: Dict[Hashable, str] = {}
-        self.symbol_to_gene: Dict[Hashable, str] = {}
+        self.symbol_to_genes: Dict[Hashable, List] = {}
 
         with smart_open(transcript_filename, 'r') as data:
             for line in data:
@@ -41,23 +41,51 @@ class ImportCanonicalData(object):
                 symbol_info = line.strip().split("\t")
                 symbol = symbol_info[0]
                 gene = symbol_info[1]
-                self.gene_to_symbol[gene] = symbol
-                self.symbol_to_gene[symbol] = gene
 
-    def has_gene(self, gene: str) -> bool:
-        if gene in self.canonical_transcript:
+                if gene not in self.gene_to_symbol:
+                    self.gene_to_symbol[gene] = symbol
+
+                if symbol not in self.symbol_to_genes:
+                    self.symbol_to_genes[symbol] = []
+                if gene not in self.symbol_to_genes[symbol]:
+                    self.symbol_to_genes[symbol].append(gene)
+
+    def has_gene(self, gene: Optional[str]) -> bool:
+        if gene and gene in self.canonical_transcript:
             return True
         else:
             return False
 
-    def get_symbol_from_gene(self, gene: str) -> str:
-        return self.gene_to_symbol[gene]
+    def get_symbol_from_gene(self, gene: Optional[str]) -> Optional[str]:
+        if not gene:
+            return None
+        try:
+            return self.gene_to_symbol[gene]
+        except KeyError as ke:
+            print(f"gene {gene} not found in gene to symbol.")
+            raise ke
 
-    def get_gene_from_symbol(self, symbol: str) -> str:
-        return self.symbol_to_gene[symbol]
+    def get_genes_from_symbol(self, symbol: str) -> List:
+        try:
+            return self.symbol_to_genes[symbol]
+        except KeyError as ke:
+            print(f"symbol {symbol} not found in gene to symbol.")
+            raise ke
+
+    @staticmethod
+    def pick_gene_id(gene_ids: List) -> Optional[str]:
+        if not gene_ids:
+            return None
+        length = len(gene_ids)
+        if length == 1:
+            return gene_ids[0]
+        else:
+            ids = [int(gene[4:]) for gene in gene_ids]
+            max_id = max(ids)
+            return f"ENSG{max_id}"
 
     def is_known_symbol(self, symbol: str) -> bool:
-        if symbol in self.symbol_to_gene:
+        if symbol in self.symbol_to_genes:
             return True
         return False
 
@@ -104,13 +132,16 @@ class ImportCanonicalData(object):
         else:
             return self.by_transcript[transcript_id]['len']
 
-    def get_length_of_canonical_transcript(self, gene_id: str) -> int:
+    def get_length_of_canonical_transcript(self, gene_id: Optional[str]) -> int:
         """
         Return the length of a transcript, given an ensembl gene ID.
 
         Args:
              gene_id: An Ensembl gene ID, starting with ENSG
         """
+        if not gene_id:
+            return 0
+
         transcript_id = self.get_canonical_transcript(gene_id)
 
         if not transcript_id or transcript_id not in self.by_transcript:
