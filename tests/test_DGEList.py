@@ -222,8 +222,6 @@ def test_rpkm():
 
 def test_non_implemented():
     with pytest.raises(NotImplementedError):
-        dge_list().rpkm(None)
-    with pytest.raises(NotImplementedError):
         dge_list().tpm(None)
 
 
