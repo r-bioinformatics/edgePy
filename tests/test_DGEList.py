@@ -6,6 +6,10 @@ from smart_open import smart_open  # type: ignore
 from edgePy.DGEList import DGEList
 from edgePy.data_import.data_import import get_dataset_path
 
+TEST_GENE_SET_DATA = "transcripts_homo_sapiens_core_75_37.tsv"
+TEST_GENE_SYMBOLS = "symbols_homo_sapiens_core_75_37.tsv"
+from edgePy.data_import.ensembl.ensembl_flat_file_reader import ImportCanonicalData
+
 TEST_DATASET = "GSE49712_HTSeq.txt.gz"
 TEST_DATASET_NPZ = "GSE49712_HTSeq.txt.npz"
 TEST_GROUPS = "groups.json"
@@ -187,7 +191,7 @@ def test_repr():
     assert dge_list().__repr__() == "DGEList(num_samples=10, num_genes=21,711)"
 
 
-def test_broken_dge_call():
+def test_broken_dge_caGENE_SYMBOL_SQLll():
     with pytest.raises(Exception):
         DGEList(filename="fake_filename", counts=np.array([[1, 1, 1], [1, 1, 1]]))
     with pytest.raises(Exception):
@@ -200,6 +204,19 @@ def test_cpm():
     col_sum = np.sum(dge_list.counts, axis=0)
     assert isinstance(first_pos, np.integer)
     dge_list.cpm()
+    assert dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
+
+
+def test_rpkm():
+    dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+    icd = ImportCanonicalData(
+        get_dataset_path(TEST_GENE_SET_DATA), get_dataset_path(TEST_GENE_SYMBOLS)
+    )
+    first_pos = dge_list.counts[0][0]
+    first_gene = dge_list.genes[0]
+    col_sum = np.sum(dge_list.counts, axis=0)
+    assert isinstance(first_pos, np.integer)
+    dge_list.rpkm(icd)
     assert dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
 
 

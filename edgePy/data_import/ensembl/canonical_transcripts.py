@@ -13,6 +13,12 @@ from transcript,
 from exon, exon_transcript as et where et.exon_id = exon.exon_id group by et.transcript_id ) as t_len, gene
 where t_len.transcript_id = transcript.transcript_id and transcript.gene_id = gene.gene_id;"""
 
+GENE_SYMBOL_SQL = """select xref.display_label as symbol, gene.stable_id as gene
+from xref, gene
+where xref.xref_id = gene.display_xref_id
+      and xref.external_db_id = 1100;
+"""
+
 
 def parse_arguments(parser=None):
     if not parser:
@@ -29,10 +35,21 @@ def parse_arguments(parser=None):
         default="homo_sapiens_core_75_37",
     )
 
-    parser.add_argument("--output", help="database to use for the query", default="blank")
+    parser.add_argument(
+        "--output_transcripts",
+        help="where to put the file with the transcript data",
+        default="blank",
+    )
+    parser.add_argument(
+        "--output_symbols", help="where to put the file with the gene symbols", default="blank"
+    )
     args = parser.parse_args()
-    if args.output == "blank":
-        args.output = f"../../data/transcripts_{args.database}.tsv"
+
+    if args.output_transcripts == "blank":
+        args.output_transcripts = f"../../data/transcripts_{args.database}.tsv"
+
+    if args.output_symbols == "blank":
+        args.output_symbols = f"../../data/symbols_{args.database}.tsv"
 
     return args
 
@@ -46,13 +63,20 @@ class CanonicalTranscript(object):
             host=host, port=port, username=user, password=password, database=database
         )
 
-        print("retrieving data.")
+        print("retrieving canonical transcript data.")
         self.canonical_transcripts = self.mysql_wrapper.run_sql_query(CANONICAL_TRANSCRIPT_SQL)
+
+        print("retrieving gene synonym data.")
+        self.gene_symbols = self.mysql_wrapper.run_sql_query(GENE_SYMBOL_SQL)
+
         print("completed")
         self.mysql_wrapper.close()
 
     def get_canonical(self) -> List:
         return self.canonical_transcripts
+
+    def get_gene_symbols(self) -> List:
+        return self.gene_symbols
 
 
 def main():
@@ -62,12 +86,18 @@ def main():
     )
     canonical = default_class.get_canonical()
 
-    with smart_open(args.output, 'w') as output:
+    with smart_open(args.output_transcripts, 'w') as output:
         for transcript in canonical:
             output.write(
                 f"{transcript['gene']}\t{transcript['transcript']}\t"
                 f"{transcript['length']}\t{transcript['canonical']}\n"
             )
+
+    symbols = default_class.get_gene_symbols()
+
+    with smart_open(args.output_symbols, 'w') as output:
+        for symbol in symbols:
+            output.write(f"{symbol['symbol']}\t{symbol['gene']}\n")
 
 
 if __name__ == "__main__":

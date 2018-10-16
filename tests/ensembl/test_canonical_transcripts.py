@@ -4,13 +4,16 @@ import unittest
 from edgePy.data_import.data_import import get_dataset_path
 
 TEST_DATASET = "transcripts_homo_sapiens_core_75_37.tsv"
+TEST_GENE_SYMBOLS = "symbols_homo_sapiens_core_75_37.tsv"
 from edgePy.data_import.ensembl.ensembl_flat_file_reader import ImportCanonicalData
 
 
 class TestCanonicalTranscripts(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.canonicaldata = ImportCanonicalData(get_dataset_path(TEST_DATASET))
+        cls.canonicaldata = ImportCanonicalData(
+            get_dataset_path(TEST_DATASET), get_dataset_path(TEST_GENE_SYMBOLS)
+        )
 
     def test_is_canonical_by_transcript(self):
         # ENSG00000224451	ENST00000433775	567	True

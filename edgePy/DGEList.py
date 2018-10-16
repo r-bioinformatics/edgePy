@@ -9,6 +9,7 @@ import numpy as np  # type: ignore
 from smart_open import smart_open  # type: ignore
 
 from edgePy.util import getLogger
+from edgePy.data_import.ensembl.ensembl_flat_file_reader import ImportCanonicalData
 
 __all__ = ["DGEList"]
 
@@ -26,10 +27,12 @@ class DGEList(object):
         samples: Array of sample names, same length as ncol(counts).
         genes: Array of gene names, same length as nrow(counts).
         norm_factors: Weighting factors for each sample.
-        group: ...
+        groups_in_list: a list of groups to which each sample belongs, in the same order as samples *or*
+        groups_in_dict: a dictionary of groups, containing sample names.
         to_remove_zeroes: To remove genes with zero counts for all samples.
         filename: a shortcut to import NPZ (zipped numpy format) files.
-
+        current_type:  None means raw counts, otherwise, if transformed, store a string (eg. 'cpm', 'rpkm', etc)
+        current_log: Optional[bool] = False,  If counts has already been log transformed, store True.
     Examples:
 
         >>> from edgePy.data_import import get_dataset_path
@@ -58,6 +61,8 @@ class DGEList(object):
         groups_in_dict: Optional[Dict] = None,
         to_remove_zeroes: Optional[bool] = False,
         filename: Optional[str] = None,
+        current_type: Optional[str] = None,
+        current_log: Optional[bool] = False,
     ) -> None:
 
         self.to_remove_zeroes = to_remove_zeroes
@@ -98,6 +103,9 @@ class DGEList(object):
                     "You must provide either group by sample or sample by group, "
                     "and samples must be present"
                 )
+
+        self.current_data_format = current_type
+        self.log = current_log
 
     @staticmethod
     def _sample_group_dict(groups_list: List[str], samples: np.array):
@@ -278,18 +286,37 @@ class DGEList(object):
         if log:
             self.counts[self.counts == 0] = prior_count
             self.counts = np.log(self.counts)
+            self.log = True
 
     def rpkm(
-        self, gene_lengths: Mapping, log: bool = False, prior_count: float = PRIOR_COUNT
+        self, gene_data: ImportCanonicalData, log: bool = False, prior_count: float = PRIOR_COUNT
     ) -> None:
         """Return the DGEList normalized to reads per kilobase of gene length
-        per million reads.
+        per million reads. (RPKM =   numReads / ( geneLength/1000 * totalNumReads/1,000,000 )
 
         """
-        raise NotImplementedError
+        temp_gene_len = []
+        temp_genes = []
+        if self.log:
+            self.counts = np.exp(self.counts)
+            self.log = False
 
-        # TODO: Implement here
-        # self = self.cpm(log=log, prior_count=prior_count)
+        for gene in self.genes:
+            if gene_data.has_gene(gene):
+                temp_gene_len.append(gene_data.get_length_of_canonical_transcript(gene) * 1e3)
+                temp_genes.append(gene)
+
+        gene_len = np.array(temp_gene_len)
+        for idx, gene in enumerate(self.genes):
+            if gene not in temp_genes:
+                pass  # still writing this code.
+
+        self.counts = (self.counts.T * gene_len).T
+
+        if log:
+            self.counts[self.counts == 0] = prior_count
+            self.counts = np.log(self.counts)
+            self.log = True
 
     def tpm(
         self, transcripts: Mapping, log: bool = False, prior_count: float = PRIOR_COUNT

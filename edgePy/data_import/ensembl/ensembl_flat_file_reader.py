@@ -12,12 +12,17 @@ class ImportCanonicalData(object):
 
     """
 
-    def __init__(self, filename: Union[str, Path]) -> None:
+    def __init__(
+        self, transcript_filename: Union[str, Path], symbols_filename: Union[str, Path]
+    ) -> None:
 
         self.by_transcript: Dict[Hashable, Dict[Hashable, Any]] = {}
         self.canonical_transcript: Dict[Hashable, str] = {}
 
-        with smart_open(filename, 'r') as data:
+        self.gene_to_symbol: Dict[Hashable, str] = {}
+        self.symbol_to_gene: Dict[Hashable, str] = {}
+
+        with smart_open(transcript_filename, 'r') as data:
             for line in data:
                 gene_info = line.strip().split("\t")
                 gene = gene_info[0]
@@ -29,6 +34,36 @@ class ImportCanonicalData(object):
 
                 if canonical:
                     self.canonical_transcript[gene] = transcript
+
+        with smart_open(symbols_filename, 'r') as data:
+            for line in data:
+                symbol_info = line.strip().split("\t")
+                symbol = symbol_info[0]
+                gene = symbol_info[1]
+                self.gene_to_symbol[gene] = symbol
+                self.symbol_to_gene[symbol] = gene
+
+    def has_gene(self, gene: str) -> bool:
+        if gene in self.canonical_transcript:
+            return True
+        else:
+            return False
+
+    def get_symbol_from_gene(self, gene: str) -> str:
+        return self.gene_to_symbol[gene]
+
+    def get_gene_from_symbol(self, symbol: str) -> str:
+        return self.symbol_to_gene[symbol]
+
+    def is_known_symbol(self, symbol: str) -> bool:
+        if symbol in self.symbol_to_gene:
+            return True
+        return False
+
+    def is_known_gene(self, gene: str) -> bool:
+        if gene in self.gene_to_symbol:
+            return True
+        return False
 
     def is_canonical_by_transcript(self, transcript_id: str) -> bool:
         """
