@@ -214,10 +214,18 @@ def test_rpkm():
     )
     first_pos = dge_list.counts[0][0]
     first_gene = dge_list.genes[0]
+
     col_sum = np.sum(dge_list.counts, axis=0)
     assert isinstance(first_pos, np.integer)
-    dge_list.rpkm(icd)
-    assert dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
+    rpm_dge = dge_list.rpkm(icd)
+    ensg_gene = icd.pick_gene_id(icd.get_genes_from_symbol(first_gene))
+    gene_len = icd.get_length_of_canonical_transcript(ensg_gene)
+    # RPKM=numReads / (geneLength / 1000 * totalNumReads / 1, 000, 000)
+    print(gene_len)
+    print(rpm_dge.counts[0][0])
+    print(first_pos)
+    print(first_pos / ((gene_len / 1e3) * (col_sum[0] / 1e6)))
+    assert rpm_dge.counts[0][0] == (first_pos / ((gene_len / 1e3) * (col_sum[0] / 1e6)))
 
 
 def test_non_implemented():

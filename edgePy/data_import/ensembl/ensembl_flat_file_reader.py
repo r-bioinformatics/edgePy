@@ -68,9 +68,8 @@ class ImportCanonicalData(object):
     def get_genes_from_symbol(self, symbol: str) -> List:
         try:
             return self.symbol_to_genes[symbol]
-        except KeyError as ke:
-            print(f"symbol {symbol} not found in gene to symbol.")
-            raise ke
+        except KeyError:
+            return []
 
     @staticmethod
     def pick_gene_id(gene_ids: List) -> Optional[str]:

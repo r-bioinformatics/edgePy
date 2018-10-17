@@ -66,6 +66,10 @@ class DGEList(object):
     ) -> None:
 
         self.to_remove_zeroes = to_remove_zeroes
+        self.current_data_format = current_type
+        self.log = current_log
+        print(f"current log status is: {self.log}")
+
         if filename:
             if counts or samples or genes or norm_factors or groups_in_list or groups_in_dict:
                 raise Exception("if filename is provided, you can't also provide other parameters")
@@ -104,8 +108,32 @@ class DGEList(object):
                     "and samples must be present"
                 )
 
-        self.current_data_format = current_type
-        self.log = current_log
+    def copy(
+        self,
+        counts: Optional[np.ndarray] = None,
+        samples: Optional[np.array] = None,
+        genes: Optional[np.array] = None,
+        norm_factors: Optional[np.array] = None,
+        groups_in_list: Optional[np.array] = None,
+        groups_in_dict: Optional[Dict] = None,
+        to_remove_zeroes: Optional[bool] = False,
+        current_type: Optional[str] = None,
+        current_log: Optional[bool] = False,
+    ) -> "DGEList":
+
+        return DGEList(
+            counts=self.counts if counts is None else counts,
+            samples=self.samples if samples is None else samples,
+            genes=self.genes if genes is None else genes,
+            norm_factors=self.norm_factors if norm_factors is None else norm_factors,
+            groups_in_list=self.groups_dict if groups_in_dict is None else groups_in_dict,
+            groups_in_dict=self.groups_list if groups_in_list is None else groups_in_list,
+            to_remove_zeroes=self.to_remove_zeroes
+            if to_remove_zeroes is None
+            else to_remove_zeroes,
+            current_type=self.current_data_format if current_type is None else current_type,
+            current_log=self.log if current_log is None else current_log,
+        )
 
     @staticmethod
     def _sample_group_dict(groups_list: List[str], samples: np.array):
@@ -217,8 +245,10 @@ class DGEList(object):
 
         if np.isnan(counts).any():
             raise ValueError("Counts matrix must have only real values.")
-        if (counts < 0).any():
+        if not self.log and (counts < 0).any():
+            print(f"counts = {counts}")
             raise ValueError("Counts matrix cannot contain negative values.")
+
         if self.to_remove_zeroes:
             # this is not working.  Does not remove rows with only zeros.
             counts = counts[np.all(counts != 0, axis=1)]
@@ -263,9 +293,7 @@ class DGEList(object):
         if genes is not None:
             genes = np.array(list(self._format_fields(genes)))
             # Creates boolean mask and filters out metatag rows from samples and counts
-            metatag_mask = ~(
-                np.isin(genes, self._old_metatags) | np.core.defchararray.startswith(genes, '__')
-            )
+            metatag_mask = ~(np.isin(genes, self._old_metatags) | np.char.startswith(genes, '__'))
             genes = genes[metatag_mask].copy()
             self._counts = self.counts[metatag_mask].copy()
         self._genes = genes
@@ -288,43 +316,71 @@ class DGEList(object):
             self.counts = np.log(self.counts)
             self.log = True
 
-    def rpkm(
-        self, gene_data: ImportCanonicalData, log: bool = False, prior_count: float = PRIOR_COUNT
-    ) -> None:
+    def rpkm(self, gene_data: ImportCanonicalData) -> "DGEList":
         """Return the DGEList normalized to reads per kilobase of gene length
         per million reads. (RPKM =   numReads / ( geneLength/1000 * totalNumReads/1,000,000 )
 
         """
+        current_log = self.log
         temp_gene_len = []
-        temp_genes = []
+
+        print(f"self.counts shape: {self.counts.shape}")
+
         if self.log:
             self.counts = np.exp(self.counts)
-            self.log = False
+            current_log = False
+
+        gene_mask = []
+        gene_ensg = []
 
         for gene in self.genes:
+            if gene.startswith("ENSG"):
+                gene_name = gene
+                gene_ensg.append(gene_name)
+                if gene_data.has_gene(gene_name):
+                    gene_mask.append(True)
+                    temp_gene_len.append(
+                        gene_data.get_length_of_canonical_transcript(gene_name) * 1e3
+                    )
+                else:
+                    gene_mask.append(False)
+            else:
+                t_gene = gene_data.get_genes_from_symbol(gene)
+                if t_gene:
+                    if len(t_gene) > 1:
+                        gene_name = gene_data.pick_gene_id(t_gene)
+                    else:
+                        gene_name = t_gene[0]
+                    gene_ensg.append(gene_name)
+                    if gene_data.has_gene(gene_name):
+                        gene_mask.append(True)
+                        temp_gene_len.append(
+                            gene_data.get_length_of_canonical_transcript(gene_name) * 1e3
+                        )
+                    else:
+                        gene_mask.append(False)
+                else:
+                    gene_mask.append(False)
 
+        print(f"length of the gene_mask: {len(gene_mask)}")
+        print(f"length of temp gene len: {len(temp_gene_len)}")
 
-            gene_name = (
-                gene_data.pick_gene_id(gene_data.get_genes_from_symbol(gene))
-                if not gene.startswith("ENSG")
-                else gene
-            )
+        genes = self.genes[gene_mask].copy()
+        counts = self.counts[gene_mask].copy()
+        print(f"counts shape: {counts.shape}, temp gene len: {len(temp_gene_len)}")
 
-            if gene_data.has_gene(gene_name):
-                temp_gene_len.append(gene_data.get_length_of_canonical_transcript(gene_name) * 1e3)
-                temp_genes.append(gene_name)
+        counts = (counts.T * temp_gene_len).T
 
-        gene_len = np.array(temp_gene_len)
-        for idx, gene in enumerate(self.genes):
-            if gene not in temp_genes:
-                pass  # still writing this code.
-
-        self.counts = (self.counts.T * gene_len).T
+        if (counts < 0).any():
+            print(counts)
+            print("counts has negative values")
 
         if log:
-            self.counts[self.counts == 0] = prior_count
-            self.counts = np.log(self.counts)
-            self.log = True
+            print("going LOG!")
+            counts = np.log(counts)
+            current_log = True
+
+        return self.copy(counts=counts, current_log=current_log, genes=genes)
 
     def tpm(
         self, transcripts: Mapping, log: bool = False, prior_count: float = PRIOR_COUNT
