@@ -198,21 +198,39 @@ def test_cpm():
     dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
     first_pos = dge_list.counts[0][0]
     col_sum = np.sum(dge_list.counts, axis=0)
-    assert isinstance(first_pos, int)
+    assert isinstance(first_pos, np.integer)
     dge_list.cpm()
     assert dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
 
 
 def test_tpm():
-    # simple dataset with two genes and 2 samples
-    counts = np.array([[2, 3], [3, 4]])
-    gene_lengths = [8, 11]
+    # example hand calculated as in https://www.youtube.com/watch?time_continue=611&v=TTUrtCY2k-w
+    counts = np.array([[10, 12, 30], [20, 25, 60], [5, 8, 15], [0, 0, 1]])
+    gene_lengths = np.array([2000, 4000, 1000, 10000])
 
-    dge_list = DGEList(counts=counts)
-    assert isinstance(dge_list.counts[0][0], int)
+    expected = np.array(
+        [
+            [333_333.333_333_33, 296_296.296_296_3, 332_594.235_033_26],
+            [333_333.333_333_33, 308_641.975_308_64, 332_594.235_033_26],
+            [333_333.333_333_33, 395_061.728_395_06, 332_594.235_033_26],
+            [0.0, 0.0, 2217.294_900_22],
+        ]
+    )
+
+    dge_list = DGEList(
+        counts=counts,
+        samples=np.array(['a', 'b', 'c']),
+        genes=np.array(['a', 'b', 'c', 'd']),
+        groups_in_dict={'a': ('a',), 'b': ('b',), 'c': ('c',)},
+    )
+    assert isinstance(dge_list.counts[0][0], np.integer)
     dge_list.tpm(gene_lengths)
 
-    assert dge_list.counts[0][0] == 1e6 * (counts[0][0] / gene_lengths[0]) / np.sum(counts[:,0] / gene_lengths)
+    assert np.allclose(dge_list.counts, expected, atol=1e-1)
+
+    # make sure that the sums of all genes across are the same the each sample (an important property of TPM)
+    gene_sums = dge_list.counts.sum(axis=0)
+    assert np.allclose(gene_sums, [gene_sums[0]] * len(gene_sums))
 
 
 def test_non_implemented():

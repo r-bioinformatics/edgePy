@@ -277,14 +277,17 @@ class DGEList(object):
         self.counts[self.counts == 0] = prior_count
         self.counts = np.log(self.counts)
 
-    def cpm(self, tranform_to_log: bool = False, prior_count: float = PRIOR_COUNT) -> None:
+    def cpm(self, transform_to_log: bool = False, prior_count: float = PRIOR_COUNT) -> None:
         """Normalize the DGEList to read counts per million."""
         self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
         if transform_to_log:
             self.log_transform(prior_count)
 
     def rpkm(
-            self, gene_lengths: Mapping, transform_to_log: bool = False, prior_count: float = PRIOR_COUNT
+        self,
+        gene_lengths: Mapping,
+        transform_to_log: bool = False,
+        prior_count: float = PRIOR_COUNT,
     ) -> None:
         """Return the DGEList normalized to reads per kilobase of gene length
         per million reads.
@@ -293,7 +296,7 @@ class DGEList(object):
         raise NotImplementedError
 
         # TODO: Implement here
-        # self = self.cpm(transform_to_log=tranform_to_log, prior_count=prior_count)
+        # self = self.cpm(transform_to_log=transform_to_log, prior_count=prior_count)
 
     def tpm(
         self,
@@ -318,9 +321,9 @@ class DGEList(object):
 
         # compute effective length not allowing negative lengths
         if mean_fragment_lengths:
-            effective_lengths = (gene_lengths[:, np.newaxis] - mean_fragment_lengths[np.newaxis, :]).clip(
-                min=1
-            )
+            effective_lengths = (
+                gene_lengths[:, np.newaxis] - mean_fragment_lengths[np.newaxis, :]
+            ).clip(min=1)
         else:
             effective_lengths = gene_lengths[:, np.newaxis]
 
