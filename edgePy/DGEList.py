@@ -68,7 +68,6 @@ class DGEList(object):
         self.to_remove_zeroes = to_remove_zeroes
         self.current_data_format = current_type
         self.log = current_log
-        print(f"current log status is: {self.log}")
 
         if filename:
             if counts or samples or genes or norm_factors or groups_in_list or groups_in_dict:
@@ -246,7 +245,6 @@ class DGEList(object):
         if np.isnan(counts).any():
             raise ValueError("Counts matrix must have only real values.")
         if not self.log and (counts < 0).any():
-            print(f"counts = {counts}")
             raise ValueError("Counts matrix cannot contain negative values.")
 
         if self.to_remove_zeroes:
@@ -316,7 +314,9 @@ class DGEList(object):
             self.counts = np.log(self.counts)
             self.log = True
 
-    def rpkm(self, gene_data: ImportCanonicalData, log: bool = False) -> "DGEList":
+    def rpkm(
+        self, gene_data: ImportCanonicalData, log: bool = False, prior_count: float = PRIOR_COUNT
+    ) -> "DGEList":
         """Return the DGEList normalized to reads per kilobase of gene length
         per million reads. (RPKM =   numReads / ( geneLength/1000 * totalNumReads/1,000,000 )
 
@@ -324,10 +324,7 @@ class DGEList(object):
         current_log = self.log
         temp_gene_len = []
 
-        print(f"self.counts shape: {self.counts.shape}")
-
         if self.log:
-            print("UN-LOGGING!")
             self.counts = np.exp(self.counts)
             current_log = False
 
@@ -364,22 +361,14 @@ class DGEList(object):
                 else:
                     gene_mask.append(False)
 
-        print(f"length of the gene_mask: {len(gene_mask)}")
-        print(f"length of temp gene len: {len(temp_gene_len)}")
-
         genes = self.genes[gene_mask].copy()
         counts = self.counts[gene_mask].copy()
-        print(f"counts shape: {counts.shape}, temp gene len: {len(temp_gene_len)}")
 
         counts = (counts.T / temp_gene_len).T
         counts = counts / (col_sum / 1e6)
 
-        if (counts < 0).any():
-            print(counts)
-            print("counts has negative values")
-
         if log:
-            print("going LOG!")
+            counts[counts == 0] = prior_count
             counts = np.log(counts)
             current_log = True
 
