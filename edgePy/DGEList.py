@@ -306,13 +306,16 @@ class DGEList(object):
         """
         return np.sum(self.counts, 0)
 
-    def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> None:
+    def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> "DGEList":
         """Return the DGEList normalized to read counts per million."""
-        self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
+        counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
+        current_log = self.log
         if log:
-            self.counts[self.counts == 0] = prior_count
-            self.counts = np.log(self.counts)
-            self.log = True
+            counts[counts == 0] = prior_count
+            counts = np.log(counts)
+            current_log = True
+
+        return self.copy(counts=counts, current_log=current_log)
 
     def rpkm(
         self, gene_data: ImportCanonicalData, log: bool = False, prior_count: float = PRIOR_COUNT

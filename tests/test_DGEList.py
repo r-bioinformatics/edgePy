@@ -203,8 +203,8 @@ def test_cpm():
     first_pos = dge_list.counts[0][0]
     col_sum = np.sum(dge_list.counts, axis=0)
     assert isinstance(first_pos, np.integer)
-    dge_list.cpm()
-    assert dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
+    new_dge_list = dge_list.cpm()
+    assert new_dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
 
 
 def test_rpkm():
