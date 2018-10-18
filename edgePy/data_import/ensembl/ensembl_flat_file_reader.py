@@ -51,12 +51,22 @@ class ImportCanonicalData(object):
                     self.symbol_to_genes[symbol].append(gene)
 
     def has_gene(self, gene: Optional[str]) -> bool:
+        """
+        Check if a gene is present in the dataset.
+        Args:
+            gene: the ensembl gene id.
+        """
         if gene and gene in self.canonical_transcript:
             return True
         else:
             return False
 
     def get_symbol_from_gene(self, gene: Optional[str]) -> Optional[str]:
+        """
+        Given a gene name, get the symbol - should give you the default ENSEMBL name, and not a synonym.
+        Args:
+            gene: the ensembl gene id.
+        """
         if not gene:
             return None
         try:
@@ -66,6 +76,12 @@ class ImportCanonicalData(object):
             raise ke
 
     def get_genes_from_symbol(self, symbol: str) -> List:
+        """
+        Given the gene symbol (or a recognized synonym), get the ensembl id.
+        Args:
+            symbol: HUGO or HGNC symbol
+        """
+
         try:
             return self.symbol_to_genes[symbol]
         except KeyError:
@@ -73,6 +89,11 @@ class ImportCanonicalData(object):
 
     @staticmethod
     def pick_gene_id(gene_ids: List) -> Optional[str]:
+        """
+        Where there are more than one gene ID for a symbol, pick the one with the largest ensembl ID integer.
+        Args:
+            gene_ids: list of gene IDs.
+        """
         if not gene_ids:
             return None
         length = len(gene_ids)
@@ -84,11 +105,23 @@ class ImportCanonicalData(object):
             return f"ENSG{max_id}"
 
     def is_known_symbol(self, symbol: str) -> bool:
+        """
+        Check to see if we recognize a given symbol - there always will be things we don't recognize.
+        Args:
+            symbol: what you think is a gene symbol.
+        """
         if symbol in self.symbol_to_genes:
             return True
         return False
 
     def is_known_gene(self, gene: str) -> bool:
+        """
+        Check to see if we can recognize a given gene ID from ENSEMBL.  If you have one that isn't recognized, it might
+        belong to a different version.
+        Args:
+            gene: what you think is a gene id.
+        :return:
+        """
         if gene in self.gene_to_symbol:
             return True
         return False
