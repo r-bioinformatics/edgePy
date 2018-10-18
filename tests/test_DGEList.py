@@ -5,10 +5,10 @@ from smart_open import smart_open  # type: ignore
 
 from edgePy.DGEList import DGEList
 from edgePy.data_import.data_import import get_dataset_path
+from edgePy.data_import.ensembl.ensembl_flat_file_reader import ImportCanonicalData
 
 TEST_GENE_SET_DATA = "transcripts_homo_sapiens_core_75_37.tsv"
 TEST_GENE_SYMBOLS = "symbols_homo_sapiens_core_75_37.tsv"
-from edgePy.data_import.ensembl.ensembl_flat_file_reader import ImportCanonicalData
 
 TEST_DATASET = "GSE49712_HTSeq.txt.gz"
 TEST_DATASET_NPZ = "GSE49712_HTSeq.txt.npz"
