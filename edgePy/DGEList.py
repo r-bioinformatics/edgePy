@@ -316,7 +316,7 @@ class DGEList(object):
             self.counts = np.log(self.counts)
             self.log = True
 
-    def rpkm(self, gene_data: ImportCanonicalData) -> "DGEList":
+    def rpkm(self, gene_data: ImportCanonicalData, log: bool = False) -> "DGEList":
         """Return the DGEList normalized to reads per kilobase of gene length
         per million reads. (RPKM =   numReads / ( geneLength/1000 * totalNumReads/1,000,000 )
 
@@ -327,11 +327,13 @@ class DGEList(object):
         print(f"self.counts shape: {self.counts.shape}")
 
         if self.log:
+            print("UN-LOGGING!")
             self.counts = np.exp(self.counts)
             current_log = False
 
         gene_mask = []
         gene_ensg = []
+        col_sum = np.sum(self.counts, axis=0)
 
         for gene in self.genes:
             if gene.startswith("ENSG"):
@@ -340,7 +342,7 @@ class DGEList(object):
                 if gene_data.has_gene(gene_name):
                     gene_mask.append(True)
                     temp_gene_len.append(
-                        gene_data.get_length_of_canonical_transcript(gene_name) * 1e3
+                        gene_data.get_length_of_canonical_transcript(gene_name) / 1e3
                     )
                 else:
                     gene_mask.append(False)
@@ -355,7 +357,7 @@ class DGEList(object):
                     if gene_data.has_gene(gene_name):
                         gene_mask.append(True)
                         temp_gene_len.append(
-                            gene_data.get_length_of_canonical_transcript(gene_name) * 1e3
+                            gene_data.get_length_of_canonical_transcript(gene_name) / 1e3
                         )
                     else:
                         gene_mask.append(False)
@@ -369,7 +371,8 @@ class DGEList(object):
         counts = self.counts[gene_mask].copy()
         print(f"counts shape: {counts.shape}, temp gene len: {len(temp_gene_len)}")
 
-        counts = (counts.T * temp_gene_len).T
+        counts = (counts.T / temp_gene_len).T
+        counts = counts / (col_sum / 1e6)
 
         if (counts < 0).any():
             print(counts)
