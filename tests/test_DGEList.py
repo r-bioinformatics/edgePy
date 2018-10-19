@@ -1,10 +1,14 @@
 import pytest
 import pkgutil
 import numpy as np
-from smart_open import smart_open
+from smart_open import smart_open  # type: ignore
 
 from edgePy.DGEList import DGEList
 from edgePy.data_import.data_import import get_dataset_path
+from edgePy.data_import.ensembl.ensembl_flat_file_reader import ImportCanonicalData
+
+TEST_GENE_SET_DATA = "transcripts_homo_sapiens_core_75_37.tsv"
+TEST_GENE_SYMBOLS = "symbols_homo_sapiens_core_75_37.tsv"
 
 TEST_DATASET = "GSE49712_HTSeq.txt.gz"
 TEST_DATASET_NPZ = "GSE49712_HTSeq.txt.npz"
@@ -187,7 +191,7 @@ def test_repr():
     assert dge_list().__repr__() == "DGEList(num_samples=10, num_genes=21,711)"
 
 
-def test_broken_dge_call():
+def test_broken_dge_caGENE_SYMBOL_SQLll():
     with pytest.raises(Exception):
         DGEList(filename="fake_filename", counts=np.array([[1, 1, 1], [1, 1, 1]]))
     with pytest.raises(Exception):
@@ -199,8 +203,29 @@ def test_cpm():
     first_pos = dge_list.counts[0][0]
     col_sum = np.sum(dge_list.counts, axis=0)
     assert isinstance(first_pos, np.integer)
-    dge_list.cpm()
-    assert dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
+    new_dge_list = dge_list.cpm()
+    assert new_dge_list.counts[0][0] == first_pos * 1e6 / col_sum[0]
+
+
+def test_rpkm():
+    dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+    icd = ImportCanonicalData(
+        get_dataset_path(TEST_GENE_SET_DATA), get_dataset_path(TEST_GENE_SYMBOLS)
+    )
+    first_pos = dge_list.counts[0][0]
+    first_gene = dge_list.genes[0]
+
+    col_sum = np.sum(dge_list.counts, axis=0)
+    assert isinstance(first_pos, np.integer)
+    rpm_dge = dge_list.rpkm(icd)
+    ensg_gene = icd.pick_gene_id(icd.get_genes_from_symbol(first_gene))
+    gene_len = icd.get_length_of_canonical_transcript(ensg_gene)
+    # RPKM=numReads / (geneLength / 1000 * totalNumReads / 1, 000, 000)
+    print(gene_len)
+    print(rpm_dge.counts[0][0])
+    print(first_pos)
+    print(first_pos / ((gene_len / 1e3) * (col_sum[0] / 1e6)))
+    assert rpm_dge.counts[0][0] == (first_pos / ((gene_len / 1e3) * (col_sum[0] / 1e6)))
 
 
 def test_tpm():
@@ -234,9 +259,7 @@ def test_tpm():
 
 
 def test_non_implemented():
-    with pytest.raises(NotImplementedError):
-        dge_list().rpkm(None)
-
+    pass
 
 # Unit tests for ``edgePy.data_import.Importer``.\
 def test_init():

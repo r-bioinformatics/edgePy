@@ -9,6 +9,7 @@ import numpy as np  # type: ignore
 from smart_open import smart_open  # type: ignore
 
 from edgePy.util import getLogger
+from edgePy.data_import.ensembl.ensembl_flat_file_reader import ImportCanonicalData
 
 __all__ = ["DGEList"]
 
@@ -26,10 +27,12 @@ class DGEList(object):
         samples: Array of sample names, same length as ncol(counts).
         genes: Array of gene names, same length as nrow(counts).
         norm_factors: Weighting factors for each sample.
-        group: ...
+        groups_in_list: a list of groups to which each sample belongs, in the same order as samples *or*
+        groups_in_dict: a dictionary of groups, containing sample names.
         to_remove_zeroes: To remove genes with zero counts for all samples.
         filename: a shortcut to import NPZ (zipped numpy format) files.
-
+        current_type:  None means raw counts, otherwise, if transformed, store a string (eg. 'cpm', 'rpkm', etc)
+        current_log: Optional[bool] = False,  If counts has already been log transformed, store True.
     Examples:
 
         >>> from edgePy.data_import import get_dataset_path
@@ -58,9 +61,14 @@ class DGEList(object):
         groups_in_dict: Optional[Dict] = None,
         to_remove_zeroes: Optional[bool] = False,
         filename: Optional[str] = None,
+        current_type: Optional[str] = None,
+        current_log: Optional[bool] = False,
     ) -> None:
 
         self.to_remove_zeroes = to_remove_zeroes
+        self.current_data_format = current_type
+        self.log = current_log
+
         if filename:
             if counts or samples or genes or norm_factors or groups_in_list or groups_in_dict:
                 raise Exception("if filename is provided, you can't also provide other parameters")
@@ -98,6 +106,33 @@ class DGEList(object):
                     "You must provide either group by sample or sample by group, "
                     "and samples must be present"
                 )
+
+    def copy(
+        self,
+        counts: Optional[np.ndarray] = None,
+        samples: Optional[np.array] = None,
+        genes: Optional[np.array] = None,
+        norm_factors: Optional[np.array] = None,
+        groups_in_list: Optional[np.array] = None,
+        groups_in_dict: Optional[Dict] = None,
+        to_remove_zeroes: Optional[bool] = False,
+        current_type: Optional[str] = None,
+        current_log: Optional[bool] = False,
+    ) -> "DGEList":
+
+        return DGEList(
+            counts=self.counts if counts is None else counts,
+            samples=self.samples if samples is None else samples,
+            genes=self.genes if genes is None else genes,
+            norm_factors=self.norm_factors if norm_factors is None else norm_factors,
+            groups_in_list=self.groups_dict if groups_in_dict is None else groups_in_dict,
+            groups_in_dict=self.groups_list if groups_in_list is None else groups_in_list,
+            to_remove_zeroes=self.to_remove_zeroes
+            if to_remove_zeroes is None
+            else to_remove_zeroes,
+            current_type=self.current_data_format if current_type is None else current_type,
+            current_log=self.log if current_log is None else current_log,
+        )
 
     @staticmethod
     def _sample_group_dict(groups_list: List[str], samples: np.array):
@@ -209,8 +244,9 @@ class DGEList(object):
 
         if np.isnan(counts).any():
             raise ValueError("Counts matrix must have only real values.")
-        if (counts < 0).any():
+        if not self.log and (counts < 0).any():
             raise ValueError("Counts matrix cannot contain negative values.")
+
         if self.to_remove_zeroes:
             # this is not working.  Does not remove rows with only zeros.
             counts = counts[np.all(counts != 0, axis=1)]
@@ -255,9 +291,7 @@ class DGEList(object):
         if genes is not None:
             genes = np.array(list(self._format_fields(genes)))
             # Creates boolean mask and filters out metatag rows from samples and counts
-            metatag_mask = ~(
-                np.isin(genes, self._old_metatags) | np.core.defchararray.startswith(genes, '__')
-            )
+            metatag_mask = ~(np.isin(genes, self._old_metatags) | np.char.startswith(genes, '__'))
             genes = genes[metatag_mask].copy()
             self._counts = self.counts[metatag_mask].copy()
         self._genes = genes
@@ -272,31 +306,80 @@ class DGEList(object):
         """
         return np.sum(self.counts, 0)
 
-    def log_transform(self, prior_count):
+    def log_transform(self, counts, prior_count):
         """Compute the log of the counts"""
-        self.counts[self.counts == 0] = prior_count
-        self.counts = np.log(self.counts)
+        counts[counts == 0] = prior_count
+        return np.log(counts)
 
-    def cpm(self, transform_to_log: bool = False, prior_count: float = PRIOR_COUNT) -> None:
+    def cpm(self, transform_to_log: bool = False, prior_count: float = PRIOR_COUNT) -> "DGEList":
         """Normalize the DGEList to read counts per million."""
-        self.counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
+        counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
+        current_log = self.log
         if transform_to_log:
-            self.log_transform(prior_count)
+            counts = self.log_transform(counts, prior_count)
+            current_log = True
+            
+        return self.copy(counts=counts, current_log=current_log)    
 
     def rpkm(
-        self,
-        gene_lengths: Mapping,
-        transform_to_log: bool = False,
-        prior_count: float = PRIOR_COUNT,
-    ) -> None:
+        self, gene_data: ImportCanonicalData, log: bool = False, prior_count: float = PRIOR_COUNT
+    ) -> "DGEList":
         """Return the DGEList normalized to reads per kilobase of gene length
-        per million reads.
+        per million reads. (RPKM =   numReads / ( geneLength/1000 * totalNumReads/1,000,000 )
 
         """
-        raise NotImplementedError
+        current_log = self.log
+        temp_gene_len = []
 
-        # TODO: Implement here
-        # self = self.cpm(transform_to_log=transform_to_log, prior_count=prior_count)
+        if self.log:
+            self.counts = np.exp(self.counts)
+            current_log = False
+
+        gene_mask = []
+        gene_ensg = []
+        col_sum = np.sum(self.counts, axis=0)
+
+        for gene in self.genes:
+            if gene.startswith("ENSG"):
+                gene_name = gene
+                gene_ensg.append(gene_name)
+                if gene_data.has_gene(gene_name):
+                    gene_mask.append(True)
+                    temp_gene_len.append(
+                        gene_data.get_length_of_canonical_transcript(gene_name) / 1e3
+                    )
+                else:
+                    gene_mask.append(False)
+            else:
+                t_gene = gene_data.get_genes_from_symbol(gene)
+                if t_gene:
+                    if len(t_gene) > 1:
+                        gene_name = gene_data.pick_gene_id(t_gene)
+                    else:
+                        gene_name = t_gene[0]
+                    gene_ensg.append(gene_name)
+                    if gene_data.has_gene(gene_name):
+                        gene_mask.append(True)
+                        temp_gene_len.append(
+                            gene_data.get_length_of_canonical_transcript(gene_name) / 1e3
+                        )
+                    else:
+                        gene_mask.append(False)
+                else:
+                    gene_mask.append(False)
+
+        genes = self.genes[gene_mask].copy()
+        counts = self.counts[gene_mask].copy()
+
+        counts = (counts.T / temp_gene_len).T
+        counts = counts / (col_sum / 1e6)
+
+        current_log = self.log
+        if transform_to_log:
+            counts = self.log_transform(counts, prior_count)
+            current_log = True
+
+        return self.copy(counts=counts, current_log=current_log, genes=genes)
 
     def tpm(
         self,
@@ -330,9 +413,13 @@ class DGEList(object):
         # how many counts per base
         base_counts = self.counts / effective_lengths
 
-        self.counts = 10 ** 6 * base_counts / np.sum(base_counts, axis=0)[np.newaxis, :]
+        counts = 10 ** 6 * base_counts / np.sum(base_counts, axis=0)[np.newaxis, :]      
+        current_log = self.log
         if transform_to_log:
-            self.log_transform(prior_count)
+            counts = log_transform(counts, prior_count)      
+            current_log = True
+            
+        return self.copy(counts=counts, current_log=current_log)
 
     def __repr__(self) -> str:
         """Give a pretty non-executeable representation of this object."""

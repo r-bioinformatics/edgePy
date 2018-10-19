@@ -1,5 +1,5 @@
 import argparse
-from typing import Dict, Hashable, Any, Tuple, List, Optional
+from typing import Dict, Hashable, Any, Tuple, List, Optional, Union
 
 from edgePy.data_import.mongodb.mongo_wrapper import MongoWrapper
 from edgePy.data_import.mongodb.gene_functions import get_canonical_rpkm
@@ -55,7 +55,7 @@ class ImportFromMongodb(object):
         host: str,
         port: int,
         mongo_key: Optional[str],
-        mongo_value: Optional[str],
+        mongo_value: Union[str, List, None],
         gene_list_file: Optional[str],
     ) -> None:
 
@@ -95,7 +95,7 @@ class ImportFromMongodb(object):
 
         Args:
             database: name of the database to retrieve data from.
-            rpkm: takes the rpkm values from the mongodb, instead of the raw counts
+            rpkm_flag: takes the rpkm values from the mongodb, instead of the raw counts
 
         Returns:
             the list of samples, the data itself,
