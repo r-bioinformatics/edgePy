@@ -61,13 +61,13 @@ class DGEList(object):
         groups_in_dict: Optional[Dict] = None,
         to_remove_zeroes: Optional[bool] = False,
         filename: Optional[str] = None,
-        current_type: Optional[str] = None,
-        current_log: Optional[bool] = False,
+        current_transform_type: Optional[str] = None,
+        current_log_status: Optional[bool] = False,
     ) -> None:
 
         self.to_remove_zeroes = to_remove_zeroes
-        self.current_data_format = current_type
-        self.log = current_log
+        self.current_data_format = current_transform_type
+        self.current_log_status = current_log_status
 
         if filename:
             if counts or samples or genes or norm_factors or groups_in_list or groups_in_dict:
@@ -130,8 +130,8 @@ class DGEList(object):
             to_remove_zeroes=self.to_remove_zeroes
             if to_remove_zeroes is None
             else to_remove_zeroes,
-            current_type=self.current_data_format if current_type is None else current_type,
-            current_log=self.log if current_log is None else current_log,
+            current_transform_type=self.current_data_format if current_type is None else current_type,
+            current_log_status=self.current_log_status if current_log is None else current_log,
         )
 
     @staticmethod
@@ -244,7 +244,7 @@ class DGEList(object):
 
         if np.isnan(counts).any():
             raise ValueError("Counts matrix must have only real values.")
-        if not self.log and (counts < 0).any():
+        if not self.current_log_status and (counts < 0).any():
             raise ValueError("Counts matrix cannot contain negative values.")
 
         if self.to_remove_zeroes:
@@ -314,7 +314,7 @@ class DGEList(object):
     def cpm(self, transform_to_log: bool = False, prior_count: float = PRIOR_COUNT) -> "DGEList":
         """Normalize the DGEList to read counts per million."""
         counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
-        current_log = self.log
+        current_log = self.current_log_status
         if transform_to_log:
             counts = self.log_transform(counts, prior_count)
             current_log = True
@@ -330,25 +330,50 @@ class DGEList(object):
         """Return the DGEList normalized to reads per kilobase of gene length
         per million reads. (RPKM =   numReads / ( geneLength/1000 * totalNumReads/1,000,000 )
 
+        Args:
+            gene_data: An object that works to import Ensembl based data, for use in calculations
+            transform_to_log: true, if you wish to convert to log after converting to RPKM
+            prior_count: a minimum value for genes, if you do log transforms.
         """
-        current_log = self.log
-        temp_gene_len = []
+        current_log = self.current_log_status
 
-        if self.log:
+        if self.current_log_status:
             self.counts = np.exp(self.counts)
             current_log = False
-
-        gene_mask = []
-        gene_ensg = []
         col_sum = np.sum(self.counts, axis=0)
 
+        gene_len_ordered, gene_mask = self.get_gene_mask_and_lengths(gene_data)
+
+        genes = self.genes[gene_mask].copy()
+        counts = self.counts[gene_mask].copy()
+
+        counts = (counts.T / gene_len_ordered).T
+        counts = counts / (col_sum / 1e6)
+
+        if transform_to_log:
+            counts = self.log_transform(counts, prior_count)
+            current_log = True
+
+        return self.copy(counts=counts, current_log=current_log, genes=genes)
+
+    def get_gene_mask_and_lengths(self, gene_data):
+
+        """
+        use gene_data to get the gene lenths and a gene mask for the tranformation.
+        Args:
+            gene_data: the object that holds gene data from ensembl
+
+        """
+        gene_len_ordered = []
+        gene_mask = []
+        gene_ensg = []
         for gene in self.genes:
             if gene.startswith("ENSG"):
                 gene_name = gene
                 gene_ensg.append(gene_name)
                 if gene_data.has_gene(gene_name):
                     gene_mask.append(True)
-                    temp_gene_len.append(
+                    gene_len_ordered.append(
                         gene_data.get_length_of_canonical_transcript(gene_name) / 1e3
                     )
                 else:
@@ -363,25 +388,14 @@ class DGEList(object):
                     gene_ensg.append(gene_name)
                     if gene_data.has_gene(gene_name):
                         gene_mask.append(True)
-                        temp_gene_len.append(
+                        gene_len_ordered.append(
                             gene_data.get_length_of_canonical_transcript(gene_name) / 1e3
                         )
                     else:
                         gene_mask.append(False)
                 else:
                     gene_mask.append(False)
-
-        genes = self.genes[gene_mask].copy()
-        counts = self.counts[gene_mask].copy()
-
-        counts = (counts.T / temp_gene_len).T
-        counts = counts / (col_sum / 1e6)
-
-        if transform_to_log:
-            counts = self.log_transform(counts, prior_count)
-            current_log = True
-
-        return self.copy(counts=counts, current_log=current_log, genes=genes)
+        return gene_len_ordered, gene_mask
 
     def tpm(
         self,
@@ -415,8 +429,8 @@ class DGEList(object):
         # how many counts per base
         base_counts = self.counts / effective_lengths
 
-        counts = 10 ** 6 * base_counts / np.sum(base_counts, axis=0)[np.newaxis, :]
-        current_log = self.log
+        counts = 1e6 * base_counts / np.sum(base_counts, axis=0)[np.newaxis, :]
+        current_log = self.current_log_status
         if transform_to_log:
             counts = self.log_transform(counts, prior_count)
             current_log = True
