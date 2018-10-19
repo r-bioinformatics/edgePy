@@ -130,7 +130,9 @@ class DGEList(object):
             to_remove_zeroes=self.to_remove_zeroes
             if to_remove_zeroes is None
             else to_remove_zeroes,
-            current_transform_type=self.current_data_format if current_type is None else current_type,
+            current_transform_type=self.current_data_format
+            if current_type is None
+            else current_type,
             current_log_status=self.current_log_status if current_log is None else current_log,
         )
 
