@@ -177,16 +177,6 @@ def testing_setting_samples_and_counts():
     )
 
 
-# def test_generate_testing_output():
-#     """ Use this function to regenerate the npz file for the GSE49712 test data set.
-#     """
-#
-#     dge_list_first = dge_list()
-#     dge_list_first.write_npz_file(
-#         filename="/Users/anthony/Development/edgePy/edgePy/data/GSE49712_HTSeq.txt.npz"
-#     )
-
-
 def test_repr():
     assert dge_list().__repr__() == "DGEList(num_samples=10, num_genes=21,711)"
 
@@ -246,20 +236,17 @@ def test_tpm():
         counts=counts,
         samples=np.array(['a', 'b', 'c']),
         genes=np.array(['a', 'b', 'c', 'd']),
-        groups_in_dict={'a': ('a',), 'b': ('b',), 'c': ('c',)},
+        groups_in_dict={'group1': ['a', 'c'], 'group2': ['b', 'd']},
     )
     assert isinstance(dge_list.counts[0][0], np.integer)
-    dge_list.tpm(gene_lengths)
+    new_dge_list = dge_list.tpm(gene_lengths)
 
-    assert np.allclose(dge_list.counts, expected, atol=1e-1)
+    assert np.allclose(new_dge_list.counts, expected, atol=1e-1)
 
     # make sure that the sums of all genes across are the same the each sample (an important property of TPM)
-    gene_sums = dge_list.counts.sum(axis=0)
+    gene_sums = new_dge_list.counts.sum(axis=0)
     assert np.allclose(gene_sums, [gene_sums[0]] * len(gene_sums))
 
-
-def test_non_implemented():
-    pass
 
 # Unit tests for ``edgePy.data_import.Importer``.\
 def test_init():

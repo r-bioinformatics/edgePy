@@ -92,10 +92,10 @@ class DGEList(object):
             self.genes = genes
             self.norm_factors = norm_factors
 
-            if groups_in_dict and groups_in_list:
+            if groups_in_dict is not None and groups_in_list is not None:
                 self.groups_dict = groups_in_dict
                 self.groups_list = groups_in_list
-            elif groups_in_dict and self.samples is not None:
+            elif groups_in_dict is not None and self.samples is not None:
                 self.groups_dict = groups_in_dict
                 self.groups_list = self._sample_group_list(groups_in_dict, self.samples)
             elif groups_in_list is not None and self.samples is not None:
@@ -318,11 +318,14 @@ class DGEList(object):
         if transform_to_log:
             counts = self.log_transform(counts, prior_count)
             current_log = True
-            
-        return self.copy(counts=counts, current_log=current_log)    
+
+        return self.copy(counts=counts, current_log=current_log)
 
     def rpkm(
-        self, gene_data: ImportCanonicalData, log: bool = False, prior_count: float = PRIOR_COUNT
+        self,
+        gene_data: ImportCanonicalData,
+        transform_to_log: bool = False,
+        prior_count: float = PRIOR_COUNT,
     ) -> "DGEList":
         """Return the DGEList normalized to reads per kilobase of gene length
         per million reads. (RPKM =   numReads / ( geneLength/1000 * totalNumReads/1,000,000 )
@@ -374,7 +377,6 @@ class DGEList(object):
         counts = (counts.T / temp_gene_len).T
         counts = counts / (col_sum / 1e6)
 
-        current_log = self.log
         if transform_to_log:
             counts = self.log_transform(counts, prior_count)
             current_log = True
@@ -387,7 +389,7 @@ class DGEList(object):
         transform_to_log: bool = False,
         prior_count: float = PRIOR_COUNT,
         mean_fragment_lengths: np.ndarray = None,
-    ) -> np.ndarray:
+    ) -> "DGEList":
         """Normalize the DGEList to transcripts per million
 
         Args:
@@ -413,12 +415,12 @@ class DGEList(object):
         # how many counts per base
         base_counts = self.counts / effective_lengths
 
-        counts = 10 ** 6 * base_counts / np.sum(base_counts, axis=0)[np.newaxis, :]      
+        counts = 10 ** 6 * base_counts / np.sum(base_counts, axis=0)[np.newaxis, :]
         current_log = self.log
         if transform_to_log:
-            counts = log_transform(counts, prior_count)      
+            counts = self.log_transform(counts, prior_count)
             current_log = True
-            
+
         return self.copy(counts=counts, current_log=current_log)
 
     def __repr__(self) -> str:
