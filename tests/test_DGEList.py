@@ -76,16 +76,16 @@ def test_library_size():
         dge_list.library_size,
         np.array(
             [
-                63579607,
-                58531933,
-                39138521,
-                78565885,
-                48667119,
-                62799917,
-                66032107,
-                66194776,
-                55085875,
-                37760315,
+                63_579_607,
+                58_531_933,
+                39_138_521,
+                78_565_885,
+                48_667_119,
+                62_799_917,
+                66_032_107,
+                66_194_776,
+                55_085_875,
+                37_760_315,
             ]
         ),
     )
@@ -228,10 +228,38 @@ def test_rpkm():
     assert rpm_dge.counts[0][0] == (first_pos / ((gene_len / 1e3) * (col_sum[0] / 1e6)))
 
 
-def test_non_implemented():
-    with pytest.raises(NotImplementedError):
-        dge_list().tpm(None)
+def test_tpm():
+    # example hand calculated as in https://www.youtube.com/watch?time_continue=611&v=TTUrtCY2k-w
+    counts = np.array([[10, 12, 30], [20, 25, 60], [5, 8, 15], [0, 0, 1]])
+    gene_lengths = np.array([2000, 4000, 1000, 10000])
 
+    expected = np.array(
+        [
+            [333_333.333_333_33, 296_296.296_296_3, 332_594.235_033_26],
+            [333_333.333_333_33, 308_641.975_308_64, 332_594.235_033_26],
+            [333_333.333_333_33, 395_061.728_395_06, 332_594.235_033_26],
+            [0.0, 0.0, 2217.294_900_22],
+        ]
+    )
+
+    dge_list = DGEList(
+        counts=counts,
+        samples=np.array(['a', 'b', 'c']),
+        genes=np.array(['a', 'b', 'c', 'd']),
+        groups_in_dict={'a': ('a',), 'b': ('b',), 'c': ('c',)},
+    )
+    assert isinstance(dge_list.counts[0][0], np.integer)
+    dge_list.tpm(gene_lengths)
+
+    assert np.allclose(dge_list.counts, expected, atol=1e-1)
+
+    # make sure that the sums of all genes across are the same the each sample (an important property of TPM)
+    gene_sums = dge_list.counts.sum(axis=0)
+    assert np.allclose(gene_sums, [gene_sums[0]] * len(gene_sums))
+
+
+def test_non_implemented():
+    pass
 
 # Unit tests for ``edgePy.data_import.Importer``.\
 def test_init():

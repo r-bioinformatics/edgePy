@@ -306,16 +306,20 @@ class DGEList(object):
         """
         return np.sum(self.counts, 0)
 
-    def cpm(self, log: bool = False, prior_count: float = PRIOR_COUNT) -> "DGEList":
-        """Return the DGEList normalized to read counts per million."""
+    def log_transform(self, counts, prior_count):
+        """Compute the log of the counts"""
+        counts[counts == 0] = prior_count
+        return np.log(counts)
+
+    def cpm(self, transform_to_log: bool = False, prior_count: float = PRIOR_COUNT) -> "DGEList":
+        """Normalize the DGEList to read counts per million."""
         counts = 1e6 * self.counts / np.sum(self.counts, axis=0)
         current_log = self.log
-        if log:
-            counts[counts == 0] = prior_count
-            counts = np.log(counts)
+        if transform_to_log:
+            counts = self.log_transform(counts, prior_count)
             current_log = True
-
-        return self.copy(counts=counts, current_log=current_log)
+            
+        return self.copy(counts=counts, current_log=current_log)    
 
     def rpkm(
         self, gene_data: ImportCanonicalData, log: bool = False, prior_count: float = PRIOR_COUNT
@@ -370,25 +374,52 @@ class DGEList(object):
         counts = (counts.T / temp_gene_len).T
         counts = counts / (col_sum / 1e6)
 
-        if log:
-            counts[counts == 0] = prior_count
-            counts = np.log(counts)
+        current_log = self.log
+        if transform_to_log:
+            counts = self.log_transform(counts, prior_count)
             current_log = True
 
         return self.copy(counts=counts, current_log=current_log, genes=genes)
 
     def tpm(
-        self, transcripts: Mapping, log: bool = False, prior_count: float = PRIOR_COUNT
-    ) -> None:
-        """Return the DGEList normalized to reads per kilobase of transcript
-        length.
+        self,
+        gene_lengths: np.ndarray,
+        transform_to_log: bool = False,
+        prior_count: float = PRIOR_COUNT,
+        mean_fragment_lengths: np.ndarray = None,
+    ) -> np.ndarray:
+        """Normalize the DGEList to transcripts per million
+
+        Args:
+            gene_lengths: 1D array of gene lengths for each gene in the rows of `DGEList.counts`.
+            transform_to_log: store log outputs
+            prior_count:
+            mean_fragment_lengths: 1D array of mean fragment lengths for each sample in the columns of `DGEList.counts`
+                (optional)
 
         """
-        raise NotImplementedError
 
-        # TODO: Implement here
+        # adapted from Wagner, et al. 'Measurement of mRNA abundance using RNA-seq data:
+        # RPKM measure is inconsistent among samples.' doi:10.1007/s12064-012-0162-3
 
-        # self = self.cpm(log=log, prior_count=prior_count)
+        # compute effective length not allowing negative lengths
+        if mean_fragment_lengths:
+            effective_lengths = (
+                gene_lengths[:, np.newaxis] - mean_fragment_lengths[np.newaxis, :]
+            ).clip(min=1)
+        else:
+            effective_lengths = gene_lengths[:, np.newaxis]
+
+        # how many counts per base
+        base_counts = self.counts / effective_lengths
+
+        counts = 10 ** 6 * base_counts / np.sum(base_counts, axis=0)[np.newaxis, :]      
+        current_log = self.log
+        if transform_to_log:
+            counts = log_transform(counts, prior_count)      
+            current_log = True
+            
+        return self.copy(counts=counts, current_log=current_log)
 
     def __repr__(self) -> str:
         """Give a pretty non-executeable representation of this object."""
@@ -472,6 +503,10 @@ class DGEList(object):
     ) -> "DGEList":
         """Wrapper for creating DGEList objects from file locations.  Performs open and passes
         the file handles to the method for creating a DGEList object.
+
+        This function uses smart_open, which provides a broad list of data sources that can be
+        opened.  For a full list of data sources, see smart_open's documentation at
+        https://github.com/RaRe-Technologies/smart_open/blob/master/README.rst
 
         Args:
             data_file: Text file defining the data set.
