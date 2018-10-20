@@ -406,7 +406,16 @@ class DGEList(object):
         prior_count: float = PRIOR_COUNT,
         mean_fragment_lengths: np.ndarray = None,
     ) -> "DGEList":
-        """Normalize the DGEList to transcripts per million
+        """Normalize the DGEList to transcripts per million.
+
+        Adapted from Wagner, et al. 'Measurement of mRNA abundance using RNA-seq data:
+        RPKM measure is inconsistent among samples.' doi:10.1007/s12064-012-0162-3
+
+        Read counts :math:`X_i` (for each gene :math:`i` with gene length :math:`\widetilde{l_j}` ) are normalized as follows:
+        .. math::
+
+           TPM_i = \frac{X_i}{\widetilde{l_i}}\cdot (\frac{1}{\sum_j \frac{X_j}{\widetilde{l_j}}}) * 10^6
+
 
         Args:
             gene_lengths: 1D array of gene lengths for each gene in the rows of `DGEList.counts`.
@@ -417,8 +426,6 @@ class DGEList(object):
 
         """
 
-        # adapted from Wagner, et al. 'Measurement of mRNA abundance using RNA-seq data:
-        # RPKM measure is inconsistent among samples.' doi:10.1007/s12064-012-0162-3
 
         # compute effective length not allowing negative lengths
         if mean_fragment_lengths:
