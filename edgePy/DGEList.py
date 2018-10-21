@@ -411,7 +411,8 @@ class DGEList(object):
         Adapted from Wagner, et al. 'Measurement of mRNA abundance using RNA-seq data:
         RPKM measure is inconsistent among samples.' doi:10.1007/s12064-012-0162-3
 
-        Read counts :math:`X_i` (for each gene :math:`i` with gene length :math:`\widetilde{l_j}` ) are normalized as follows:
+        Read counts :math:`X_i` (for each gene :math:`i` with gene length :math:`\widetilde{l_j}` )
+        are normalized as follows:
         .. math::
 
            TPM_i = \frac{X_i}{\widetilde{l_i}}\cdot (\frac{1}{\sum_j \frac{X_j}{\widetilde{l_j}}}) * 10^6
