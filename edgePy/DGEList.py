@@ -546,7 +546,7 @@ class DGEList(object):
     ) -> "DGEList":
         """Read in a file-like object of delimited data for instantiation.
 
-        Args:
+        Args:get_canonical
             data_handle: Text file defining the data set.
             group_handle: The JSON file defining the groups.
             kwargs: Additional arguments supported by ``np.genfromtxt``.
