@@ -416,7 +416,7 @@ class DGEList(object):
 
         .. math::
 
-           TPM_i = \\frac{X_i}{\\widetilde{l_i}}\cdot (\\frac{1}{\sum_j \\frac{X_j}{\widetilde{l_j}}}) * 10^6
+           TPM_i = \\frac{X_i}{\\widetilde{l_i}}\cdot \\left(\\frac{1}{\sum_j \\frac{X_j}{\widetilde{l_j}}}\\right) \cdot 10^6
 
 
         Args:
