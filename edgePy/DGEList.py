@@ -237,7 +237,6 @@ class DGEList(object):
                 log.info(self.genes)
 
                 if sample_count != self.samples.shape[0] or gene_count != self.genes.shape[0]:
-
                     raise ValueError(
                         "Attempting to substitute counts data "
                         "into DGEList object with different "
@@ -415,8 +414,7 @@ class DGEList(object):
         are normalized as follows:
         .. math::
 
-           TPM_i = \frac{X_i}{\widetilde{l_i}}\cdot (\frac{1}{\sum_j \frac{X_j}{\widetilde{l_j}}}) * 10^6
-
+            TPM_i = \\frac{X_i}{\\widetilde{l_i}}\cdot (\\frac{1}{\sum_j \\frac{X_j}{\widetilde{l_j}}}) * 10^6
 
         Args:
             gene_lengths: 1D array of gene lengths for each gene in the rows of `DGEList.counts`.
@@ -426,7 +424,6 @@ class DGEList(object):
                 (optional)
 
         """
-
 
         # compute effective length not allowing negative lengths
         if mean_fragment_lengths:
