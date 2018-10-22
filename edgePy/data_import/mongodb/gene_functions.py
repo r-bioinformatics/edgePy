@@ -1,4 +1,3 @@
-
 """The core Python code for generating data."""
 from typing import Dict, Optional, List, Tuple, Any, Hashable
 

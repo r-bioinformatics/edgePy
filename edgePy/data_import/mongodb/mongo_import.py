@@ -157,7 +157,7 @@ class ImportFromMongodb(object):
         gene_list = set()
         sample_list = set()
         for count, result in enumerate(cursor):
-            if count % 100000 == 0:
+            if count % 100_000 == 0:
                 log.info(f"{count} rows processed.")
             sample = result["sample_name"]
             rpkm = get_canonical_rpkm(result) if rpkm_flag else get_canonical_raw(result)
