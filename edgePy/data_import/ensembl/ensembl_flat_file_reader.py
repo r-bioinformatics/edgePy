@@ -3,7 +3,7 @@ from typing import Optional, Union, Dict, Hashable, Any, List
 from pathlib import Path
 
 
-class ImportCanonicalData(object):
+class CanonicalDataStore(object):
     """
     A simple tool for reading canonical data, generated from the canonical_transcripts.py script provided with edgePy.
 

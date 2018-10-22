@@ -4,7 +4,6 @@ import argparse
 from smart_open import smart_open  # type: ignore
 
 from edgePy.data_import.ensembl.mysql_wrapper import MySQLWrapper
-from typing import List
 
 CANONICAL_TRANSCRIPT_SQL = """select gene.stable_id as gene, transcript.stable_id as transcript,
 t_len.exon_len as length, IF(gene.canonical_transcript_id = transcript.transcript_id, "True", "False") as canonical
@@ -62,6 +61,9 @@ def parse_arguments(parser=None):
 
 
 class CanonicalTranscript(object):
+    """A simple class for storing Ensembl transcript data, as well as
+    supplemental data for gene id/symbols/synnonyms"""
+
     def __init__(self, host, port, user, password, database):
         # needs to go into a config file, but for now:
         self.exon_store = {}
@@ -77,19 +79,10 @@ class CanonicalTranscript(object):
         self.gene_symbols = self.mysql_wrapper.run_sql_query(GENE_SYMBOL_SQL)
 
         print("retrieving gene synonym data.")
-        self.synonyms = self.mysql_wrapper.run_sql_query(GENE_SYNONYM_SQL)
+        self.gene_synonyms = self.mysql_wrapper.run_sql_query(GENE_SYNONYM_SQL)
 
         print("completed")
         self.mysql_wrapper.close()
-
-    def get_canonical(self) -> List:
-        return self.canonical_transcripts
-
-    def get_gene_symbols(self) -> List:
-        return self.gene_symbols
-
-    def get_gene_synonyms(self) -> List:
-        return self.synonyms
 
 
 def main():
@@ -97,7 +90,7 @@ def main():
     default_class = CanonicalTranscript(
         args.host, args.port, args.username, args.password, args.database
     )
-    canonical = default_class.get_canonical()
+    canonical = default_class.canonical_transcripts
 
     with smart_open(args.output_transcripts, 'w') as output:
         for transcript in canonical:
@@ -106,8 +99,8 @@ def main():
                 f"{transcript['length']}\t{transcript['canonical']}\n"
             )
 
-    symbols = default_class.get_gene_symbols()
-    synonyms = default_class.get_gene_synonyms()
+    symbols = default_class.gene_symbols
+    synonyms = default_class.gene_synonyms
 
     with smart_open(args.output_symbols, 'w') as output:
         """ The order here is important - symbols contain duplicates, so make sure the symbols

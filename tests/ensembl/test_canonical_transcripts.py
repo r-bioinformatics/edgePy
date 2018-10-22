@@ -5,13 +5,13 @@ from edgePy.data_import.data_import import get_dataset_path
 
 TEST_DATASET = "transcripts_homo_sapiens_core_75_37.tsv"
 TEST_GENE_SYMBOLS = "symbols_homo_sapiens_core_75_37.tsv"
-from edgePy.data_import.ensembl.ensembl_flat_file_reader import ImportCanonicalData
+from edgePy.data_import.ensembl.ensembl_flat_file_reader import CanonicalDataStore
 
 
 class TestCanonicalTranscripts(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.canonicaldata = ImportCanonicalData(
+        cls.canonicaldata = CanonicalDataStore(
             get_dataset_path(TEST_DATASET), get_dataset_path(TEST_GENE_SYMBOLS)
         )
 

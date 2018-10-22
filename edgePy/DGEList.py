@@ -9,7 +9,7 @@ import numpy as np  # type: ignore
 from smart_open import smart_open  # type: ignore
 
 from edgePy.util import getLogger
-from edgePy.data_import.ensembl.ensembl_flat_file_reader import ImportCanonicalData
+from edgePy.data_import.ensembl.ensembl_flat_file_reader import CanonicalDataStore
 
 __all__ = ["DGEList"]
 
@@ -237,7 +237,6 @@ class DGEList(object):
                 log.info(self.genes)
 
                 if sample_count != self.samples.shape[0] or gene_count != self.genes.shape[0]:
-
                     raise ValueError(
                         "Attempting to substitute counts data "
                         "into DGEList object with different "
@@ -325,7 +324,7 @@ class DGEList(object):
 
     def rpkm(
         self,
-        gene_data: ImportCanonicalData,
+        gene_data: CanonicalDataStore,
         transform_to_log: bool = False,
         prior_count: float = PRIOR_COUNT,
     ) -> "DGEList":
@@ -418,7 +417,6 @@ class DGEList(object):
 
            TPM_i = \\frac{X_i}{\\widetilde{l_i}}\cdot \\
            \\left(\\frac{1}{\sum_j \\frac{X_j}{\widetilde{l_j}}}\\right) \cdot 10^6
-
 
         Args:
             gene_lengths: 1D array of gene lengths for each gene in the rows of `DGEList.counts`.
@@ -555,7 +553,7 @@ class DGEList(object):
     ) -> "DGEList":
         """Read in a file-like object of delimited data for instantiation.
 
-        Args:
+        Args:get_canonical
             data_handle: Text file defining the data set.
             group_handle: The JSON file defining the groups.
             kwargs: Additional arguments supported by ``np.genfromtxt``.
