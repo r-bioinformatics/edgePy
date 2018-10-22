@@ -5,7 +5,7 @@ from smart_open import smart_open  # type: ignore
 
 from edgePy.DGEList import DGEList
 from edgePy.data_import.data_import import get_dataset_path
-from edgePy.data_import.ensembl.ensembl_flat_file_reader import ImportCanonicalData
+from edgePy.data_import.ensembl.ensembl_flat_file_reader import CanonicalDataStore
 
 TEST_GENE_SET_DATA = "transcripts_homo_sapiens_core_75_37.tsv"
 TEST_GENE_SYMBOLS = "symbols_homo_sapiens_core_75_37.tsv"
@@ -199,7 +199,7 @@ def test_cpm():
 
 def test_rpkm():
     dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
-    icd = ImportCanonicalData(
+    icd = CanonicalDataStore(
         get_dataset_path(TEST_GENE_SET_DATA), get_dataset_path(TEST_GENE_SYMBOLS)
     )
     first_pos = dge_list.counts[0][0]
@@ -211,10 +211,6 @@ def test_rpkm():
     ensg_gene = icd.pick_gene_id(icd.get_genes_from_symbol(first_gene))
     gene_len = icd.get_length_of_canonical_transcript(ensg_gene)
     # RPKM=numReads / (geneLength / 1000 * totalNumReads / 1, 000, 000)
-    print(gene_len)
-    print(rpm_dge.counts[0][0])
-    print(first_pos)
-    print(first_pos / ((gene_len / 1e3) * (col_sum[0] / 1e6)))
     assert rpm_dge.counts[0][0] == (first_pos / ((gene_len / 1e3) * (col_sum[0] / 1e6)))
 
 

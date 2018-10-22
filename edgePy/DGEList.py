@@ -9,7 +9,7 @@ import numpy as np  # type: ignore
 from smart_open import smart_open  # type: ignore
 
 from edgePy.util import getLogger
-from edgePy.data_import.ensembl.ensembl_flat_file_reader import ImportCanonicalData
+from edgePy.data_import.ensembl.ensembl_flat_file_reader import CanonicalDataStore
 
 __all__ = ["DGEList"]
 
@@ -324,7 +324,7 @@ class DGEList(object):
 
     def rpkm(
         self,
-        gene_data: ImportCanonicalData,
+        gene_data: CanonicalDataStore,
         transform_to_log: bool = False,
         prior_count: float = PRIOR_COUNT,
     ) -> "DGEList":
