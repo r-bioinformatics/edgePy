@@ -71,9 +71,9 @@ class CanonicalDataStore(object):
             return None
         try:
             return self.gene_to_symbol[gene]
-        except KeyError as ke:
+        except KeyError:
             print(f"gene {gene} not found in gene to symbol.")
-            raise ke
+            raise KeyError
 
     def get_genes_from_symbol(self, symbol: str) -> List:
         """
@@ -100,9 +100,8 @@ class CanonicalDataStore(object):
         if length == 1:
             return gene_ids[0]
         else:
-            ids = [int(gene[4:]) for gene in gene_ids]
-            max_id = max(ids)
-            return f"ENSG{max_id}"
+            gene_ids.sort(reverse=True)
+            return gene_ids[0]
 
     def is_known_symbol(self, symbol: str) -> bool:
         """
