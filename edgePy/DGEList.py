@@ -400,7 +400,7 @@ class DGEList(object):
 
     def tpm(
         self,
-        gene_lengths: np.ndarray,
+        gene_data: CanonicalDataStore,
         transform_to_log: bool = False,
         prior_count: float = PRIOR_COUNT,
         mean_fragment_lengths: np.ndarray = None,
@@ -419,9 +419,9 @@ class DGEList(object):
            \\left(\\frac{1}{\sum_j \\frac{X_j}{\widetilde{l_j}}}\\right) \cdot 10^6
 
         Args:
-            gene_lengths: 1D array of gene lengths for each gene in the rows of `DGEList.counts`.
+            gene_data: An object that works to import Ensembl based data, for use in calculations
             transform_to_log: store log outputs
-            prior_count:
+            prior_count: a minimum value for genes, if you do log transforms
             mean_fragment_lengths: 1D array of mean fragment lengths for each sample in the columns of `DGEList.counts`
                 (optional)
 
@@ -430,10 +430,10 @@ class DGEList(object):
         # compute effective length not allowing negative lengths
         if mean_fragment_lengths:
             effective_lengths = (
-                gene_lengths[:, np.newaxis] - mean_fragment_lengths[np.newaxis, :]
+                gene_data[:, np.newaxis] - mean_fragment_lengths[np.newaxis, :]
             ).clip(min=1)
         else:
-            effective_lengths = gene_lengths[:, np.newaxis]
+            effective_lengths = gene_data[:, np.newaxis]
 
         # how many counts per base
         base_counts = self.counts / effective_lengths
