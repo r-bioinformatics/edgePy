@@ -357,6 +357,46 @@ class DGEList(object):
 
         return self.copy(counts=counts, current_log=current_log, genes=genes)
 
+    def tpm(
+        self,
+        gene_data: CanonicalDataStore,
+        transform_to_log: bool = False,
+        prior_count: float = PRIOR_COUNT,
+    ) -> "DGEList":
+        """Return the DGEList normalized to transcripts per million reads.
+        TPM =   countsPerBase * ( 1/sum[countsPerBase]) * 10^6
+
+        Args:
+            gene_data: An object that works to import Ensembl based data, for use in calculations
+            transform_to_log: true, if you wish to convert to log after converting to RPKM
+            prior_count: a minimum value for genes, if you do log transforms.
+        """
+        current_log = self.current_log_status
+
+        #checks current log status and converts if currently in log format
+        if self.current_log_status:
+            self.counts = np.exp(self.counts)
+            current_log = False
+
+        #returns canonical gene length and gene mask
+        gene_len_ordered, gene_mask = self.get_gene_mask_and_lengths(gene_data)
+
+        genes = self.genes[gene_mask].copy()
+        counts = self.counts[gene_mask].copy()
+
+        #calculates counts per base (ie, the rate)
+        rate = (counts.T / gene_len_ordered).T
+
+        #calculates tpm
+        counts = (rate / np.sum(rate)) * 1e6
+
+        if transform_to_log:
+            counts = self.log_transform(counts, prior_count)
+            current_log = True
+
+        return self.copy(counts=counts, current_log=current_log, genes=genes)
+
+
     def get_gene_mask_and_lengths(self, gene_data):
 
         """
@@ -398,9 +438,10 @@ class DGEList(object):
                     gene_mask.append(False)
         return gene_len_ordered, gene_mask
 
+'''Commented out for now. May reuse later, depending on approach to user-defined DGELists
     def tpm(
         self,
-        gene_data: CanonicalDataStore,
+        gene_lengths: np.ndarray,
         transform_to_log: bool = False,
         prior_count: float = PRIOR_COUNT,
         mean_fragment_lengths: np.ndarray = None,
@@ -430,10 +471,10 @@ class DGEList(object):
         # compute effective length not allowing negative lengths
         if mean_fragment_lengths:
             effective_lengths = (
-                gene_data[:, np.newaxis] - mean_fragment_lengths[np.newaxis, :]
+                gene_lengths[:, np.newaxis] - mean_fragment_lengths[np.newaxis, :]
             ).clip(min=1)
         else:
-            effective_lengths = gene_data[:, np.newaxis]
+            effective_lengths = gene_lengths[:, np.newaxis]
 
         # how many counts per base
         base_counts = self.counts / effective_lengths
@@ -445,7 +486,7 @@ class DGEList(object):
             current_log = True
 
         return self.copy(counts=counts, current_log=current_log)
-
+'''
     def __repr__(self) -> str:
         """Give a pretty non-executeable representation of this object."""
         num_samples = len(self._samples) if self._samples is not None else 0
