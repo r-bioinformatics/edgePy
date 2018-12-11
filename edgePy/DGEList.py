@@ -365,6 +365,8 @@ class DGEList(object):
     ) -> "DGEList":
         """Return the DGEList normalized to transcripts per million reads.
         TPM =   countsPerBase * ( 1/sum[countsPerBase]) * 10^6
+        From Harold Pimentel; "What is FPKM? A review of RNA-Seq expression units"
+        https://haroldpimentel.wordpress.com/2014/05/08/what-the-fpkm-a-review-rna-seq-expression-units/
 
         Args:
             gene_data: An object that works to import Ensembl based data, for use in calculations
@@ -438,7 +440,7 @@ class DGEList(object):
                     gene_mask.append(False)
         return gene_len_ordered, gene_mask
 
-'''Commented out for now. May reuse later, depending on approach to user-defined DGELists
+    '''Commented out for now. May reuse later, depending on approach to user-defined DGELists
     def tpm(
         self,
         gene_lengths: np.ndarray,
@@ -486,7 +488,7 @@ class DGEList(object):
             current_log = True
 
         return self.copy(counts=counts, current_log=current_log)
-'''
+    '''
     def __repr__(self) -> str:
         """Give a pretty non-executeable representation of this object."""
         num_samples = len(self._samples) if self._samples is not None else 0

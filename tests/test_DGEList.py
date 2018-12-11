@@ -213,7 +213,23 @@ def test_rpkm():
     # RPKM=numReads / (geneLength / 1000 * totalNumReads / 1, 000, 000)
     assert rpm_dge.counts[0][0] == (first_pos / ((gene_len / 1e3) * (col_sum[0] / 1e6)))
 
+def test_tpm():
+    dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+    icd = CanonicalDataStore(
+        get_dataset_path(TEST_GENE_SET_DATA), get_dataset_path(TEST_GENE_SYMBOLS)
+    )
+    first_pos = dge_list.counts[0][0]
+    first_gene = dge_list.genes[0]
 
+    col_sum = np.sum(dge_list.counts, axis=0)
+    assert isinstance(first_pos, np.integer)
+    tpm_dge = dge_list.tpm(icd)
+    ensg_gene = icd.pick_gene_id(icd.get_genes_from_symbol(first_gene))
+    gene_len = icd.get_length_of_canonical_transcript(ensg_gene)
+
+    # TPM=countsPerBase * (1/sum[countsPerBase]) * 10^6
+    assert tpm_dge.counts[0][0] == (first_pos / col_sum[0]) * 1e6
+'''
 def test_tpm():
     # example hand calculated as in https://www.youtube.com/watch?time_continue=611&v=TTUrtCY2k-w
     counts = np.array([[10, 12, 30], [20, 25, 60], [5, 8, 15], [0, 0, 1]])
@@ -242,7 +258,7 @@ def test_tpm():
     # make sure that the sums of all genes across are the same the each sample (an important property of TPM)
     gene_sums = new_dge_list.counts.sum(axis=0)
     assert np.allclose(gene_sums, [gene_sums[0]] * len(gene_sums))
-
+'''
 
 # Unit tests for ``edgePy.data_import.Importer``.\
 def test_init():
