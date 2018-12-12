@@ -223,8 +223,9 @@ def test_tpm():
 
     gene_len_ordered, gene_mask = dge_list.get_gene_mask_and_lengths(icd)
 
-    rate = (dge_list.counts.T / gene_len_ordered).T
-    rate_sum = np.sum(rate)
+    rates = dge_list.get_rates(icd)
+
+    rate_sum = np.sum(rates)
 
     assert isinstance(first_pos, np.integer)
     tpm_dge = dge_list.tpm(icd)

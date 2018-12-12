@@ -421,7 +421,7 @@ class DGEList(object):
 
         Args:
             gene_data: An object that works to import Ensembl based data, for use in calculations
-            transform_to_log: true, if you wish to convert to log after converting to RPKM
+            transform_to_log: true, if you wish to convert to log after converting to TPM
             prior_count: a minimum value for genes, if you do log transforms.
 
         """
@@ -432,23 +432,36 @@ class DGEList(object):
             self.counts = np.exp(self.counts)
             current_log = False
 
-        # returns canonical gene length and gene mask
-        gene_len_ordered, gene_mask = self.get_gene_mask_and_lengths(gene_data)
-
-        genes = self.genes[gene_mask].copy()
-        counts = self.counts[gene_mask].copy()
-
-        # calculates counts per base (ie, the rate)
-        rate = (counts.T / gene_len_ordered).T
+        rates = self.get_rates(gene_data)
+        rate_sum = np.sum(rates)
 
         # calculates tpm
-        counts = (rate / np.sum(rate)) * 1e6
+        counts = (rates / rate_sum) * 1e6
 
         if transform_to_log:
             counts = self.log_transform(counts, prior_count)
             current_log = True
 
         return self.copy(counts=counts, current_log=current_log, genes=genes)
+
+    def get_rates(
+        self,
+        gene_data: CanonicalDataStore
+        ) -> "DGEList":
+        """Gets the number of counts per base, otherwise known as the rate, for all genes.
+        Currently used for TPM calculations.
+
+        Args:
+            gene_data: An object that works to import Ensembl based data, for use in calculations
+        """
+
+        gene_len_ordered, gene_mask = self.get_gene_mask_and_lengths(gene_data)
+        counts = self.counts[gene_mask].copy()
+
+        # calculates counts per base (ie, the rate)
+        rates = (counts.T / gene_len_ordered).T
+
+        return rates
 
     def __repr__(self) -> str:
         """Give a pretty non-executeable representation of this object."""
