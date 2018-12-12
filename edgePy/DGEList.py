@@ -435,7 +435,7 @@ class DGEList(object):
         gene_len_ordered, gene_mask = self.get_gene_mask_and_lengths(gene_data)
 
         genes = self.genes[gene_mask].copy()
-        
+
         rates = self.get_rates(gene_data)
         rate_sum = np.sum(rates)
 

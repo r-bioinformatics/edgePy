@@ -221,8 +221,6 @@ def test_tpm():
     first_pos = dge_list.counts[0][0]
     first_gene = dge_list.genes[0]
 
-    gene_len_ordered, gene_mask = dge_list.get_gene_mask_and_lengths(icd)
-
     rates = dge_list.get_rates(icd)
 
     rate_sum = np.sum(rates)
@@ -232,7 +230,7 @@ def test_tpm():
     ensg_gene = icd.pick_gene_id(icd.get_genes_from_symbol(first_gene))
     gene_len = icd.get_length_of_canonical_transcript(ensg_gene)
 
-    # TPM=countsPerBase * (1/sum[countsPerBase]) * 10^6
+    # TPM = countsPerBase / sum[countsPerBase]) * 10^6
     assert tpm_dge.counts[0][0] == ((first_pos / gene_len) / rate_sum) * 1e6
 
 
