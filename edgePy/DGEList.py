@@ -432,6 +432,7 @@ class DGEList(object):
             self.counts = np.exp(self.counts)
             current_log = False
 
+        genes = self.genes[gene_mask].copy()
         rates = self.get_rates(gene_data)
         rate_sum = np.sum(rates)
 
