@@ -466,8 +466,8 @@ class DGEList(object):
         # calculates counts per base (ie, the rate)
         rates = (counts.T / gene_len_ordered).T
 
-        rates = rates * 1e3
-        
+        rates = rates / 1e3
+
         return rates
 
     def __repr__(self) -> str:
