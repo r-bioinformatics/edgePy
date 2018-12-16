@@ -360,7 +360,7 @@ class DGEList(object):
     def get_gene_mask_and_lengths(self, gene_data):
 
         """
-        use gene_data to get the gene lenths and a gene mask for the tranformation.
+        use gene_data to get the gene lengths and a gene mask for the tranformation.
         Args:
             gene_data: the object that holds gene data from ensembl
 
@@ -461,6 +461,8 @@ class DGEList(object):
 
         gene_len_ordered, gene_mask = self.get_gene_mask_and_lengths(gene_data)
         counts = self.counts[gene_mask].copy()
+
+        gene_len_ordered = gene_len_ordered * 1e3
 
         # calculates counts per base (ie, the rate)
         rates = (counts.T / gene_len_ordered).T
