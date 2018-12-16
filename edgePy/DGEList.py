@@ -464,7 +464,7 @@ class DGEList(object):
 
 
         # calculates counts per base (ie, the rate)
-        rates = (counts.T / gene_len_ordered).T
+        rates = (counts.T / (gene_len_ordered * 1e3)).T
 
         return rates
 
