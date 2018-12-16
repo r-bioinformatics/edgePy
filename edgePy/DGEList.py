@@ -439,8 +439,8 @@ class DGEList(object):
         rates = self.get_rates(gene_data)
         rate_sum = np.sum(rates)
 
-        # calculates tpm
-        counts = (rates / rate_sum) * 1e6
+        # calculates tpm and adds kilobase conversion from get_gene_mask_and_lengths
+        counts = (rates / rate_sum) * 1e9
 
         if transform_to_log:
             counts = self.log_transform(counts, prior_count)
@@ -462,7 +462,6 @@ class DGEList(object):
         gene_len_ordered, gene_mask = self.get_gene_mask_and_lengths(gene_data)
         counts = self.counts[gene_mask].copy()
 
-        gene_len_ordered = gene_len_ordered * 1e3
 
         # calculates counts per base (ie, the rate)
         rates = (counts.T / gene_len_ordered).T
