@@ -227,7 +227,7 @@ def test_get_rates():
 
     rates = dge_list.get_rates(icd)
 
-    assert rates[0] == first_pos / gene_len
+    assert rates[0][0] == first_pos / gene_len
 
 def test_tpm():
     dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
