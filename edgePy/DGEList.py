@@ -440,7 +440,7 @@ class DGEList(object):
         rate_sum = np.sum(rates)
 
         # calculates tpm and adds kilobase conversion from get_gene_mask_and_lengths
-        counts = (rates / rate_sum) * 1e3
+        counts = (rates / rate_sum) * 1e6
 
         if transform_to_log:
             counts = self.log_transform(counts, prior_count)
