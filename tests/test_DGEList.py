@@ -18,7 +18,7 @@ TEST_GROUPS = "groups.json"
 @pytest.fixture
 def dge_list():
     with smart_open(get_dataset_path(TEST_DATASET), 'r') as data_handle, smart_open(
-        get_dataset_path(TEST_GROUPS), 'r'
+            get_dataset_path(TEST_GROUPS), 'r'
     ) as group_handle:
         return DGEList.create_DGEList_handle(data_handle, group_handle)
 
@@ -40,7 +40,6 @@ def test_sample_group_list():
 
 
 def test_minimal_init():
-
     dge_list = DGEList(
         to_remove_zeroes=False,
         counts=np.ones(shape=(5, 5)),
@@ -92,7 +91,6 @@ def test_library_size():
 
 
 def test_setting_DGElist_counts():
-
     dge_list = DGEList(
         counts=np.zeros(shape=(5, 10)),
         groups_in_list=['A', 'A', 'B', 'B', 'B'],
@@ -116,7 +114,6 @@ def test_setting_DGElist_counts():
 
 
 def test_cycle_dge_npz():
-
     import tempfile
     import os
 
@@ -213,6 +210,7 @@ def test_rpkm():
     # RPKM=numReads / (geneLength / 1000 * totalNumReads / 1, 000, 000)
     assert rpm_dge.counts[0][0] == (first_pos / ((gene_len / 1e3) * (col_sum[0] / 1e6)))
 
+
 def test_get_rates():
     dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
     icd = CanonicalDataStore(
@@ -228,6 +226,7 @@ def test_get_rates():
     rates = dge_list.get_rates(icd)
 
     assert rates[0][0] == first_pos / gene_len
+
 
 def test_tpm():
     dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
