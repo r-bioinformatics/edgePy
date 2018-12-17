@@ -360,7 +360,7 @@ class DGEList(object):
     def get_gene_mask_and_lengths(self, gene_data):
 
         """
-        use gene_data to get the gene lenths and a gene mask for the tranformation.
+        use gene_data to get the gene lengths and a gene mask for the tranformation.
         Args:
             gene_data: the object that holds gene data from ensembl
 
@@ -400,15 +400,16 @@ class DGEList(object):
 
     def tpm(
         self,
-        gene_lengths: np.ndarray,
+        gene_data: CanonicalDataStore,
         transform_to_log: bool = False,
         prior_count: float = PRIOR_COUNT,
-        mean_fragment_lengths: np.ndarray = None,
     ) -> "DGEList":
         """Normalize the DGEList to transcripts per million.
 
-        Adapted from Wagner, et al. 'Measurement of mRNA abundance using RNA-seq data:
-        RPKM measure is inconsistent among samples.' doi:10.1007/s12064-012-0162-3
+        Adapted from Li et al. "RNA-Seq gene expression estimation with read mapping uncertainty."
+        Bioinformatics, Volume 26, Issue 4, 15 February 2010, Pages 493–500,
+        https://doi.org/10.1093/bioinformatics/btp692
+
 
         Read counts :math:`X_i` (for each gene :math:`i` with gene length :math:`\widetilde{l_j}` )
         are normalized as follows:
@@ -419,32 +420,51 @@ class DGEList(object):
            \\left(\\frac{1}{\sum_j \\frac{X_j}{\widetilde{l_j}}}\\right) \cdot 10^6
 
         Args:
-            gene_lengths: 1D array of gene lengths for each gene in the rows of `DGEList.counts`.
-            transform_to_log: store log outputs
-            prior_count:
-            mean_fragment_lengths: 1D array of mean fragment lengths for each sample in the columns of `DGEList.counts`
-                (optional)
+            gene_data: An object that works to import Ensembl based data, for use in calculations
+            transform_to_log: true, if you wish to convert to log after converting to TPM
+            prior_count: a minimum value for genes, if you do log transforms.
 
         """
-
-        # compute effective length not allowing negative lengths
-        if mean_fragment_lengths:
-            effective_lengths = (
-                gene_lengths[:, np.newaxis] - mean_fragment_lengths[np.newaxis, :]
-            ).clip(min=1)
-        else:
-            effective_lengths = gene_lengths[:, np.newaxis]
-
-        # how many counts per base
-        base_counts = self.counts / effective_lengths
-
-        counts = 1e6 * base_counts / np.sum(base_counts, axis=0)[np.newaxis, :]
         current_log = self.current_log_status
+
+        # checks current log status and converts if currently in log format
+        if self.current_log_status:
+            self.counts = np.exp(self.counts)
+            current_log = False
+
+        gene_len_ordered, gene_mask = self.get_gene_mask_and_lengths(gene_data)
+
+        genes = self.genes[gene_mask].copy()
+
+        rates = self.get_rates(gene_data)
+        rate_sum = np.sum(rates)
+
+        # calculates tpm and adds kilobase conversion from get_gene_mask_and_lengths
+        counts = (rates / rate_sum) * 1e6
+
         if transform_to_log:
             counts = self.log_transform(counts, prior_count)
             current_log = True
 
-        return self.copy(counts=counts, current_log=current_log)
+        return self.copy(counts=counts, current_log=current_log, genes=genes)
+
+    def get_rates(self, gene_data: CanonicalDataStore) -> "DGEList":
+        """Gets the number of counts per base, otherwise known as the rate, for all genes.
+        Currently used for TPM calculations.
+
+        Args:
+            gene_data: An object that works to import Ensembl based data, for use in calculations
+        """
+
+        gene_len_ordered, gene_mask = self.get_gene_mask_and_lengths(gene_data)
+        counts = self.counts[gene_mask].copy()
+
+        # calculates counts per base (ie, the rate)
+        rates = (counts.T / gene_len_ordered).T
+
+        rates = rates / 1e3
+
+        return rates
 
     def __repr__(self) -> str:
         """Give a pretty non-executeable representation of this object."""

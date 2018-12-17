@@ -40,7 +40,6 @@ def test_sample_group_list():
 
 
 def test_minimal_init():
-
     dge_list = DGEList(
         to_remove_zeroes=False,
         counts=np.ones(shape=(5, 5)),
@@ -92,7 +91,6 @@ def test_library_size():
 
 
 def test_setting_DGElist_counts():
-
     dge_list = DGEList(
         counts=np.zeros(shape=(5, 10)),
         groups_in_list=['A', 'A', 'B', 'B', 'B'],
@@ -116,7 +114,6 @@ def test_setting_DGElist_counts():
 
 
 def test_cycle_dge_npz():
-
     import tempfile
     import os
 
@@ -214,34 +211,42 @@ def test_rpkm():
     assert rpm_dge.counts[0][0] == (first_pos / ((gene_len / 1e3) * (col_sum[0] / 1e6)))
 
 
+def test_get_rates():
+    dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+    icd = CanonicalDataStore(
+        get_dataset_path(TEST_GENE_SET_DATA), get_dataset_path(TEST_GENE_SYMBOLS)
+    )
+    first_pos = dge_list.counts[0][0]
+    first_gene = dge_list.genes[0]
+
+    assert isinstance(first_pos, np.integer)
+    ensg_gene = icd.pick_gene_id(icd.get_genes_from_symbol(first_gene))
+    gene_len = icd.get_length_of_canonical_transcript(ensg_gene)
+
+    rates = dge_list.get_rates(icd)
+
+    assert rates[0][0] == first_pos / gene_len
+
+
 def test_tpm():
-    # example hand calculated as in https://www.youtube.com/watch?time_continue=611&v=TTUrtCY2k-w
-    counts = np.array([[10, 12, 30], [20, 25, 60], [5, 8, 15], [0, 0, 1]])
-    gene_lengths = np.array([2000, 4000, 1000, 10000])
-
-    expected = np.array(
-        [
-            [333_333.333_333_33, 296_296.296_296_3, 332_594.235_033_26],
-            [333_333.333_333_33, 308_641.975_308_64, 332_594.235_033_26],
-            [333_333.333_333_33, 395_061.728_395_06, 332_594.235_033_26],
-            [0.0, 0.0, 2217.294_900_22],
-        ]
+    dge_list = DGEList(filename=str(get_dataset_path(TEST_DATASET_NPZ)))
+    icd = CanonicalDataStore(
+        get_dataset_path(TEST_GENE_SET_DATA), get_dataset_path(TEST_GENE_SYMBOLS)
     )
+    first_pos = dge_list.counts[0][0]
+    first_gene = dge_list.genes[0]
 
-    dge_list = DGEList(
-        counts=counts,
-        samples=np.array(['a', 'b', 'c']),
-        genes=np.array(['a', 'b', 'c', 'd']),
-        groups_in_dict={'group1': ['a', 'c'], 'group2': ['b', 'd']},
-    )
-    assert isinstance(dge_list.counts[0][0], np.integer)
-    new_dge_list = dge_list.tpm(gene_lengths)
+    rates = dge_list.get_rates(icd)
 
-    assert np.allclose(new_dge_list.counts, expected, atol=1e-1)
+    rate_sum = np.sum(rates)
 
-    # make sure that the sums of all genes across are the same the each sample (an important property of TPM)
-    gene_sums = new_dge_list.counts.sum(axis=0)
-    assert np.allclose(gene_sums, [gene_sums[0]] * len(gene_sums))
+    assert isinstance(first_pos, np.integer)
+    tpm_dge = dge_list.tpm(icd)
+    ensg_gene = icd.pick_gene_id(icd.get_genes_from_symbol(first_gene))
+    gene_len = icd.get_length_of_canonical_transcript(ensg_gene)
+
+    # TPM = countsPerBase / sum[countsPerBase]) * 10^6
+    assert tpm_dge.counts[0][0] == ((first_pos / gene_len) / rate_sum) * 1e6
 
 
 # Unit tests for ``edgePy.data_import.Importer``.\
