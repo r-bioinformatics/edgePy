@@ -52,17 +52,17 @@ class DGEList(object):
     )
 
     def __init__(
-            self,
-            counts: Optional[np.ndarray] = None,
-            samples: Optional[np.array] = None,
-            genes: Optional[np.array] = None,
-            norm_factors: Optional[np.array] = None,
-            groups_in_list: Optional[np.array] = None,
-            groups_in_dict: Optional[Dict] = None,
-            to_remove_zeroes: Optional[bool] = False,
-            filename: Optional[str] = None,
-            current_transform_type: Optional[str] = None,
-            current_log_status: Optional[bool] = False,
+        self,
+        counts: Optional[np.ndarray] = None,
+        samples: Optional[np.array] = None,
+        genes: Optional[np.array] = None,
+        norm_factors: Optional[np.array] = None,
+        groups_in_list: Optional[np.array] = None,
+        groups_in_dict: Optional[Dict] = None,
+        to_remove_zeroes: Optional[bool] = False,
+        filename: Optional[str] = None,
+        current_transform_type: Optional[str] = None,
+        current_log_status: Optional[bool] = False,
     ) -> None:
 
         self.to_remove_zeroes = to_remove_zeroes
@@ -108,16 +108,16 @@ class DGEList(object):
                 )
 
     def copy(
-            self,
-            counts: Optional[np.ndarray] = None,
-            samples: Optional[np.array] = None,
-            genes: Optional[np.array] = None,
-            norm_factors: Optional[np.array] = None,
-            groups_in_list: Optional[np.array] = None,
-            groups_in_dict: Optional[Dict] = None,
-            to_remove_zeroes: Optional[bool] = False,
-            current_type: Optional[str] = None,
-            current_log: Optional[bool] = False,
+        self,
+        counts: Optional[np.ndarray] = None,
+        samples: Optional[np.array] = None,
+        genes: Optional[np.array] = None,
+        norm_factors: Optional[np.array] = None,
+        groups_in_list: Optional[np.array] = None,
+        groups_in_dict: Optional[Dict] = None,
+        to_remove_zeroes: Optional[bool] = False,
+        current_type: Optional[str] = None,
+        current_log: Optional[bool] = False,
     ) -> "DGEList":
 
         return DGEList(
@@ -323,10 +323,10 @@ class DGEList(object):
         return self.copy(counts=counts, current_log=current_log)
 
     def rpkm(
-            self,
-            gene_data: CanonicalDataStore,
-            transform_to_log: bool = False,
-            prior_count: float = PRIOR_COUNT,
+        self,
+        gene_data: CanonicalDataStore,
+        transform_to_log: bool = False,
+        prior_count: float = PRIOR_COUNT,
     ) -> "DGEList":
         """Return the DGEList normalized to reads per kilobase of gene length
         per million reads. (RPKM =   numReads / ( geneLength/1000 * totalNumReads/1,000,000 )
@@ -399,10 +399,10 @@ class DGEList(object):
         return gene_len_ordered, gene_mask
 
     def tpm(
-            self,
-            gene_data: CanonicalDataStore,
-            transform_to_log: bool = False,
-            prior_count: float = PRIOR_COUNT,
+        self,
+        gene_data: CanonicalDataStore,
+        transform_to_log: bool = False,
+        prior_count: float = PRIOR_COUNT,
     ) -> "DGEList":
         """Normalize the DGEList to transcripts per million.
 
@@ -448,10 +448,7 @@ class DGEList(object):
 
         return self.copy(counts=counts, current_log=current_log, genes=genes)
 
-    def get_rates(
-            self,
-            gene_data: CanonicalDataStore
-    ) -> "DGEList":
+    def get_rates(self, gene_data: CanonicalDataStore) -> "DGEList":
         """Gets the number of counts per base, otherwise known as the rate, for all genes.
         Currently used for TPM calculations.
 
@@ -517,12 +514,12 @@ class DGEList(object):
 
     @classmethod
     def create_DGEList(
-            cls,
-            sample_list: List[str],
-            data_set: Dict[Hashable, Any],  # {sample: {gene1: x, gene2: y}},
-            gene_list: List[str],
-            sample_to_category: Optional[List[str]] = None,
-            category_to_samples: Optional[Dict[Hashable, List[str]]] = None,
+        cls,
+        sample_list: List[str],
+        data_set: Dict[Hashable, Any],  # {sample: {gene1: x, gene2: y}},
+        gene_list: List[str],
+        sample_to_category: Optional[List[str]] = None,
+        category_to_samples: Optional[Dict[Hashable, List[str]]] = None,
     ) -> "DGEList":
         """ sample list and gene list must be pre-sorted
             Use this to create the DGE object for future work."""
@@ -547,7 +544,7 @@ class DGEList(object):
 
     @classmethod
     def create_DGEList_data_file(
-            cls, data_file: Path, group_file: Path, **kwargs: Mapping
+        cls, data_file: Path, group_file: Path, **kwargs: Mapping
     ) -> "DGEList":
         """Wrapper for creating DGEList objects from file locations.  Performs open and passes
         the file handles to the method for creating a DGEList object.
@@ -566,13 +563,13 @@ class DGEList(object):
 
         """
         with smart_open(data_file, 'r') as data_handle, smart_open(
-                group_file, 'r'
+            group_file, 'r'
         ) as group_handle:
             return cls.create_DGEList_handle(data_handle, group_handle, **kwargs)
 
     @classmethod
     def create_DGEList_handle(
-            cls, data_handle: StringIO, group_handle: StringIO, **kwargs: Mapping
+        cls, data_handle: StringIO, group_handle: StringIO, **kwargs: Mapping
     ) -> "DGEList":
         """Read in a file-like object of delimited data for instantiation.
 

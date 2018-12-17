@@ -18,7 +18,7 @@ TEST_GROUPS = "groups.json"
 @pytest.fixture
 def dge_list():
     with smart_open(get_dataset_path(TEST_DATASET), 'r') as data_handle, smart_open(
-            get_dataset_path(TEST_GROUPS), 'r'
+        get_dataset_path(TEST_GROUPS), 'r'
     ) as group_handle:
         return DGEList.create_DGEList_handle(data_handle, group_handle)
 
