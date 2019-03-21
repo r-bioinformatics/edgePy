@@ -2,14 +2,14 @@ import argparse
 from typing import List, Dict, Hashable, Any
 import configparser
 
-import numpy as np
-from scipy.stats import ks_2samp
+
 from smart_open import smart_open  # type: ignore
 
 
 from edgePy.DGEList import DGEList
 from edgePy.data_import.mongodb.mongo_import import ImportFromMongodb
 from edgePy.util import getLogger
+from edgePy.lib.statistics import ks_2_samples, AVAILABLE_CORRECTION
 
 log = getLogger(name="script")
 
@@ -40,6 +40,9 @@ def parse_arguments(parser=None):
         "--groups_json", help="A JSON file with the group names, and list of samples. see example."
     )
 
+    parser.add_argument("--correct", help=f"use multiple testing correction.  "
+                                          f"Available methods: {', '.join(AVAILABLE_CORRECTION)}",
+                        default=None)
     parser.add_argument("--output", help="optional output file for results")
     parser.add_argument("--cutoff", help="p-value cutoff to accept.", default=0.05)
     parser.add_argument(
@@ -86,7 +89,7 @@ class EdgePy(object):
             )
 
             sample_list, data_set, gene_list, sample_category = mongo_importer.get_data_from_mongo(
-                database=args.database_name
+                database=args.database_name, rpkm_flag=True
             )
 
             if key == 'sample_name':
@@ -122,7 +125,7 @@ class EdgePy(object):
         self.p_value_cutoff = args.cutoff
         self.minimum_cpm = args.minimum_cpm
 
-    def run_ks(self):
+    def run_ks(self, correction_method):
         """
         First pass implementation of a Kolmogorov-Smirnov test for different groups, using the Scipy KS test two-tailed
         implementation.
@@ -134,7 +137,7 @@ class EdgePy(object):
 
         log.info(self.dge_list.groups_list)
 
-        gene_details, gene_likelyhood1, group_types = self.ks_2_samples()
+        gene_details, gene_likelyhood1, group_types = ks_2_samples(self.dge_list, correction_method=correction_method)
 
         results = self.generate_results(
             gene_details, gene_likelyhood1, group_types[0], group_types[1]
@@ -147,39 +150,6 @@ class EdgePy(object):
         else:
             for line in results:
                 log.info(line)
-
-    def ks_2_samples(self):
-        """Run a 2-tailed Kolmogorov-Smirnov test on the DGEList object.
-
-        Args:
-            None.
-
-        Returns:
-            gene_details: a dictionary of dictionary (key, gene), holding mean1 and mean2 for the two groups
-            gene_likelihood: a dictionary (key, gene), holding the p-value of the separation of the two groups
-            group_types: list of the groups in order.
-
-        """
-        gene_likelihood1: Dict[Hashable, float] = {}
-        group_types = set(self.dge_list.groups_list)
-        group_types = list(group_types)
-        group_filters: Dict[Hashable, Any] = {}
-        gene_details: Dict[Hashable, Dict[Hashable, Any]] = {}
-        for group in group_types:
-            group_filters[group] = [g == group for g in self.dge_list.groups_list]
-        for gene_idx, gene in enumerate(self.dge_list.genes):
-            gene_row = self.dge_list.counts[gene_idx]
-            if len(group_types) == 2:
-                group_data1 = gene_row.compress(group_filters[group_types[0]])
-                mean1 = np.mean(group_data1)
-
-                group_data2 = gene_row.compress(group_filters[group_types[1]])
-                mean2 = np.mean(group_data2)
-
-                gene_likelihood1[gene] = ks_2samp(group_data1, group_data2)[1]
-
-                gene_details[gene] = {'mean1': mean1, 'mean2': mean2}
-        return gene_details, gene_likelihood1, group_types
 
     def generate_results(
         self,
