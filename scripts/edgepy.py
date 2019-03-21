@@ -1,17 +1,17 @@
 import argparse
 from typing import List, Dict, Hashable, Any
 import configparser
-
+import logging
 
 from smart_open import smart_open  # type: ignore
 
 
 from edgePy.DGEList import DGEList
 from edgePy.data_import.mongodb.mongo_import import ImportFromMongodb
-from edgePy.util import getLogger
-from edgePy.lib.statistics import ks_2_samples, AVAILABLE_CORRECTION
+from edgePy.util.statistics import ks_2_samples, AVAILABLE_CORRECTION
 
-log = getLogger(name="script")
+
+log = logging.getLogger(name="script")
 
 
 def parse_arguments(parser=None):
@@ -125,7 +125,7 @@ class EdgePy(object):
         self.p_value_cutoff = args.cutoff
         self.minimum_cpm = args.minimum_cpm
 
-    def run_ks(self, correction_method):
+    def run_ks(self, correction_method=None):
         """
         First pass implementation of a Kolmogorov-Smirnov test for different groups, using the Scipy KS test two-tailed
         implementation.
