@@ -1,0 +1,7 @@
+AUTOSOMAL_CHROMOSOMES = {
+    str(x) for x in range(1, 23)
+}  # not inclusive on the right end of the range.
+NON_AUTOSOMAL_CHHROMOSOMES = {"X", "Y", "MT"}
+ALL_STANDARD_CHROMSOMES = AUTOSOMAL_CHROMOSOMES | NON_AUTOSOMAL_CHHROMOSOMES
+
+MAX_EXON_LENGTH = 91666
