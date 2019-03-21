@@ -7,7 +7,7 @@ import pymongo  # type: ignore
 from pymongo.errors import BulkWriteError  # type: ignore
 from pymongo import InsertOne, UpdateOne
 
-from edgePy.util import getLogger
+from logging import getLogger
 
 log = getLogger(name=__name__)
 

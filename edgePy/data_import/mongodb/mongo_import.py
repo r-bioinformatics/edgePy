@@ -6,7 +6,7 @@ from edgePy.data_import.mongodb.gene_functions import get_canonical_rpkm
 from edgePy.data_import.mongodb.gene_functions import get_canonical_raw
 from edgePy.data_import.mongodb.gene_functions import get_genelist_from_file
 from edgePy.data_import.mongodb.gene_functions import translate_genes
-from edgePy.util import getLogger
+from logging import getLogger
 
 log = getLogger(name=__name__)
 

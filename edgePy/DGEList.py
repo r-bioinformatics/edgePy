@@ -8,7 +8,7 @@ from typing import Generator, Iterable, Mapping, Optional, Union, Dict, List, Ha
 import numpy as np  # type: ignore
 from smart_open import smart_open  # type: ignore
 
-from edgePy.util import getLogger
+from logging import getLogger
 from edgePy.data_import.ensembl.ensembl_flat_file_reader import CanonicalDataStore
 
 __all__ = ["DGEList"]
